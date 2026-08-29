@@ -6,6 +6,10 @@ const GROUND_Y: float = 0.0
 @export var loot_radius: float = 150.0
 @export var loot_cooldown: float = 8.0
 
+@onready var cabin: Node2D = get_tree().get_first_node_in_group("cabin_structure")
+var _cat_floor: String = "ground"
+var _cat_climbing: bool = false
+
 var target_player: Node2D = null
 var is_carrying_item: bool = false
 var carried_item_node: Node2D = null
@@ -16,9 +20,11 @@ var pet_happiness: float = 0.0
 func _ready() -> void:
 	add_to_group("companion_cat")
 	position.y = GROUND_Y
+	if cabin == null:
+		cabin = get_node_or_null("../CabinStructure") as Node2D
 
 func _physics_process(_delta: float) -> void:
-	position.y = GROUND_Y
+	position.y = cabin.get_current_floor_y() if (cabin != null and not _cat_climbing) else GROUND_Y
 
 	if target_player == null or not is_instance_valid(target_player):
 		target_player = get_tree().get_first_node_in_group("player")
@@ -57,6 +63,15 @@ func _physics_process(_delta: float) -> void:
 		_seek_x(target_player.global_position.x, 40.0)
 
 func _seek_x(target_x: float, stop_dist: float) -> void:
+	if cabin != null and abs(global_position.x - 252.0) < 16.0:
+		if cabin.current_floor == "mezzanine" and _cat_floor == "ground":
+			cabin.climb_up()
+			_cat_floor = "mezzanine"
+			_start_cat_climb()
+		elif cabin.current_floor == "ground" and _cat_floor == "mezzanine":
+			cabin.climb_down()
+			_cat_floor = "ground"
+			_start_cat_climb()
 	var diff: float = target_x - global_position.x
 	if abs(diff) > stop_dist:
 		velocity = Vector2(sign(diff) * follow_speed, 0.0)
@@ -66,6 +81,15 @@ func _seek_x(target_x: float, stop_dist: float) -> void:
 	if art and velocity.x != 0.0:
 		art.scale.x = -1.0 if velocity.x < 0.0 else 1.0
 	move_and_slide()
+
+func _start_cat_climb() -> void:
+	if cabin == null:
+		return
+	_cat_climbing = true
+	var target_y: float = cabin.get_current_floor_y()
+	var tw := create_tween()
+	tw.tween_property(self, "position:y", target_y, 0.3)
+	tw.tween_callback(func() -> void: _cat_climbing = false)
 
 func _find_nearest_scrap() -> Node2D:
 	var best: Node2D = null

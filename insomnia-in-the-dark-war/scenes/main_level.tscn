@@ -13,6 +13,7 @@
 [ext_resource type="Script" path="res://scripts/warm_fireplace_light.gd" id="11_light"]
 [ext_resource type="PackedScene" path="res://scenes/crafting_ui.tscn" id="12_craft"]
 [ext_resource type="Script" path="res://scripts/art_clouds.gd" id="12_clouds"]
+[ext_resource type="Script" path="res://scripts/cabin_structure.gd" id="14_cabin"]
 
 [node name="MainLevel" type="Node2D" unique_id=129172497]
 script = ExtResource("1_level")
@@ -100,6 +101,25 @@ offset_top = -8.0
 offset_right = 200.0
 offset_bottom = 0.0
 color = Color(0.25, 0.16, 0.13, 1)
+
+[node name="CabinStructure" type="Node2D" parent="." unique_id=129172499]
+script = ExtResource("14_cabin")
+
+[node name="MezzanineWall" type="ColorRect" parent="CabinStructure"]
+z_index = -4
+offset_left = -200.0
+offset_top = -160.0
+offset_right = 200.0
+offset_bottom = -140.0
+color = Color(0.5, 0.38, 0.28, 1)
+
+[node name="MezzanineFloor" type="ColorRect" parent="CabinStructure"]
+z_index = -4
+offset_left = -200.0
+offset_top = -140.0
+offset_right = 200.0
+offset_bottom = -135.0
+color = Color(0.35, 0.25, 0.20, 1)
 
 [node name="CozyRug" type="ColorRect" parent="." unique_id=1708000511]
 z_index = -4
