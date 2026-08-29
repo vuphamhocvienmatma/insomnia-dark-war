@@ -2,12 +2,11 @@ extends Node2D
 
 var holding_part_type: String = "Wall"
 var active_socket: BuildSocket2D = null
-var ghost_preview: Sprite2D = null
+var ghost_preview: Node2D = null
 
 func _ready() -> void:
-	ghost_preview = Sprite2D.new()
-	ghost_preview.texture = load("res://icon.svg")
-	ghost_preview.scale = Vector2(0.25, 0.5)
+	ghost_preview = Node2D.new()
+	ghost_preview.set_script(preload("res://scripts/art_wall.gd"))
 	ghost_preview.modulate = Color(1, 1, 1, 0.4)
 	add_child(ghost_preview)
 

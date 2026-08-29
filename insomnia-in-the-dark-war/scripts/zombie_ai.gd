@@ -31,33 +31,66 @@ func _ready() -> void:
 func _physics_process(_delta: float) -> void:
 	position.y = GROUND_Y
 
+	if state == "leave":
+		_do_leave()
+		return
+
 	if is_attacking:
 		return
 
-	var dir: float = 0.0
+	if state == "at_gap":
+		velocity = Vector2.ZERO
+		move_and_slide()
+		return
+
 	var art := get_node_or_null("Art") as Node2D
 
-	if state == "approach":
-		dir = -sign(global_position.x)
+	if abs(global_position.x) > 232.0:
+		var dir: float = -sign(global_position.x)
 		velocity = Vector2(dir * speed, 0.0)
 		if art != null:
 			art.scale.x = -1.0 if global_position.x > 0.0 else 1.0
 		move_and_slide()
-		if abs(global_position.x) < 40.0 and not has_looted:
-			has_looted = true
-			if GameState.spend_scrap(1):
-				print("Zombie lục lọi! Mất 1 phế liệu.")
-			else:
-				print("Zombie lục lội nhưng bạn sạch túi... chúng chán nản bỏ đi.")
-			state = "leave"
-	elif state == "leave":
-		dir = sign(spawn_position.x - global_position.x)
-		velocity = Vector2(dir * speed, 0.0)
-		if art != null:
-			art.scale.x = -1.0 if (spawn_position.x - global_position.x) < 0.0 else 1.0
-		move_and_slide()
-		if abs(global_position.x - spawn_position.x) < 35.0:
-			queue_free()
+	else:
+		var side: float = sign(global_position.x)
+		var has_gap := false
+		for socket in get_tree().get_nodes_in_group("critical_socket"):
+			if socket is BuildSocket2D and not socket.is_occupied:
+				if sign(socket.global_position.x) == side:
+					has_gap = true
+					break
+
+		if has_gap:
+			state = "at_gap"
+			velocity = Vector2.ZERO
+			move_and_slide()
+		elif abs(global_position.x) < 200.0 and not _has_wall_in_front():
+			if not has_looted:
+				has_looted = true
+				if GameState.spend_scrap(1):
+					print("Zombie lục lọi! Mất 1 phế liệu.")
+				else:
+					print("Zombie lục lội nhưng bạn sạch túi... chúng chán nản bỏ đi.")
+				state = "leave"
+		else:
+			velocity = Vector2.ZERO
+			move_and_slide()
+
+func _has_wall_in_front() -> bool:
+	for body in attack_area.get_overlapping_bodies():
+		if body.is_in_group("defensive_wall"):
+			return true
+	return false
+
+func _do_leave() -> void:
+	var art := get_node_or_null("Art") as Node2D
+	var dir: float = sign(spawn_position.x)
+	velocity = Vector2(dir * speed, 0.0)
+	if art != null:
+		art.scale.x = -1.0 if dir < 0.0 else 1.0
+	move_and_slide()
+	if abs(global_position.x - spawn_position.x) < 35.0:
+		queue_free()
 
 func _on_attack_area_body_entered(body: Node2D) -> void:
 	if body.is_in_group("defensive_wall"):

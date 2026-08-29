@@ -23,6 +23,18 @@
         # Code xử lý...
     ```
 
+*   **CẢNH BÁO sign():** Hàm `sign()` trong Godot 4 trả về `int`, không phải `float`. Khi dùng `var x := sign(...)` sẽ lỗi type inference. **Bắt buộc khai báo rõ kiểu:**
+    ```gdscript
+    # SAI — lỗi Cannot infer the type:
+    var dir := sign(global_position.x)
+    var side := -sign(global_position.x)
+    
+    # ĐÚNG:
+    var dir: float = sign(global_position.x)
+    var side: float = -sign(global_position.x)
+    ```
+    Tương tự cho mọi hàm trả `int`: `absi()`, `snappedi()`, `floori()`, `ceili()`, `roundi()`. Luôn dùng `var x: float = ...` khi cần float.
+
 ---
 
 ### 3. Không tự tiện thêm Addons hay Dependency bên ngoài

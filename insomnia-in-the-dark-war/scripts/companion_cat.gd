@@ -57,7 +57,7 @@ func _physics_process(_delta: float) -> void:
 		_seek_x(target_player.global_position.x, 40.0)
 
 func _seek_x(target_x: float, stop_dist: float) -> void:
-	var diff := target_x - global_position.x
+	var diff: float = target_x - global_position.x
 	if abs(diff) > stop_dist:
 		velocity = Vector2(sign(diff) * follow_speed, 0.0)
 	else:
@@ -83,10 +83,9 @@ func _deliver_item() -> void:
 	if carried_item_node == null or not is_instance_valid(carried_item_node):
 		is_carrying_item = false
 		return
-		
-	# Lấy item_type an toàn (chỉ truyền 1 tham số vào hàm get)
+
 	var item_type: String = str(carried_item_node.get("item_type")) if "item_type" in carried_item_node else "scrap"
-	
+
 	match item_type:
 		"scrap":
 			GameState.add_scrap(1)
@@ -95,7 +94,7 @@ func _deliver_item() -> void:
 			JournalManager.track_progress("seed")
 		"water":
 			GameState.add_water(1)
-	
+
 	print("Mèo mang về 1 ", item_type, "!")
 	carried_item_node.queue_free()
 	carried_item_node = null
@@ -107,7 +106,7 @@ func _unhandled_input(event: InputEvent) -> void:
 			is_being_pet = true
 			pet_happiness = min(pet_happiness + 10.0, 100.0)
 			print("Vuốt ve mèo... purrr... Mood: ", pet_happiness)
-			modulate = Color("ffcc80")
+			modulate = Color(1.0, 0.8, 0.5, 1.0)
 			_finish_pet_after_delay()
 
 func _finish_pet_after_delay() -> void:

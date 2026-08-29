@@ -21,7 +21,7 @@ offset_left = -1250.0
 offset_top = -1200.0
 offset_right = 1250.0
 offset_bottom = 0.0
-color = Color(0.33, 0.45, 0.65, 1)
+color = Color(0.45, 0.70, 0.95, 1)
 
 [node name="GroundStrip" type="ColorRect" parent="." unique_id=989305600]
 z_index = -9
@@ -29,7 +29,7 @@ offset_left = -1250.0
 offset_top = 0.0
 offset_right = 1250.0
 offset_bottom = 300.0
-color = Color(0.42, 0.40, 0.36, 1)
+color = Color(0.50, 0.42, 0.32, 1)
 
 [node name="CabinInterior" type="ColorRect" parent="." unique_id=1634149016]
 z_index = -5
