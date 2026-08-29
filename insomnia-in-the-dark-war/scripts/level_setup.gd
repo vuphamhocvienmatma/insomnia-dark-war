@@ -14,6 +14,7 @@ const GROUND_Y: float = 0.0
 
 var _spawned_zombies: Array[Node2D] = []
 var _night_sky: Node2D = null
+var day_count: int = 1
 
 func _ready() -> void:
 	var skyline := Node2D.new()
@@ -114,6 +115,8 @@ func _create_night_sky() -> void:
 	add_child(_night_sky)
 
 func _on_phase_changed(is_night: bool) -> void:
+	if not is_night:
+		day_count += 1
 	if _night_sky != null:
 		_night_sky.visible = is_night
 
@@ -126,12 +129,14 @@ func _on_phase_changed(is_night: bool) -> void:
 		_spawned_zombies.clear()
 
 func _respawn_zombie_wave() -> void:
-	var wave_size: int = 10 + int(GameState.scrap_count / 5.0)
+	var speed_multiplier: float = 1.0 + (float(day_count) * 0.05) if day_count <= 10 else 1.5
+	var wave_size: int = 10 + int(GameState.scrap_count / 5.0) + (day_count * 2)
 	for i in wave_size:
 		var side: float = -1.0 if (i % 2 == 0) else 1.0
 		var x: float = side * 1200.0
 		var pos := Vector2(x, GROUND_Y)
 		var zombie := ZOMBIE_SCENE.instantiate() as Node2D
 		zombie.position = pos
+		zombie.set("speed", 30.0 * speed_multiplier)
 		add_child(zombie)
 		_spawned_zombies.append(zombie)

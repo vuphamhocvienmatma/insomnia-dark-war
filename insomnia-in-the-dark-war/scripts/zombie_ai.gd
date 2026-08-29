@@ -118,6 +118,28 @@ func take_damage(amount: float) -> void:
 	current_health -= amount
 	print("Zombie chịu ", amount, " sát thương! Còn lại: ", current_health)
 	if current_health <= 0.0:
+		_spawn_death_fx()
 		print("Zombie gục ngã và tan biến...")
 		JournalManager.track_progress("zombie_kill")
 		queue_free()
+
+
+func _spawn_death_fx() -> void:
+	var particles := GPUParticles2D.new()
+	var parent := get_parent()
+	if parent != null:
+		parent.add_child(particles)
+	else:
+		add_child(particles)
+	particles.global_position = global_position
+	particles.amount = 15
+	particles.lifetime = 0.5
+	particles.one_shot = true
+	var mat := ParticleProcessMaterial.new()
+	mat.color = Color(0.5, 0.7, 0.5)
+	mat.gravity = Vector3(0.0, 100.0, 0.0)
+	mat.scale_min = 0.0
+	mat.scale_max = 0.3
+	particles.process_material = mat
+	particles.emitting = true
+	get_tree().create_timer(0.6).timeout.connect(particles.queue_free)

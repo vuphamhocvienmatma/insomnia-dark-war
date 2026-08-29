@@ -22,12 +22,20 @@ func _ready() -> void:
 
 func _on_scrap_changed(new_amount: int) -> void:
 	label.text = "Phế liệu: " + str(new_amount)
+	_pulse_label(label)
 
 func _on_seeds_changed(new_amount: int) -> void:
 	seeds_label.text = "Hạt giống: " + str(new_amount)
+	_pulse_label(seeds_label)
 
 func _on_water_changed(new_amount: int) -> void:
 	water_label.text = "Nước: " + str(new_amount)
+	_pulse_label(water_label)
+
+func _pulse_label(lbl: Label) -> void:
+	var tw := create_tween()
+	tw.tween_property(lbl, "scale", Vector2(1.2, 1.2), 0.1)
+	tw.tween_property(lbl, "scale", Vector2.ONE, 0.1)
 
 func _on_tired_changed(is_tired: bool) -> void:
 	tired_label.visible = is_tired

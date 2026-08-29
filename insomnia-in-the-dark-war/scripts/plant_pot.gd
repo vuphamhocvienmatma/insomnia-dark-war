@@ -6,6 +6,7 @@ enum PotState { EMPTY, PLANTED, BLOOMED }
 
 var current_state: PotState = PotState.EMPTY
 var growth_timer: float = 0.0
+var growth_progress: float = 0.0
 
 @onready var art_node: Node2D = $Art
 
@@ -16,10 +17,17 @@ func _ready() -> void:
 func _process(delta: float) -> void:
 	if current_state == PotState.PLANTED:
 		growth_timer += delta
+		growth_progress = growth_timer / growth_time
+		art_node.queue_redraw()
 		if growth_timer >= growth_time:
 			current_state = PotState.BLOOMED
+			growth_progress = 1.0
 			art_node.set_state("bloomed")
 			print("Cây đã nở hoa! Đến thu hoạch thôi.")
+	elif current_state == PotState.EMPTY:
+		growth_progress = 0.0
+	elif current_state == PotState.BLOOMED:
+		growth_progress = 1.0
 
 func plant_seed() -> bool:
 	if current_state != PotState.EMPTY:

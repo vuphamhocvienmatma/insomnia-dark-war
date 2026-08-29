@@ -3,6 +3,7 @@ extends Node
 var daily_tasks: Array[Dictionary] = []
 
 signal tasks_updated
+signal task_completed(task_desc: String)
 
 func _ready() -> void:
 	generate_daily_tasks()
@@ -35,7 +36,10 @@ func track_progress(task_type: String) -> void:
 	for task in daily_tasks:
 		if task["type"] == task_type and task["progress"] < task["target"]:
 			task["progress"] += 1
-			if task["progress"] == task["target"]:
-				print("Hoàn thành nhiệm vụ: ", task["desc"])
-			break
+		if task["progress"] == task["target"]:
+			task_completed.emit(task["desc"])
+			GameState.add_scrap(5)
+			GameState.add_seeds(2)
+			print("🎉 Hoàn thành nhiệm vụ: ", task["desc"], "! Thưởng 5 phế liệu + 2 hạt giống.")
+		break
 	tasks_updated.emit()
