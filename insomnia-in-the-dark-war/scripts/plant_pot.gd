@@ -7,17 +7,18 @@ enum PotState { EMPTY, PLANTED, BLOOMED }
 var current_state: PotState = PotState.EMPTY
 var growth_timer: float = 0.0
 
-@onready var sprite_2d: Sprite2D = $Sprite2D
+@onready var art_node: Node2D = $Art
 
 func _ready() -> void:
 	add_to_group("plant_pot")
+	art_node.set_state("empty")
 
 func _process(delta: float) -> void:
 	if current_state == PotState.PLANTED:
 		growth_timer += delta
 		if growth_timer >= growth_time:
 			current_state = PotState.BLOOMED
-			sprite_2d.modulate = Color("7fff7f")
+			art_node.set_state("bloomed")
 			print("Cây đã nở hoa! Đến thu hoạch thôi.")
 
 func plant_seed() -> bool:
@@ -28,7 +29,7 @@ func plant_seed() -> bool:
 		return false
 	current_state = PotState.PLANTED
 	growth_timer = 0.0
-	sprite_2d.modulate = Color("c8a165")
+	art_node.set_state("planted")
 	print("Đã trồng hạt giống, chờ nở...")
 	return true
 
@@ -38,7 +39,7 @@ func harvest() -> bool:
 	var reward: int = 2 + GameState.plant_harvest_bonus
 	GameState.add_scrap(reward)
 	current_state = PotState.EMPTY
-	sprite_2d.modulate = Color.WHITE
+	art_node.set_state("empty")
 	print("Thu hoạch hoa, nhận ", reward, " phế liệu! Thật chill...")
 	return true
 

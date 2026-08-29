@@ -1,6 +1,7 @@
 extends Node2D
 
 const SOCKET_SCRIPT := preload("res://scripts/build_socket_2d.gd")
+const SOCKET_ART := preload("res://scripts/art_socket.gd")
 const TURRET_SCENE := preload("res://scenes/auto_turret.tscn")
 const SCRAP_SCENE := preload("res://scenes/scrap_item.tscn")
 const ZOMBIE_SCENE := preload("res://scenes/zombie.tscn")
@@ -41,11 +42,9 @@ func _spawn_wall_columns() -> void:
 			shape.shape = circle
 			socket.add_child(shape)
 
-			var sprite := Sprite2D.new()
-			sprite.texture = load("res://icon.svg")
-			sprite.scale = Vector2(0.25, 0.25)
-			sprite.modulate = Color(0.3, 0.8, 1.0, 0.9)
-			socket.add_child(sprite)
+			var art_node := Node2D.new()
+			art_node.set_script(SOCKET_ART)
+			socket.add_child(art_node)
 
 func _spawn_turrets() -> void:
 	var positions := [Vector2(-140.0, -250.0), Vector2(140.0, -250.0)]
@@ -56,7 +55,6 @@ func _spawn_turrets() -> void:
 		var collider := turret.get_node_or_null("CollisionShape2D") as CollisionShape2D
 		if collider != null and collider.shape is CircleShape2D:
 			(collider.shape as CircleShape2D).radius = 300.0
-		_boost_sprite(turret)
 
 func _spawn_scrap_field() -> void:
 	var scrap_count: int = 40
@@ -72,7 +70,6 @@ func _spawn_scrap_field() -> void:
 		scrap.position = pos
 		scrap.set("item_type", types[randi() % types.size()])
 		add_child(scrap)
-		_boost_sprite(scrap)
 
 	var relic_count: int = 3
 	var relic_types := ["buff_turret", "buff_plant", "buff_solar"]
@@ -83,12 +80,11 @@ func _spawn_scrap_field() -> void:
 		relic.position = pos
 		relic.set("relic_type", relic_types[randi() % relic_types.size()])
 		add_child(relic)
-		_boost_sprite(relic)
 
 func _spawn_sky_details() -> void:
 	var moon := ColorRect.new()
 	moon.size = Vector2(48.0, 48.0)
-	moon.position = Vector2(-700.0, -520.0)
+	moon.position = Vector2(-600.0, -260.0)
 	moon.color = Color(0.91, 0.91, 0.94, 1.0)
 	moon.z_index = -9
 	add_child(moon)
@@ -96,7 +92,7 @@ func _spawn_sky_details() -> void:
 	for i in 10:
 		var star := ColorRect.new()
 		star.size = Vector2(4.0, 4.0)
-		star.position = Vector2(randf_range(-1100.0, 1100.0), randf_range(-650.0, -300.0))
+		star.position = Vector2(randf_range(-1100.0, 1100.0), randf_range(-300.0, -120.0))
 		star.color = Color(1.0, 1.0, 1.0, 0.7)
 		star.z_index = -9
 		add_child(star)
@@ -133,8 +129,3 @@ func _respawn_zombie_wave() -> void:
 		zombie.position = pos
 		add_child(zombie)
 		_spawned_zombies.append(zombie)
-
-func _boost_sprite(node: Node2D) -> void:
-	var sprite := node.get_node_or_null("Sprite2D") as Sprite2D
-	if sprite != null and sprite.scale.x < 0.2:
-		sprite.scale = Vector2(0.5, 0.5)

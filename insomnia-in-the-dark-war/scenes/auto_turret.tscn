@@ -1,7 +1,7 @@
 [gd_scene load_steps=3 format=3]
 
 [ext_resource type="Script" path="res://scripts/auto_turret.gd" id="1_turret"]
-[ext_resource type="Texture2D" path="res://icon.svg" id="2_icon"]
+[ext_resource type="Script" path="res://scripts/art_turret.gd" id="2_art"]
 
 [sub_resource type="CircleShape2D" id="3_circle"]
 radius = 150.0
@@ -12,9 +12,8 @@ script = ExtResource("1_turret")
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
 shape = SubResource("3_circle")
 
-[node name="Sprite2D" type="Sprite2D" parent="."]
-texture = ExtResource("2_icon")
-scale = Vector2(0.4, 0.4)
+[node name="Art" type="Node2D" parent="."]
+script = ExtResource("2_art")
 
 [node name="FireRateTimer" type="Timer" parent="."]
 wait_time = 1.0

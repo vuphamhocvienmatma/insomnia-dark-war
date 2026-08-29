@@ -117,6 +117,9 @@ func load_game() -> bool:
 		var loaded_tasks: Array = save_data.get("daily_tasks", [])
 		JournalManager.daily_tasks.clear()
 		for task_data in loaded_tasks:
+			if task_data is Dictionary:
+				task_data["progress"] = int(task_data.get("progress", 0))
+				task_data["target"] = int(task_data.get("target", 0))
 			JournalManager.daily_tasks.append(task_data)
 		JournalManager.tasks_updated.emit()
 

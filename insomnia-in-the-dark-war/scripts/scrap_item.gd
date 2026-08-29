@@ -8,13 +8,7 @@ func _ready() -> void:
 	add_to_group("scrap")
 	body_entered.connect(_on_body_entered)
 	body_exited.connect(_on_body_exited)
-	match item_type:
-		"scrap":
-			$Sprite2D.modulate = Color(0.7, 0.7, 0.7, 1)
-		"seed":
-			$Sprite2D.modulate = Color(0.4, 0.9, 0.4, 1)
-		"water":
-			$Sprite2D.modulate = Color(0.4, 0.6, 1.0, 1)
+	$Art.set_type(item_type)
 
 func _on_body_entered(body: Node2D) -> void:
 	if body.is_in_group("player"):

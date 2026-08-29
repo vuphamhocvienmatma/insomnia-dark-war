@@ -23,9 +23,9 @@ func _physics_process(_delta: float) -> void:
 	var effective_speed: float = speed * (0.85 if (GameState and GameState.is_tired) else 1.0)
 	velocity = Vector2(direction.x * effective_speed, 0.0)
 
-	var sprite := get_node_or_null("Sprite2D") as Sprite2D
-	if sprite and direction.x != 0.0:
-		sprite.flip_h = direction.x < 0.0
+	var art := get_node_or_null("Art") as Node2D
+	if art and direction.x != 0.0:
+		art.scale.x = -1.0 if direction.x < 0.0 else 1.0
 
 	move_and_slide()
 	position.y = GROUND_Y

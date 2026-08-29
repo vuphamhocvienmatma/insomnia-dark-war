@@ -62,9 +62,9 @@ func _seek_x(target_x: float, stop_dist: float) -> void:
 		velocity = Vector2(sign(diff) * follow_speed, 0.0)
 	else:
 		velocity = Vector2.ZERO
-	var sprite := get_node_or_null("Sprite2D") as Sprite2D
-	if sprite and velocity.x != 0.0:
-		sprite.flip_h = velocity.x < 0.0
+	var art := get_node_or_null("Art") as Node2D
+	if art and velocity.x != 0.0:
+		art.scale.x = -1.0 if velocity.x < 0.0 else 1.0
 	move_and_slide()
 
 func _find_nearest_scrap() -> Node2D:

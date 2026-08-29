@@ -35,13 +35,13 @@ func _physics_process(_delta: float) -> void:
 		return
 
 	var dir: float = 0.0
-	var sprite := get_node_or_null("Sprite2D") as Sprite2D
+	var art := get_node_or_null("Art") as Node2D
 
 	if state == "approach":
 		dir = -sign(global_position.x)
 		velocity = Vector2(dir * speed, 0.0)
-		if sprite != null:
-			sprite.flip_h = global_position.x > 0.0
+		if art != null:
+			art.scale.x = -1.0 if global_position.x > 0.0 else 1.0
 		move_and_slide()
 		if abs(global_position.x) < 40.0 and not has_looted:
 			has_looted = true
@@ -53,8 +53,8 @@ func _physics_process(_delta: float) -> void:
 	elif state == "leave":
 		dir = sign(spawn_position.x - global_position.x)
 		velocity = Vector2(dir * speed, 0.0)
-		if sprite != null:
-			sprite.flip_h = (spawn_position.x - global_position.x) < 0.0
+		if art != null:
+			art.scale.x = -1.0 if (spawn_position.x - global_position.x) < 0.0 else 1.0
 		move_and_slide()
 		if abs(global_position.x - spawn_position.x) < 35.0:
 			queue_free()

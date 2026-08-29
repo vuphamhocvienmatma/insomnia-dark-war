@@ -42,6 +42,6 @@ func _update_tasks() -> void:
 		if i < tasks.size():
 			var task: Dictionary = tasks[i]
 			var mark := "x" if task["progress"] >= task["target"] else " "
-			labels[i].text = "[" + mark + "] " + str(task["desc"]) + " (" + str(task["progress"]) + "/" + str(task["target"]) + ")"
+			labels[i].text = "[" + mark + "] " + str(task["desc"]) + " (" + str(int(task["progress"])) + "/" + str(int(task["target"])) + ")"
 		else:
 			labels[i].text = ""
