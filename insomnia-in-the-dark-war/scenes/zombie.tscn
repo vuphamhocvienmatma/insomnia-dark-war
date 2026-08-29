@@ -1,0 +1,37 @@
+[gd_scene load_steps=5 format=3]
+
+[ext_resource type="Script" path="res://scripts/zombie_ai.gd" id="1_zombie"]
+[ext_resource type="Texture2D" path="res://icon.svg" id="2_icon"]
+
+[sub_resource type="CircleShape2D" id="3_body"]
+radius = 16.0
+
+[sub_resource type="CircleShape2D" id="4_attack"]
+radius = 30.0
+
+[node name="Zombie" type="CharacterBody2D"]
+script = ExtResource("1_zombie")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+shape = SubResource("3_body")
+
+[node name="Sprite2D" type="Sprite2D" parent="."]
+texture = ExtResource("2_icon")
+modulate = Color(0.4, 0.1, 0.5, 1)
+scale = Vector2(0.25, 0.25)
+
+[node name="NavigationAgent2D" type="NavigationAgent2D" parent="."]
+path_desired_distance = 10.0
+target_desired_distance = 15.0
+
+[node name="AttackArea" type="Area2D" parent="."]
+collision_layer = 0
+collision_mask = 1
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="AttackArea"]
+shape = SubResource("4_attack")
+
+[node name="AttackTimer" type="Timer" parent="."]
+one_shot = false
+wait_time = 1.5
+autostart = false

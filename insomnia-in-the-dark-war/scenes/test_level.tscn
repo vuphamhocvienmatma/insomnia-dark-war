@@ -1,0 +1,257 @@
+[gd_scene load_steps=14 format=3]
+
+[ext_resource type="PackedScene" path="res://scenes/player.tscn" id="1_player"]
+[ext_resource type="Texture2D" path="res://icon.svg" id="2_icon"]
+[ext_resource type="PackedScene" path="res://scenes/scrap_item.tscn" id="3_scrap"]
+[ext_resource type="PackedScene" path="res://scenes/hud.tscn" id="4_hud"]
+[ext_resource type="Script" path="res://scripts/build_socket_2d.gd" id="5_socket"]
+[ext_resource type="Script" path="res://scripts/building_manager.gd" id="6_bm"]
+[ext_resource type="PackedScene" path="res://scenes/zombie.tscn" id="7_zombie"]
+[ext_resource type="PackedScene" path="res://scenes/stove.tscn" id="8_stove"]
+[ext_resource type="Script" path="res://scripts/time_manager.gd" id="9_time"]
+[ext_resource type="Script" path="res://scripts/warm_fireplace_light.gd" id="10_fire"]
+[ext_resource type="Script" path="res://scripts/lofi_audio_manager.gd" id="11_audio"]
+[ext_resource type="PackedScene" path="res://scenes/plant_pot.tscn" id="12_pot"]
+[ext_resource type="PackedScene" path="res://scenes/auto_turret.tscn" id="13_turret"]
+[ext_resource type="Script" path="res://scripts/integrity_tracker.gd" id="14_integrity"]
+
+[sub_resource type="RectangleShape2D" id="15_rect"]
+size = Vector2(64, 64)
+
+[sub_resource type="RectangleShape2D" id="16_rect_b"]
+size = Vector2(96, 48)
+
+[sub_resource type="RectangleShape2D" id="17_rect_c"]
+size = Vector2(48, 96)
+
+[sub_resource type="RectangleShape2D" id="18_rect_d"]
+size = Vector2(80, 80)
+
+[sub_resource type="CircleShape2D" id="19_socket_circle"]
+radius = 24.0
+
+[node name="TestLevel" type="Node2D"]
+
+[node name="Player" parent="." instance=ExtResource("1_player")]
+position = Vector2(400, 300)
+
+[node name="Obstacle1" type="StaticBody2D" parent="."]
+position = Vector2(200, 300)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Obstacle1"]
+shape = SubResource("15_rect")
+
+[node name="Sprite2D" type="Sprite2D" parent="Obstacle1"]
+texture = ExtResource("2_icon")
+modulate = Color(0.9, 0.4, 0.4, 1)
+scale = Vector2(0.5, 0.5)
+
+[node name="Obstacle2" type="StaticBody2D" parent="."]
+position = Vector2(600, 300)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Obstacle2"]
+shape = SubResource("16_rect_b")
+
+[node name="Sprite2D" type="Sprite2D" parent="Obstacle2"]
+texture = ExtResource("2_icon")
+modulate = Color(0.4, 0.9, 0.4, 1)
+scale = Vector2(0.75, 0.375)
+
+[node name="Obstacle3" type="StaticBody2D" parent="."]
+position = Vector2(400, 150)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Obstacle3"]
+shape = SubResource("17_rect_c")
+
+[node name="Sprite2D" type="Sprite2D" parent="Obstacle3"]
+texture = ExtResource("2_icon")
+modulate = Color(0.4, 0.4, 0.9, 1)
+scale = Vector2(0.375, 0.75)
+
+[node name="Obstacle4" type="StaticBody2D" parent="."]
+position = Vector2(400, 450)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Obstacle4"]
+shape = SubResource("18_rect_d")
+
+[node name="Sprite2D" type="Sprite2D" parent="Obstacle4"]
+texture = ExtResource("2_icon")
+modulate = Color(0.9, 0.9, 0.4, 1)
+scale = Vector2(0.625, 0.625)
+
+[node name="Scrap1" parent="." instance=ExtResource("3_scrap")]
+position = Vector2(300, 200)
+
+[node name="Scrap2" parent="." instance=ExtResource("3_scrap")]
+position = Vector2(500, 200)
+
+[node name="Scrap3" parent="." instance=ExtResource("3_scrap")]
+position = Vector2(300, 400)
+
+[node name="Scrap4" parent="." instance=ExtResource("3_scrap")]
+position = Vector2(500, 400)
+
+[node name="Scrap5" parent="." instance=ExtResource("3_scrap")]
+position = Vector2(250, 300)
+
+[node name="Scrap6" parent="." instance=ExtResource("3_scrap")]
+position = Vector2(550, 300)
+
+[node name="Seed1" parent="." instance=ExtResource("3_scrap")]
+position = Vector2(180, 200)
+item_type = "seed"
+
+[node name="Seed2" parent="." instance=ExtResource("3_scrap")]
+position = Vector2(620, 200)
+item_type = "seed"
+
+[node name="Seed3" parent="." instance=ExtResource("3_scrap")]
+position = Vector2(180, 420)
+item_type = "seed"
+
+[node name="Water1" parent="." instance=ExtResource("3_scrap")]
+position = Vector2(620, 420)
+item_type = "water"
+
+[node name="Water2" parent="." instance=ExtResource("3_scrap")]
+position = Vector2(300, 100)
+item_type = "water"
+
+[node name="Water3" parent="." instance=ExtResource("3_scrap")]
+position = Vector2(500, 100)
+item_type = "water"
+
+[node name="PlantPot1" parent="." instance=ExtResource("12_pot")]
+position = Vector2(300, 400)
+
+[node name="PlantPot2" parent="." instance=ExtResource("12_pot")]
+position = Vector2(360, 440)
+
+[node name="PlantPot3" parent="." instance=ExtResource("12_pot")]
+position = Vector2(420, 400)
+
+[node name="AutoTurret" parent="." instance=ExtResource("13_turret")]
+position = Vector2(450, 300)
+
+[node name="Zombie" parent="." instance=ExtResource("7_zombie")]
+position = Vector2(100, 100)
+
+[node name="Zombie2" parent="." instance=ExtResource("7_zombie")]
+position = Vector2(300, 300)
+
+[node name="Zombie3" parent="." instance=ExtResource("7_zombie")]
+position = Vector2(600, 300)
+
+[node name="Zombie4" parent="." instance=ExtResource("7_zombie")]
+position = Vector2(450, 150)
+
+[node name="Zombie5" parent="." instance=ExtResource("7_zombie")]
+position = Vector2(450, 450)
+
+[node name="BuildSocket1" type="Area2D" parent="."]
+script = ExtResource("5_socket")
+groups = ["critical_socket"]
+position = Vector2(700, 150)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="BuildSocket1"]
+shape = SubResource("19_socket_circle")
+
+[node name="Sprite2D" type="Sprite2D" parent="BuildSocket1"]
+texture = ExtResource("2_icon")
+modulate = Color(0.6, 0.9, 1.0, 0.6)
+scale = Vector2(0.2, 0.2)
+
+[node name="BuildSocket2" type="Area2D" parent="."]
+script = ExtResource("5_socket")
+groups = ["critical_socket"]
+position = Vector2(700, 230)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="BuildSocket2"]
+shape = SubResource("19_socket_circle")
+
+[node name="Sprite2D" type="Sprite2D" parent="BuildSocket2"]
+texture = ExtResource("2_icon")
+modulate = Color(0.6, 0.9, 1.0, 0.6)
+scale = Vector2(0.2, 0.2)
+
+[node name="BuildSocket3" type="Area2D" parent="."]
+script = ExtResource("5_socket")
+groups = ["critical_socket"]
+position = Vector2(700, 310)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="BuildSocket3"]
+shape = SubResource("19_socket_circle")
+
+[node name="Sprite2D" type="Sprite2D" parent="BuildSocket3"]
+texture = ExtResource("2_icon")
+modulate = Color(0.6, 0.9, 1.0, 0.6)
+scale = Vector2(0.2, 0.2)
+
+[node name="BuildSocket4" type="Area2D" parent="."]
+script = ExtResource("5_socket")
+groups = ["critical_socket"]
+position = Vector2(700, 390)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="BuildSocket4"]
+shape = SubResource("19_socket_circle")
+
+[node name="Sprite2D" type="Sprite2D" parent="BuildSocket4"]
+texture = ExtResource("2_icon")
+modulate = Color(0.6, 0.9, 1.0, 0.6)
+scale = Vector2(0.2, 0.2)
+
+[node name="BuildSocket5" type="Area2D" parent="."]
+script = ExtResource("5_socket")
+groups = ["critical_socket"]
+position = Vector2(700, 470)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="BuildSocket5"]
+shape = SubResource("19_socket_circle")
+
+[node name="Sprite2D" type="Sprite2D" parent="BuildSocket5"]
+texture = ExtResource("2_icon")
+modulate = Color(0.6, 0.9, 1.0, 0.6)
+scale = Vector2(0.2, 0.2)
+
+[node name="BuildingManager" type="Node2D" parent="."]
+script = ExtResource("6_bm")
+
+[node name="HUD" parent="." instance=ExtResource("4_hud")]
+
+[node name="NavigationRegion2D" type="NavigationRegion2D" parent="."]
+
+[node name="FortCenter" type="Marker2D" parent="."]
+position = Vector2(400, 300)
+groups = ["fort_center"]
+
+[node name="Zombie_far" parent="." instance=ExtResource("7_zombie")]
+position = Vector2(700, 600)
+
+[node name="EnvironmentLight" type="CanvasModulate" parent="."]
+color = Color(1, 1, 1, 1)
+
+[node name="TimeManager" type="Node" parent="."]
+script = ExtResource("9_time")
+environmental_light = NodePath("../EnvironmentLight")
+
+[node name="Stove" parent="." instance=ExtResource("8_stove")]
+position = Vector2(360, 360)
+
+[node name="StoveLight" type="PointLight2D" parent="."]
+script = ExtResource("10_fire")
+position = Vector2(360, 360)
+color = Color("ff9900")
+energy = 0.8
+base_energy = 0.8
+shadow_enabled = true
+
+[node name="IntegrityTracker" type="Node" parent="."]
+script = ExtResource("14_integrity")
+
+[node name="AudioManager" type="Node" parent="."]
+script = ExtResource("11_audio")
+time_manager = NodePath("../TimeManager")
+
+[node name="DayLofiPlayer" type="AudioStreamPlayer" parent="AudioManager"]
+
+[node name="NightAmbientPlayer" type="AudioStreamPlayer" parent="AudioManager"]

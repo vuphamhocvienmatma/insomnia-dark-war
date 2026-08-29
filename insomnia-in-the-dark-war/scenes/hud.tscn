@@ -1,0 +1,22 @@
+[gd_scene load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/hud.gd" id="1_hud"]
+
+[node name="HUD" type="CanvasLayer"]
+
+[node name="Label" type="Label" parent="."]
+text = "Phế liệu: 0"
+position = Vector2(16, 16)
+
+[node name="SeedsLabel" type="Label" parent="."]
+text = "Hạt giống: 0"
+position = Vector2(16, 40)
+
+[node name="WaterLabel" type="Label" parent="."]
+text = "Nước: 0"
+position = Vector2(16, 64)
+
+[node name="TiredLabel" type="Label" parent="."]
+text = "😴 Mất ngủ - bước chân nặng trĩu"
+position = Vector2(16, 88)
+visible = false

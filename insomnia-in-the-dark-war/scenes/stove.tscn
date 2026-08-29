@@ -1,0 +1,25 @@
+[gd_scene load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://scripts/interactive_stove.gd" id="1_stove"]
+[ext_resource type="Texture2D" path="res://icon.svg" id="2_icon"]
+
+[sub_resource type="RectangleShape2D" id="3_rect"]
+size = Vector2(48, 48)
+
+[node name="Stove" type="Area2D"]
+script = ExtResource("1_stove")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+shape = SubResource("3_rect")
+
+[node name="Sprite2D" type="Sprite2D" parent="."]
+texture = ExtResource("2_icon")
+scale = Vector2(0.4, 0.4)
+
+[node name="SteamParticles" type="GPUParticles2D" parent="."]
+emitting = false
+
+[node name="CookingTimer" type="Timer" parent="."]
+one_shot = true
+wait_time = 5.0
+autostart = false
