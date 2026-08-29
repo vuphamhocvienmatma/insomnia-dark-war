@@ -1,5 +1,7 @@
 extends CharacterBody2D
 
+const GROUND_Y: float = 0.0
+
 @export var follow_speed: float = 120.0
 @export var loot_radius: float = 150.0
 @export var loot_cooldown: float = 8.0
@@ -11,12 +13,13 @@ var next_loot_time: float = 0.0
 var is_being_pet: bool = false
 var pet_happiness: float = 0.0
 
-@onready var navigation_agent: NavigationAgent2D = $NavigationAgent2D
-
 func _ready() -> void:
 	add_to_group("companion_cat")
+	position.y = GROUND_Y
 
 func _physics_process(_delta: float) -> void:
+	position.y = GROUND_Y
+
 	if target_player == null or not is_instance_valid(target_player):
 		target_player = get_tree().get_first_node_in_group("player")
 	if target_player == null:
@@ -33,31 +36,35 @@ func _physics_process(_delta: float) -> void:
 		if not is_instance_valid(carried_item_node):
 			is_carrying_item = false
 			return
-		navigation_agent.target_position = target_player.global_position
-		if global_position.distance_to(target_player.global_position) < 40.0:
+		_seek_x(target_player.global_position.x, 40.0)
+		if abs(target_player.global_position.x - global_position.x) < 40.0:
 			_deliver_item()
-	else:
-		navigation_agent.target_position = target_player.global_position + Vector2(40.0, 40.0)
-		if now > next_loot_time:
-			var nearest := _find_nearest_scrap()
-			if nearest != null:
-				navigation_agent.target_position = nearest.global_position
-				if global_position.distance_to(nearest.global_position) < 20.0:
-					carried_item_node = nearest
-					is_carrying_item = true
-					next_loot_time = now + loot_cooldown
-					nearest.get_parent().remove_child(nearest)
-					add_child(nearest)
-					nearest.position = Vector2.ZERO
-					nearest.set_process(false)
-					nearest.set("player_inside", false)
+		return
 
-	if navigation_agent.is_navigation_finished():
-		velocity = Vector2.ZERO
+	var nearest := _find_nearest_scrap()
+	if now > next_loot_time and nearest != null:
+		_seek_x(nearest.global_position.x, 20.0)
+		if abs(nearest.global_position.x - global_position.x) < 20.0:
+			carried_item_node = nearest
+			is_carrying_item = true
+			next_loot_time = now + loot_cooldown
+			nearest.get_parent().remove_child(nearest)
+			add_child(nearest)
+			nearest.position = Vector2.ZERO
+			nearest.set_process(false)
+			nearest.set("player_inside", false)
 	else:
-		var next_pos := navigation_agent.get_next_path_position()
-		var dir := global_position.direction_to(next_pos)
-		velocity = dir * follow_speed
+		_seek_x(target_player.global_position.x, 40.0)
+
+func _seek_x(target_x: float, stop_dist: float) -> void:
+	var diff := target_x - global_position.x
+	if abs(diff) > stop_dist:
+		velocity = Vector2(sign(diff) * follow_speed, 0.0)
+	else:
+		velocity = Vector2.ZERO
+	var sprite := get_node_or_null("Sprite2D") as Sprite2D
+	if sprite and velocity.x != 0.0:
+		sprite.flip_h = velocity.x < 0.0
 	move_and_slide()
 
 func _find_nearest_scrap() -> Node2D:
@@ -76,17 +83,19 @@ func _deliver_item() -> void:
 	if carried_item_node == null or not is_instance_valid(carried_item_node):
 		is_carrying_item = false
 		return
-	var item_type: String = carried_item_node.get("item_type") if "item_type" in carried_item_node else "scrap"
-	if GameState:
-		match item_type:
-			"scrap":
-				GameState.add_scrap(1)
-			"seed":
-				GameState.add_seeds(1)
-				if JournalManager:
-					JournalManager.track_progress("seed")
-			"water":
-				GameState.add_water(1)
+		
+	# Lấy item_type an toàn (chỉ truyền 1 tham số vào hàm get)
+	var item_type: String = str(carried_item_node.get("item_type")) if "item_type" in carried_item_node else "scrap"
+	
+	match item_type:
+		"scrap":
+			GameState.add_scrap(1)
+		"seed":
+			GameState.add_seeds(1)
+			JournalManager.track_progress("seed")
+		"water":
+			GameState.add_water(1)
+	
 	print("Mèo mang về 1 ", item_type, "!")
 	carried_item_node.queue_free()
 	carried_item_node = null

@@ -5,6 +5,10 @@ var shake_decay: float = 5.0
 
 func _ready() -> void:
 	add_to_group("main_camera")
+	limit_left = -1300
+	limit_right = 1300
+	limit_top = -700
+	limit_bottom = 400
 
 func _process(delta: float) -> void:
 	if shake_intensity > 0.0:

@@ -213,8 +213,6 @@ script = ExtResource("6_bm")
 
 [node name="HUD" parent="." instance=ExtResource("4_hud")]
 
-[node name="NavigationRegion2D" type="NavigationRegion2D" parent="."]
-
 [node name="FortCenter" type="Marker2D" parent="." groups=["fort_center"]]
 position = Vector2(400, 300)
 

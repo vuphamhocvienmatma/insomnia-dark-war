@@ -10,92 +10,130 @@
 [ext_resource type="Script" uid="uid://b00lk8jylula8" path="res://scripts/building_manager.gd" id="8_bm"]
 [ext_resource type="PackedScene" path="res://scenes/companion_cat.tscn" id="9_cat"]
 [ext_resource type="PackedScene" path="res://scenes/hud.tscn" id="10_hud"]
+[ext_resource type="Script" path="res://scripts/warm_fireplace_light.gd" id="11_light"]
 
 [node name="MainLevel" type="Node2D" unique_id=129172497]
 script = ExtResource("1_level")
 
-[node name="WastelandBackground" type="ColorRect" parent="." unique_id=1609654701]
+[node name="SkyBackground" type="ColorRect" parent="." unique_id=1609654701]
 z_index = -10
 offset_left = -1250.0
-offset_top = -1250.0
+offset_top = -1200.0
 offset_right = 1250.0
-offset_bottom = 1250.0
+offset_bottom = 0.0
+color = Color(0.109804, 0.113725, 0.227451, 1)
+
+[node name="GroundStrip" type="ColorRect" parent="." unique_id=989305600]
+z_index = -9
+offset_left = -1250.0
+offset_top = 0.0
+offset_right = 1250.0
+offset_bottom = 300.0
 color = Color(0.176471, 0.176471, 0.176471, 1)
 
-[node name="CozyCabinFloor" type="ColorRect" parent="." unique_id=989305600]
+[node name="CabinInterior" type="ColorRect" parent="." unique_id=1634149016]
 z_index = -5
-offset_left = -300.0
-offset_top = -300.0
-offset_right = 300.0
-offset_bottom = 300.0
+offset_left = -200.0
+offset_top = -200.0
+offset_right = 200.0
+offset_bottom = 0.0
 color = Color(0.364706, 0.25098, 0.215686, 1)
 
-[node name="CabinWalls" type="Node2D" parent="." unique_id=1634149016]
-
-[node name="WallTop" type="ColorRect" parent="CabinWalls" unique_id=688920268]
+[node name="CabinWallLeft" type="ColorRect" parent="." unique_id=688920268]
 z_index = -4
-offset_left = -332.0
-offset_top = -332.0
-offset_right = 332.0
-offset_bottom = -300.0
+offset_left = -232.0
+offset_top = -200.0
+offset_right = -200.0
+offset_bottom = -120.0
 color = Color(0.243137, 0.152941, 0.137255, 1)
 
-[node name="WallLeft" type="ColorRect" parent="CabinWalls" unique_id=527787091]
+[node name="CabinWallRight" type="ColorRect" parent="." unique_id=119087588]
 z_index = -4
-offset_left = -332.0
-offset_top = -332.0
-offset_right = -300.0
-offset_bottom = 332.0
+offset_left = 200.0
+offset_top = -200.0
+offset_right = 232.0
+offset_bottom = -120.0
 color = Color(0.243137, 0.152941, 0.137255, 1)
 
-[node name="WallRight" type="ColorRect" parent="CabinWalls" unique_id=119087588]
+[node name="CabinRoof" type="ColorRect" parent="." unique_id=527787091]
 z_index = -4
-offset_left = 300.0
-offset_top = -332.0
-offset_right = 332.0
-offset_bottom = 332.0
+offset_left = -232.0
+offset_top = -232.0
+offset_right = 232.0
+offset_bottom = -200.0
 color = Color(0.243137, 0.152941, 0.137255, 1)
 
-[node name="WallBottomLeft" type="ColorRect" parent="CabinWalls" unique_id=889133611]
+[node name="WindowFrame" type="ColorRect" parent="." unique_id=1708000508]
 z_index = -4
-offset_left = -332.0
-offset_top = 300.0
-offset_right = -48.0
-offset_bottom = 332.0
-color = Color(0.243137, 0.152941, 0.137255, 1)
+offset_left = -168.0
+offset_top = -168.0
+offset_right = -112.0
+offset_bottom = -104.0
+color = Color(0.15, 0.1, 0.09, 1)
 
-[node name="WallBottomRight" type="ColorRect" parent="CabinWalls" unique_id=94628751]
+[node name="WindowGlow" type="ColorRect" parent="." unique_id=1708000509]
 z_index = -4
-offset_left = 48.0
-offset_top = 300.0
-offset_right = 332.0
-offset_bottom = 332.0
-color = Color(0.243137, 0.152941, 0.137255, 1)
+offset_left = -164.0
+offset_top = -164.0
+offset_right = -116.0
+offset_bottom = -108.0
+color = Color(1.0, 0.8, 0.5, 0.85)
 
-[node name="NavigationRegion2D" type="NavigationRegion2D" parent="." unique_id=1708000508]
+[node name="FloorLine" type="ColorRect" parent="." unique_id=1708000510]
+z_index = -4
+offset_left = -200.0
+offset_top = -8.0
+offset_right = 200.0
+offset_bottom = 0.0
+color = Color(0.25, 0.16, 0.13, 1)
+
+[node name="CozyRug" type="ColorRect" parent="." unique_id=1708000511]
+z_index = -4
+offset_left = -70.0
+offset_top = -14.0
+offset_right = 70.0
+offset_bottom = -4.0
+color = Color(0.55, 0.2, 0.2, 1)
+
+[node name="WindowShelf" type="ColorRect" parent="." unique_id=1708000512]
+z_index = -4
+offset_left = 40.0
+offset_top = -150.0
+offset_right = 180.0
+offset_bottom = -140.0
+color = Color(0.24, 0.15, 0.14, 1)
 
 [node name="FortCenter" type="Marker2D" parent="." unique_id=859842312]
+position = Vector2(0, -60)
 
 [node name="PlayerSpawn" type="Marker2D" parent="." unique_id=1906962756]
-position = Vector2(0, 100)
+position = Vector2(0, 0)
 
 [node name="Player" parent="." unique_id=1758723095 instance=ExtResource("2_player")]
-position = Vector2(0, 100)
+position = Vector2(0, 0)
 
 [node name="CompanionCat" parent="." unique_id=503473590 instance=ExtResource("9_cat")]
-position = Vector2(0, 100)
+position = Vector2(80, 0)
 
 [node name="Stove" parent="." unique_id=2007284855 instance=ExtResource("3_stove")]
-position = Vector2(-150, -120)
+position = Vector2(-80, 0)
 
 [node name="PlantPot1" parent="." unique_id=1029633691 instance=ExtResource("4_pot")]
-position = Vector2(150, -150)
+position = Vector2(0, 0)
 
 [node name="PlantPot2" parent="." unique_id=1145312961 instance=ExtResource("4_pot")]
-position = Vector2(150, 150)
+position = Vector2(60, 0)
 
 [node name="PlantPot3" parent="." unique_id=818215611 instance=ExtResource("4_pot")]
-position = Vector2(-150, 100)
+position = Vector2(110, -140)
+
+[node name="StoveLight" type="PointLight2D" parent="."]
+position = Vector2(-80, -60)
+color = Color(1.0, 0.6, 0.0, 1.0)
+energy = 1.5
+texture_scale = 3.0
+shadow_enabled = true
+script = ExtResource("11_light")
 
 [node name="TimeManager" type="Node" parent="." unique_id=44726045]
 script = ExtResource("5_time")

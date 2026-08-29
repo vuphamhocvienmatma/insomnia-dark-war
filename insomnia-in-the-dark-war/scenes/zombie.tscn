@@ -1,4 +1,4 @@
-[gd_scene load_steps=5 format=3]
+[gd_scene load_steps=4 format=3]
 
 [ext_resource type="Script" path="res://scripts/zombie_ai.gd" id="1_zombie"]
 [ext_resource type="Texture2D" path="res://icon.svg" id="2_icon"]
@@ -19,10 +19,6 @@ shape = SubResource("3_body")
 texture = ExtResource("2_icon")
 modulate = Color(0.4, 0.1, 0.5, 1)
 scale = Vector2(0.25, 0.25)
-
-[node name="NavigationAgent2D" type="NavigationAgent2D" parent="."]
-path_desired_distance = 10.0
-target_desired_distance = 15.0
 
 [node name="AttackArea" type="Area2D" parent="."]
 collision_layer = 0
