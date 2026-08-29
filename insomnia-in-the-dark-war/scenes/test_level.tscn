@@ -148,9 +148,8 @@ position = Vector2(450, 150)
 [node name="Zombie5" parent="." instance=ExtResource("7_zombie")]
 position = Vector2(450, 450)
 
-[node name="BuildSocket1" type="Area2D" parent="."]
+[node name="BuildSocket1" type="Area2D" parent="." groups=["critical_socket"]]
 script = ExtResource("5_socket")
-groups = ["critical_socket"]
 position = Vector2(700, 150)
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="BuildSocket1"]
@@ -161,9 +160,8 @@ texture = ExtResource("2_icon")
 modulate = Color(0.6, 0.9, 1.0, 0.6)
 scale = Vector2(0.2, 0.2)
 
-[node name="BuildSocket2" type="Area2D" parent="."]
+[node name="BuildSocket2" type="Area2D" parent="." groups=["critical_socket"]]
 script = ExtResource("5_socket")
-groups = ["critical_socket"]
 position = Vector2(700, 230)
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="BuildSocket2"]
@@ -174,9 +172,8 @@ texture = ExtResource("2_icon")
 modulate = Color(0.6, 0.9, 1.0, 0.6)
 scale = Vector2(0.2, 0.2)
 
-[node name="BuildSocket3" type="Area2D" parent="."]
+[node name="BuildSocket3" type="Area2D" parent="." groups=["critical_socket"]]
 script = ExtResource("5_socket")
-groups = ["critical_socket"]
 position = Vector2(700, 310)
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="BuildSocket3"]
@@ -187,9 +184,8 @@ texture = ExtResource("2_icon")
 modulate = Color(0.6, 0.9, 1.0, 0.6)
 scale = Vector2(0.2, 0.2)
 
-[node name="BuildSocket4" type="Area2D" parent="."]
+[node name="BuildSocket4" type="Area2D" parent="." groups=["critical_socket"]]
 script = ExtResource("5_socket")
-groups = ["critical_socket"]
 position = Vector2(700, 390)
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="BuildSocket4"]
@@ -200,9 +196,8 @@ texture = ExtResource("2_icon")
 modulate = Color(0.6, 0.9, 1.0, 0.6)
 scale = Vector2(0.2, 0.2)
 
-[node name="BuildSocket5" type="Area2D" parent="."]
+[node name="BuildSocket5" type="Area2D" parent="." groups=["critical_socket"]]
 script = ExtResource("5_socket")
-groups = ["critical_socket"]
 position = Vector2(700, 470)
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="BuildSocket5"]
@@ -220,9 +215,8 @@ script = ExtResource("6_bm")
 
 [node name="NavigationRegion2D" type="NavigationRegion2D" parent="."]
 
-[node name="FortCenter" type="Marker2D" parent="."]
+[node name="FortCenter" type="Marker2D" parent="." groups=["fort_center"]]
 position = Vector2(400, 300)
-groups = ["fort_center"]
 
 [node name="Zombie_far" parent="." instance=ExtResource("7_zombie")]
 position = Vector2(700, 600)
@@ -240,7 +234,7 @@ position = Vector2(360, 360)
 [node name="StoveLight" type="PointLight2D" parent="."]
 script = ExtResource("10_fire")
 position = Vector2(360, 360)
-color = Color("ff9900")
+color = Color(1, 0.6, 0, 1)
 energy = 0.8
 base_energy = 0.8
 shadow_enabled = true

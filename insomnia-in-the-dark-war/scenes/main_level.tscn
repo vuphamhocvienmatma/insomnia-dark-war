@@ -1,109 +1,120 @@
-[gd_scene load_steps=11 format=3]
+[gd_scene format=3 uid="uid://mef4bhyxlyua"]
 
-[ext_resource type="Script" path="res://scripts/level_setup.gd" id="1_level"]
-[ext_resource type="PackedScene" path="res://scenes/player.tscn" id="2_player"]
+[ext_resource type="Script" uid="uid://qgnufafhagbn" path="res://scripts/level_setup.gd" id="1_level"]
+[ext_resource type="PackedScene" uid="uid://b668nx1le5oyp" path="res://scenes/player.tscn" id="2_player"]
 [ext_resource type="PackedScene" path="res://scenes/stove.tscn" id="3_stove"]
 [ext_resource type="PackedScene" path="res://scenes/plant_pot.tscn" id="4_pot"]
-[ext_resource type="Script" path="res://scripts/time_manager.gd" id="5_time"]
-[ext_resource type="Script" path="res://scripts/integrity_tracker.gd" id="6_integrity"]
-[ext_resource type="Script" path="res://scripts/lofi_audio_manager.gd" id="7_audio"]
-[ext_resource type="Script" path="res://scripts/building_manager.gd" id="8_bm"]
+[ext_resource type="Script" uid="uid://db0n3pae53tku" path="res://scripts/time_manager.gd" id="5_time"]
+[ext_resource type="Script" uid="uid://btvx4el5yrmyk" path="res://scripts/integrity_tracker.gd" id="6_integrity"]
+[ext_resource type="Script" uid="uid://d05mag52g1bg8" path="res://scripts/lofi_audio_manager.gd" id="7_audio"]
+[ext_resource type="Script" uid="uid://b00lk8jylula8" path="res://scripts/building_manager.gd" id="8_bm"]
 [ext_resource type="PackedScene" path="res://scenes/companion_cat.tscn" id="9_cat"]
 [ext_resource type="PackedScene" path="res://scenes/hud.tscn" id="10_hud"]
 
-[node name="MainLevel" type="Node2D"]
+[node name="MainLevel" type="Node2D" unique_id=129172497]
 script = ExtResource("1_level")
 
-[node name="WastelandBackground" type="ColorRect" parent="."]
-color = Color(0.176471, 0.176471, 0.176471, 1)
-size = Vector2(2500, 2500)
-position = Vector2(-1250, -1250)
+[node name="WastelandBackground" type="ColorRect" parent="." unique_id=1609654701]
 z_index = -10
+offset_left = -1250.0
+offset_top = -1250.0
+offset_right = 1250.0
+offset_bottom = 1250.0
+color = Color(0.176471, 0.176471, 0.176471, 1)
 
-[node name="CozyCabinFloor" type="ColorRect" parent="."]
-color = Color(0.364706, 0.25098, 0.215686, 1)
-size = Vector2(600, 600)
-position = Vector2(-300, -300)
+[node name="CozyCabinFloor" type="ColorRect" parent="." unique_id=989305600]
 z_index = -5
+offset_left = -300.0
+offset_top = -300.0
+offset_right = 300.0
+offset_bottom = 300.0
+color = Color(0.364706, 0.25098, 0.215686, 1)
 
-[node name="CabinWalls" type="Node2D" parent="."]
+[node name="CabinWalls" type="Node2D" parent="." unique_id=1634149016]
 
-[node name="WallTop" type="ColorRect" parent="CabinWalls"]
-color = Color(0.243137, 0.152941, 0.137255, 1)
-size = Vector2(664, 32)
-position = Vector2(-332, -332)
+[node name="WallTop" type="ColorRect" parent="CabinWalls" unique_id=688920268]
 z_index = -4
-
-[node name="WallLeft" type="ColorRect" parent="CabinWalls"]
+offset_left = -332.0
+offset_top = -332.0
+offset_right = 332.0
+offset_bottom = -300.0
 color = Color(0.243137, 0.152941, 0.137255, 1)
-size = Vector2(32, 664)
-position = Vector2(-332, -332)
-z_index = -4
 
-[node name="WallRight" type="ColorRect" parent="CabinWalls"]
+[node name="WallLeft" type="ColorRect" parent="CabinWalls" unique_id=527787091]
+z_index = -4
+offset_left = -332.0
+offset_top = -332.0
+offset_right = -300.0
+offset_bottom = 332.0
 color = Color(0.243137, 0.152941, 0.137255, 1)
-size = Vector2(32, 664)
-position = Vector2(300, -332)
-z_index = -4
 
-[node name="WallBottomLeft" type="ColorRect" parent="CabinWalls"]
+[node name="WallRight" type="ColorRect" parent="CabinWalls" unique_id=119087588]
+z_index = -4
+offset_left = 300.0
+offset_top = -332.0
+offset_right = 332.0
+offset_bottom = 332.0
 color = Color(0.243137, 0.152941, 0.137255, 1)
-size = Vector2(282, 32)
-position = Vector2(-332, 300)
-z_index = -4
 
-[node name="WallBottomRight" type="ColorRect" parent="CabinWalls"]
+[node name="WallBottomLeft" type="ColorRect" parent="CabinWalls" unique_id=889133611]
+z_index = -4
+offset_left = -332.0
+offset_top = 300.0
+offset_right = -50.0
+offset_bottom = 332.0
 color = Color(0.243137, 0.152941, 0.137255, 1)
-size = Vector2(282, 32)
-position = Vector2(50, 300)
+
+[node name="WallBottomRight" type="ColorRect" parent="CabinWalls" unique_id=94628751]
 z_index = -4
+offset_left = 50.0
+offset_top = 300.0
+offset_right = 332.0
+offset_bottom = 332.0
+color = Color(0.243137, 0.152941, 0.137255, 1)
 
-[node name="NavigationRegion2D" type="NavigationRegion2D" parent="."]
+[node name="NavigationRegion2D" type="NavigationRegion2D" parent="." unique_id=1708000508]
 
-[node name="FortCenter" type="Marker2D" parent="."]
-position = Vector2(0, 0)
-groups = ["fort_center"]
+[node name="FortCenter" type="Marker2D" parent="." unique_id=859842312]
 
-[node name="PlayerSpawn" type="Marker2D" parent="."]
+[node name="PlayerSpawn" type="Marker2D" parent="." unique_id=1906962756]
 position = Vector2(0, 100)
 
-[node name="Player" parent="." instance=ExtResource("2_player")]
+[node name="Player" parent="." unique_id=1758723095 instance=ExtResource("2_player")]
 position = Vector2(0, 100)
 
-[node name="CompanionCat" parent="." instance=ExtResource("9_cat")]
+[node name="CompanionCat" parent="." unique_id=503473590 instance=ExtResource("9_cat")]
 position = Vector2(0, 100)
 
-[node name="Stove" parent="." instance=ExtResource("3_stove")]
+[node name="Stove" parent="." unique_id=2007284855 instance=ExtResource("3_stove")]
 position = Vector2(-150, -120)
 
-[node name="PlantPot1" parent="." instance=ExtResource("4_pot")]
+[node name="PlantPot1" parent="." unique_id=1029633691 instance=ExtResource("4_pot")]
 position = Vector2(150, -150)
 
-[node name="PlantPot2" parent="." instance=ExtResource("4_pot")]
+[node name="PlantPot2" parent="." unique_id=1145312961 instance=ExtResource("4_pot")]
 position = Vector2(150, 150)
 
-[node name="PlantPot3" parent="." instance=ExtResource("4_pot")]
+[node name="PlantPot3" parent="." unique_id=818215611 instance=ExtResource("4_pot")]
 position = Vector2(-150, 100)
 
-[node name="TimeManager" type="Node" parent="."]
+[node name="TimeManager" type="Node" parent="." unique_id=44726045]
 script = ExtResource("5_time")
 environmental_light = NodePath("../EnvironmentLight")
 
-[node name="IntegrityTracker" type="Node" parent="."]
+[node name="IntegrityTracker" type="Node" parent="." unique_id=485428721]
 script = ExtResource("6_integrity")
 
-[node name="AudioManager" type="Node" parent="."]
+[node name="AudioManager" type="Node" parent="." unique_id=1919772236]
 script = ExtResource("7_audio")
 time_manager = NodePath("../TimeManager")
 
-[node name="BuildingManager" type="Node2D" parent="."]
+[node name="DayLofiPlayer" type="AudioStreamPlayer" parent="AudioManager" unique_id=1215752836]
+
+[node name="NightAmbientPlayer" type="AudioStreamPlayer" parent="AudioManager" unique_id=1085463670]
+
+[node name="BuildingManager" type="Node2D" parent="." unique_id=164663087]
 script = ExtResource("8_bm")
 
-[node name="EnvironmentLight" type="CanvasModulate" parent="."]
-color = Color(1, 1, 1, 1)
+[node name="EnvironmentLight" type="CanvasModulate" parent="." unique_id=1824682841]
 
-[node name="HUD" parent="." instance=ExtResource("10_hud")]
-
-[node name="DayLofiPlayer" type="AudioStreamPlayer" parent="AudioManager"]
-
-[node name="NightAmbientPlayer" type="AudioStreamPlayer" parent="AudioManager"]
+[node name="HUD" parent="." unique_id=874989936 instance=ExtResource("10_hud")]

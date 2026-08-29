@@ -15,7 +15,7 @@ shape = SubResource("3_circle")
 [node name="Sprite2D" type="Sprite2D" parent="."]
 texture = ExtResource("2_icon")
 scale = Vector2(0.15, 0.15)
-modulate = Color("ffa726")
+modulate = Color(1, 0.654902, 0.14902, 1)
 
 [node name="NavigationAgent2D" type="NavigationAgent2D" parent="."]
 path_desired_distance = 20.0

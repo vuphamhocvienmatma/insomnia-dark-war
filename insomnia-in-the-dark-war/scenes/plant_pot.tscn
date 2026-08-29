@@ -15,4 +15,4 @@ shape = SubResource("3_rect")
 [node name="Sprite2D" type="Sprite2D" parent="."]
 texture = ExtResource("2_icon")
 scale = Vector2(0.25, 0.25)
-modulate = Color.WHITE
+modulate = Color(1, 1, 1, 1)

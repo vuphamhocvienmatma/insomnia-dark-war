@@ -15,4 +15,4 @@ shape = SubResource("3_circle")
 [node name="Sprite2D" type="Sprite2D" parent="."]
 texture = ExtResource("2_icon")
 scale = Vector2(0.25, 0.25)
-modulate = Color("ffd700")
+modulate = Color(1, 0.843137, 0, 1)

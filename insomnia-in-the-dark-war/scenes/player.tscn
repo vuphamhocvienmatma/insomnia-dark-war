@@ -1,23 +1,22 @@
-[gd_scene load_steps=5 format=3]
+[gd_scene format=3 uid="uid://b668nx1le5oyp"]
 
-[ext_resource type="Script" path="res://scripts/player.gd" id="1_player"]
-[ext_resource type="Texture2D" path="res://icon.svg" id="2_icon"]
-[ext_resource type="Script" path="res://scripts/camera_lofi.gd" id="3_camera"]
+[ext_resource type="Script" uid="uid://cd0bt6awahbrm" path="res://scripts/player.gd" id="1_player"]
+[ext_resource type="Texture2D" uid="uid://b764g565aru5o" path="res://icon.svg" id="2_icon"]
+[ext_resource type="Script" uid="uid://coebbogb2tvdq" path="res://scripts/camera_lofi.gd" id="3_camera"]
 
 [sub_resource type="CircleShape2D" id="4_circle"]
 radius = 16.0
 
-[node name="Player" type="CharacterBody2D"]
+[node name="Player" type="CharacterBody2D" unique_id=681441458]
 script = ExtResource("1_player")
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+[node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=773955471]
 shape = SubResource("4_circle")
 
-[node name="Sprite2D" type="Sprite2D" parent="."]
-texture = ExtResource("2_icon")
+[node name="Sprite2D" type="Sprite2D" parent="." unique_id=234552150]
 scale = Vector2(0.2, 0.2)
+texture = ExtResource("2_icon")
 
-[node name="Camera2D" type="Camera2D" parent="."]
-script = ExtResource("3_camera")
+[node name="Camera2D" type="Camera2D" parent="." unique_id=1833206607]
 position_smoothing_enabled = true
-position_smoothing_speed = 5.0
+script = ExtResource("3_camera")

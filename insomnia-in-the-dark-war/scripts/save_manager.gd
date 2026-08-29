@@ -104,7 +104,7 @@ func load_game() -> bool:
 		var closest_socket: BuildSocket2D = null
 		var min_dist: float = 9999.0
 		for socket in get_tree().get_nodes_in_group("critical_socket"):
-			var dist := socket.global_position.distance_to(wall.global_position)
+			var dist: float = socket.global_position.distance_to(wall.global_position)
 			if dist < min_dist:
 				min_dist = dist
 				closest_socket = socket

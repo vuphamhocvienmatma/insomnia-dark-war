@@ -28,7 +28,7 @@ func generate_daily_tasks() -> void:
 		{"desc": "Bắn hạ 3 Zombie", "type": "zombie_kill", "target": 3, "progress": 0}
 	]
 	task_pool.shuffle()
-	daily_tasks = task_pool.slice(0, 3)
+	daily_tasks.assign(task_pool.slice(0, 3))
 	tasks_updated.emit()
 
 func track_progress(task_type: String) -> void:
