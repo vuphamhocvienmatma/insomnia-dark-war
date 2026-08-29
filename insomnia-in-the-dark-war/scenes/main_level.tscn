@@ -60,13 +60,13 @@ color = Color(0.243137, 0.152941, 0.137255, 1)
 z_index = -4
 offset_left = -332.0
 offset_top = 300.0
-offset_right = -50.0
+offset_right = -48.0
 offset_bottom = 332.0
 color = Color(0.243137, 0.152941, 0.137255, 1)
 
 [node name="WallBottomRight" type="ColorRect" parent="CabinWalls" unique_id=94628751]
 z_index = -4
-offset_left = 50.0
+offset_left = 48.0
 offset_top = 300.0
 offset_right = 332.0
 offset_bottom = 332.0

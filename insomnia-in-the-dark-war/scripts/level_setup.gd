@@ -42,8 +42,8 @@ func _spawn_socket_ring() -> void:
 
 		var sprite := Sprite2D.new()
 		sprite.texture = load("res://icon.svg")
-		sprite.scale = Vector2(0.15, 0.15)
-		sprite.modulate = Color(0.3, 0.8, 1.0, 0.6)
+		sprite.scale = Vector2(0.25, 0.25)
+		sprite.modulate = Color(0.3, 0.8, 1.0, 0.9)
 		socket.add_child(sprite)
 
 func _spawn_turrets() -> void:
@@ -54,6 +54,7 @@ func _spawn_turrets() -> void:
 		var turret := TURRET_SCENE.instantiate() as Node2D
 		turret.position = pos
 		add_child(turret)
+		_boost_sprite(turret)
 
 func _spawn_scrap_field() -> void:
 	var scrap_count: int = 40
@@ -67,6 +68,7 @@ func _spawn_scrap_field() -> void:
 		scrap.position = pos
 		scrap.set("item_type", types[randi() % types.size()])
 		add_child(scrap)
+		_boost_sprite(scrap)
 
 	var relic_count: int = 3
 	var relic_types := ["buff_turret", "buff_plant", "buff_solar"]
@@ -79,6 +81,7 @@ func _spawn_scrap_field() -> void:
 		relic.position = pos
 		relic.set("relic_type", relic_types[randi() % relic_types.size()])
 		add_child(relic)
+		_boost_sprite(relic)
 
 func _on_phase_changed(is_night: bool) -> void:
 	if is_night:
@@ -99,3 +102,8 @@ func _respawn_zombie_wave() -> void:
 		zombie.position = pos
 		add_child(zombie)
 		_spawned_zombies.append(zombie)
+
+func _boost_sprite(node: Node2D) -> void:
+	var sprite := node.get_node_or_null("Sprite2D") as Sprite2D
+	if sprite != null and sprite.scale.x < 0.2:
+		sprite.scale = Vector2(0.5, 0.5)

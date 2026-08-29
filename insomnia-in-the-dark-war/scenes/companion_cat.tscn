@@ -8,6 +8,8 @@ radius = 10.0
 
 [node name="CompanionCat" type="CharacterBody2D"]
 script = ExtResource("1_cat")
+collision_layer = 0
+collision_mask = 0
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
 shape = SubResource("3_circle")
