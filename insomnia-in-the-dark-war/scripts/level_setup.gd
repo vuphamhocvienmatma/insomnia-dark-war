@@ -7,6 +7,8 @@ const SCRAP_SCENE := preload("res://scenes/scrap_item.tscn")
 const ZOMBIE_SCENE := preload("res://scenes/zombie.tscn")
 const RELIC_SCENE := preload("res://scenes/relic_item.tscn")
 const NIGHT_SKY_SCRIPT := preload("res://scripts/art_night_sky.gd")
+const SKYLINE_SCRIPT := preload("res://scripts/art_skyline.gd")
+const CABIN_PROPS_SCRIPT := preload("res://scripts/art_cabin_props.gd")
 
 const GROUND_Y: float = 0.0
 
@@ -14,6 +16,14 @@ var _spawned_zombies: Array[Node2D] = []
 var _night_sky: Node2D = null
 
 func _ready() -> void:
+	var skyline := Node2D.new()
+	skyline.set_script(SKYLINE_SCRIPT)
+	add_child(skyline)
+
+	var cabin_props := Node2D.new()
+	cabin_props.set_script(CABIN_PROPS_SCRIPT)
+	add_child(cabin_props)
+
 	_spawn_sockets()
 	_spawn_turrets()
 	_spawn_scrap_field()

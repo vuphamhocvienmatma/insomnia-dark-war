@@ -3,11 +3,10 @@ extends Node2D
 const OUTLINE := Color(0.12, 0.10, 0.10)
 const BOOTS := Color(0.22, 0.16, 0.12)
 const PANTS := Color(0.28, 0.32, 0.38)
-const SWEATER := Color(0.85, 0.55, 0.20)
+const SWEATER := Color(0.95, 0.72, 0.15)
 const SCARF := Color(0.75, 0.22, 0.22)
 const SKIN := Color(1.0, 0.87, 0.68)
-const BEANIE := Color(0.18, 0.50, 0.50)
-const POM_POM := Color(0.9, 0.9, 0.9)
+const HAIR := Color(0.14, 0.11, 0.10)
 
 func _draw() -> void:
 	_draw_boots()
@@ -15,7 +14,7 @@ func _draw() -> void:
 	_draw_sweater()
 	_draw_scarf()
 	_draw_head()
-	_draw_beanie()
+	_draw_hair()
 
 func _draw_boots() -> void:
 	var left := Rect2(-7.0, 0.0, 6.0, 6.0)
@@ -53,19 +52,23 @@ func _draw_head() -> void:
 	draw_circle(Vector2(-2.0, -30.0), 1.2, OUTLINE)
 	draw_circle(Vector2(2.0, -30.0), 1.2, OUTLINE)
 
-func _draw_beanie() -> void:
-	var brim := Rect2(-7.0, -37.0, 14.0, 4.0)
-	draw_rect(brim, BEANIE)
-	_draw_rect_outline(brim, OUTLINE)
+func _draw_hair() -> void:
 	var dome_pts := PackedVector2Array()
 	var segments: int = 20
 	for i in segments + 1:
 		var angle: float = PI + PI * float(i) / float(segments)
-		dome_pts.append(Vector2(cos(angle) * 7.0, sin(angle) * 7.0 - 33.0))
-	draw_polyline(dome_pts, BEANIE, 2.0)
-	_draw_circle_outline(Vector2(0.0, -33.0), 7.0, OUTLINE)
-	draw_circle(Vector2(0.0, -42.0), 2.5, POM_POM)
-	_draw_circle_outline(Vector2(0.0, -42.0), 2.5, OUTLINE)
+		dome_pts.append(Vector2(cos(angle) * 7.5, sin(angle) * 7.5 - 31.0))
+	draw_polyline(dome_pts, HAIR, 2.0)
+	_draw_circle_outline(Vector2(0.0, -31.0), 7.5, OUTLINE)
+	var top := Rect2(-7.0, -34.0, 14.0, 3.0)
+	draw_rect(top, HAIR)
+	_draw_rect_outline(top, OUTLINE)
+	var left_strand := Rect2(-8.0, -32.0, 2.0, 10.0)
+	var right_strand := Rect2(6.0, -32.0, 2.0, 10.0)
+	draw_rect(left_strand, HAIR)
+	draw_rect(right_strand, HAIR)
+	_draw_rect_outline(left_strand, OUTLINE)
+	_draw_rect_outline(right_strand, OUTLINE)
 
 func _draw_rect_outline(r: Rect2, col: Color) -> void:
 	var pts := PackedVector2Array([
