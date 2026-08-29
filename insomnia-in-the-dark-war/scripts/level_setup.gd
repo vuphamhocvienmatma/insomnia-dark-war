@@ -18,6 +18,7 @@ func _ready() -> void:
 	_spawn_turrets()
 	_spawn_scrap_field()
 	_spawn_relics()
+	_spawn_ground_details()
 	_create_night_sky()
 
 	if SaveManager:
@@ -56,14 +57,14 @@ func _spawn_turrets() -> void:
 		add_child(turret)
 
 func _spawn_scrap_field() -> void:
-	var scrap_count: int = 40
+	var scrap_count: int = 26
 	var types: Array[String] = ["scrap", "seed", "water"]
 	for i in scrap_count:
 		var x: float
 		if randf() < 0.5:
-			x = randf_range(-1200.0, -320.0)
+			x = randf_range(-1150.0, -420.0)
 		else:
-			x = randf_range(320.0, 1200.0)
+			x = randf_range(420.0, 1150.0)
 		var pos := Vector2(x, GROUND_Y)
 		var scrap := SCRAP_SCENE.instantiate() as Node2D
 		scrap.position = pos
@@ -80,11 +81,25 @@ func _spawn_relics() -> void:
 		relic.set("relic_type", relic_types[i])
 		add_child(relic)
 
+func _spawn_ground_details() -> void:
+	for i in 8:
+		var rock := ColorRect.new()
+		var s := randf_range(6.0, 14.0)
+		rock.size = Vector2(s, s)
+		var side := -1.0 if randf() < 0.5 else 1.0
+		rock.position = Vector2(side * randf_range(500.0, 1150.0), randf_range(10.0, 80.0))
+		if randf() < 0.5:
+			rock.color = Color(0.18, 0.18, 0.18, 1.0)
+		else:
+			rock.color = Color(0.25, 0.25, 0.25, 1.0)
+		rock.z_index = -8
+		add_child(rock)
+
 func _create_night_sky() -> void:
 	_night_sky = Node2D.new()
 	_night_sky.name = "NightSky"
 	_night_sky.visible = false
-	_night_sky.z_index = -8
+	_night_sky.z_index = -9
 	_night_sky.set_script(NIGHT_SKY_SCRIPT)
 	add_child(_night_sky)
 

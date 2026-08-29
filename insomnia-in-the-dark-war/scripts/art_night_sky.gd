@@ -2,7 +2,7 @@ extends Node2D
 
 const MOON_POS := Vector2(-600.0, -260.0)
 const MOON_RADIUS: float = 26.0
-const MOON_COLOR := Color(0.95, 0.93, 0.75, 1.0)
+const MOON_COLOR := Color(0.95, 0.93, 0.78, 1.0)
 const MOON_BORDER_COLOR := Color(0.7, 0.65, 0.5, 1.0)
 const STAR_COLOR := Color(0.9, 0.95, 1.0, 0.9)
 const STAR_SIZE: float = 2.0
