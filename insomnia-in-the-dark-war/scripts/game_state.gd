@@ -11,12 +11,12 @@ var seeds_count: int = 0
 var water_count: int = 0
 var breach_last_night: bool = false
 var is_tired: bool = false
-var meal_buff: bool = false
 var relics_found: Array[String] = []
 
 var turret_damage_multiplier: float = 1.0
 var plant_harvest_bonus: int = 0
 var solar_charge_multiplier: float = 1.0
+var meal_buff: bool = false
 
 func add_scrap(amount: int = 1) -> void:
 	scrap_count += amount
@@ -53,11 +53,13 @@ func spend_water(amount: int) -> bool:
 
 func start_new_day() -> void:
 	is_tired = breach_last_night and not meal_buff
-	meal_buff = false
 	breach_last_night = false
+	meal_buff = false
 	tired_changed.emit(is_tired)
 	if is_tired:
 		print("Đêm qua mất ngủ... hôm nay đi chậm hơn một chút.")
+	elif breach_last_night == false and meal_buff == true:
+		print("Bữa ăn ấm bụng đã giúp bạn ngủ ngon dù hàng rào bị hở!")
 
 func rest_well() -> void:
 	if is_tired == true:
