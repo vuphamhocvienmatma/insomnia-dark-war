@@ -38,6 +38,10 @@ func plant_seed() -> bool:
 	current_state = PotState.PLANTED
 	growth_timer = 0.0
 	art_node.set_state("planted")
+	var am := get_tree().get_first_node_in_group("audio_manager")
+	if am != null:
+		am.call("play_sfx", "plant")
+	_spawn_burst(5, Color(0.3, 0.8, 0.3, 1.0))
 	print("Đã trồng hạt giống, chờ nở...")
 	return true
 
@@ -48,6 +52,10 @@ func harvest() -> bool:
 	GameState.add_scrap(reward)
 	current_state = PotState.EMPTY
 	art_node.set_state("empty")
+	var am := get_tree().get_first_node_in_group("audio_manager")
+	if am != null:
+		am.call("play_sfx", "harvest")
+	_spawn_burst(10, Color(1.0, 0.85, 0.2, 1.0))
 	print("Thu hoạch hoa, nhận ", reward, " phế liệu! Thật chill...")
 	return true
 
@@ -69,3 +77,23 @@ func _unhandled_input(event: InputEvent) -> void:
 				plant_seed()
 			elif current_state == PotState.PLANTED:
 				water_plant()
+
+func _spawn_burst(count: int, col: Color) -> void:
+	var particles := GPUParticles2D.new()
+	var parent := get_parent()
+	if parent != null:
+		parent.add_child(particles)
+	else:
+		add_child(particles)
+	particles.global_position = global_position
+	particles.amount = count
+	particles.lifetime = 0.5
+	particles.one_shot = true
+	var mat := ParticleProcessMaterial.new()
+	mat.color = col
+	mat.gravity = Vector3(0.0, 50.0, 0.0)
+	mat.scale_min = 0.0
+	mat.scale_max = 0.3
+	particles.process_material = mat
+	particles.emitting = true
+	get_tree().create_timer(0.6).timeout.connect(particles.queue_free)

@@ -17,6 +17,7 @@ var turret_damage_multiplier: float = 1.0
 var plant_harvest_bonus: int = 0
 var solar_charge_multiplier: float = 1.0
 var meal_buff: bool = false
+var stats: Dictionary = {"zombies_killed": 0, "days_survived": 0, "walls_built": 0, "plants_harvested": 0}
 
 func add_scrap(amount: int = 1) -> void:
 	scrap_count += amount
@@ -52,6 +53,7 @@ func spend_water(amount: int) -> bool:
 	return true
 
 func start_new_day() -> void:
+	stats["days_survived"] += 1
 	var saved_meal: bool = meal_buff
 	var saved_breach: bool = breach_last_night
 	is_tired = saved_breach and not saved_meal
@@ -62,6 +64,9 @@ func start_new_day() -> void:
 		print("Đêm qua mất ngủ... hôm nay đi chậm hơn một chút.")
 	elif saved_breach and saved_meal:
 		print("Bữa ăn ấm bụng đã giúp bạn ngủ ngon dù hàng rào bị hở!")
+
+func track_stat(name: String) -> void:
+	stats[name] += 1
 
 func rest_well() -> void:
 	if is_tired == true:

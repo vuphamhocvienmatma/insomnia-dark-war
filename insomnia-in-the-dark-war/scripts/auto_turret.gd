@@ -40,6 +40,9 @@ func _on_fire_rate_timer_timeout() -> void:
 			line.default_color = Color(1.0, 0.5, 0.0, 0.8)
 			add_child(line)
 			get_tree().create_timer(0.1).timeout.connect(line.queue_free)
+			var am := get_tree().get_first_node_in_group("audio_manager")
+			if am != null:
+				am.call("play_sfx", "turret_shoot")
 		else:
 			print("Hết năng lượng mặt trời! Turret ngừng bắn.")
 

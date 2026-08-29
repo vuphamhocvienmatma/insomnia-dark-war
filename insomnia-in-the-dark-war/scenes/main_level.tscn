@@ -13,6 +13,7 @@
 [ext_resource type="Script" path="res://scripts/warm_fireplace_light.gd" id="11_light"]
 [ext_resource type="PackedScene" path="res://scenes/crafting_ui.tscn" id="12_craft"]
 [ext_resource type="PackedScene" path="res://scenes/tutorial_ui.tscn" id="15_tut"]
+[ext_resource type="Script" path="res://scripts/audio_manager.gd" id="16_audio"]
 [ext_resource type="Script" path="res://scripts/art_clouds.gd" id="12_clouds"]
 [ext_resource type="Script" path="res://scripts/cabin_structure.gd" id="14_cabin"]
 
@@ -195,3 +196,6 @@ script = ExtResource("8_bm")
 [node name="CraftingUI" parent="." unique_id=129172498 instance=ExtResource("12_craft")]
 
 [node name="TutorialUI" parent="." instance=ExtResource("15_tut")]
+
+[node name="AudioFxManager" type="Node" parent="."]
+script = ExtResource("16_audio")
