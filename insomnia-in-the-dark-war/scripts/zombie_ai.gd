@@ -43,6 +43,7 @@ func _physics_process(_delta: float) -> void:
 					print("Zombie lục lọi nhưng bạn sạch túi... chúng chán nản bỏ đi.")
 			is_leaving = true
 			navigation_agent.target_position = spawn_position
+			return # <--- THÊM CHỮ RETURN NÀY VÀO ĐÂY ĐỂ NÓ KỊP DI CHUYỂN!
 		else:
 			queue_free()
 		return
