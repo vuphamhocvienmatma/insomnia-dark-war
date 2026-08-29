@@ -6,6 +6,19 @@ const BODY := Color(0.30, 0.28, 0.25)
 const PANTS := Color(0.20, 0.18, 0.16)
 const EYE := Color(0.9, 0.2, 0.1)
 
+var _sway: float = 0.0
+var _sway_offset: float = 0.0
+
+
+func _process(delta: float) -> void:
+	_sway += delta * 3.0
+	_sway_offset = sin(_sway) * 4.0
+	var pn := get_parent() as Node2D
+	if pn != null:
+		pn.rotation = sin(_sway) * 0.1
+	queue_redraw()
+
+
 func _draw() -> void:
 	_draw_body()
 	_draw_pants()
@@ -23,7 +36,7 @@ func _draw_pants() -> void:
 	_draw_rect_outline(pants, OUTLINE)
 
 func _draw_head() -> void:
-	var head_pos := Vector2(0.0, -26.0)
+	var head_pos := Vector2(_sway_offset, -26.0)
 	draw_circle(head_pos, 7.0, SKIN)
 	_draw_circle_outline(head_pos, 7.0, OUTLINE)
 	draw_circle(Vector2(-2.0, -26.0), 1.5, EYE)

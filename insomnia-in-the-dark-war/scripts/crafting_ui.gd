@@ -9,6 +9,7 @@ const RECIPES: Array[Dictionary] = [
 var panel: Panel
 var buttons: Array[Button] = []
 var cat_toy_done: bool = false
+var craft_sound: AudioStreamPlayer
 
 
 func _ready() -> void:
@@ -28,6 +29,11 @@ func _ready() -> void:
 	GameState.scrap_changed.connect(_on_resource_changed)
 	GameState.seeds_changed.connect(_on_resource_changed)
 	GameState.water_changed.connect(_on_resource_changed)
+	craft_sound = AudioStreamPlayer.new()
+	add_child(craft_sound)
+	var sfx := load("res://assets/sfx/craft_success.ogg") as AudioStream
+	if sfx != null:
+		craft_sound.stream = sfx
 
 
 func _unhandled_input(event: InputEvent) -> void:
@@ -104,4 +110,33 @@ func _craft(i: int) -> void:
 				cat.set("loot_cooldown", 4.0)
 				cat_toy_done = true
 				print("Mèo có đồ chơi, chăm nhặt hơn!")
+	_spawn_craft_fx(i)
 	_refresh()
+
+
+func _spawn_craft_fx(i: int) -> void:
+	var btn: Button = buttons[i]
+	var particles := GPUParticles2D.new()
+	particles.global_position = btn.global_position
+	add_child(particles)
+	particles.amount = 20
+	particles.lifetime = 0.8
+	particles.one_shot = true
+	var mat := ParticleProcessMaterial.new()
+	mat.color = Color(1.0, 1.0, 0.0, 1.0)
+	mat.gravity = Vector3(0.0, 100.0, 0.0)
+	mat.direction = Vector3(0.0, -1.0, 0.0)
+	mat.spread = 45.0
+	mat.initial_velocity_min = 30.0
+	mat.initial_velocity_max = 80.0
+	mat.scale_min = 0.0
+	mat.scale_max = 0.5
+	particles.process_material = mat
+	particles.emitting = true
+	btn.modulate = Color(1.0, 1.0, 0.5, 1.0)
+	var tw := create_tween()
+	tw.tween_property(btn, "modulate", Color.WHITE, 0.2)
+	if craft_sound != null and craft_sound.stream != null:
+		craft_sound.play()
+	await get_tree().create_timer(1.0).timeout
+	particles.queue_free()

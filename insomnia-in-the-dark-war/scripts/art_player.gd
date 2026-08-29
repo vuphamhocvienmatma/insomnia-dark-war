@@ -8,7 +8,25 @@ const SCARF := Color(0.75, 0.22, 0.22)
 const SKIN := Color(1.0, 0.87, 0.68)
 const HAIR := Color(0.14, 0.11, 0.10)
 
+var _walk_bob: float = 0.0
+
+
+func _process(delta: float) -> void:
+	var vx: float = 0.0
+	var p := get_parent()
+	if p != null and "velocity" in p:
+		var v: Vector2 = p.get("velocity")
+		vx = v.x
+	if vx != 0.0:
+		_walk_bob += delta * 8.0
+	else:
+		_walk_bob = 0.0
+	queue_redraw()
+
+
 func _draw() -> void:
+	var bob_offset: float = sin(_walk_bob) * 2.0
+	draw_set_transform(Vector2(0.0, bob_offset), 0.0, Vector2.ONE)
 	_draw_boots()
 	_draw_pants()
 	_draw_sweater()
@@ -33,8 +51,10 @@ func _draw_sweater() -> void:
 	var body := Rect2(-8.0, -22.0, 16.0, 14.0)
 	draw_rect(body, SWEATER)
 	_draw_rect_outline(body, OUTLINE)
-	var left_arm := Rect2(-11.0, -20.0, 3.0, 10.0)
-	var right_arm := Rect2(8.0, -20.0, 3.0, 10.0)
+	var left_swing: float = sin(_walk_bob + PI) * 2.0
+	var right_swing: float = sin(_walk_bob) * 2.0
+	var left_arm := Rect2(-11.0, -20.0 + left_swing, 3.0, 10.0)
+	var right_arm := Rect2(8.0, -20.0 + right_swing, 3.0, 10.0)
 	draw_rect(left_arm, SWEATER)
 	draw_rect(right_arm, SWEATER)
 	_draw_rect_outline(left_arm, OUTLINE)
