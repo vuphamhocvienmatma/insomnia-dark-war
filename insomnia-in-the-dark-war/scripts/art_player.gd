@@ -27,11 +27,13 @@ func _process(delta: float) -> void:
 func _draw() -> void:
 	var bob_offset: float = sin(_walk_bob) * 2.0
 	draw_set_transform(Vector2(0.0, bob_offset), 0.0, Vector2.ONE)
+	_draw_backpack()
 	_draw_boots()
 	_draw_pants()
 	_draw_sweater()
 	_draw_scarf()
 	_draw_head()
+	_draw_face_details()
 	_draw_hair()
 
 func _draw_boots() -> void:
@@ -64,6 +66,13 @@ func _draw_scarf() -> void:
 	var scarf := Rect2(-6.0, -24.0, 12.0, 3.0)
 	draw_rect(scarf, SCARF)
 	_draw_rect_outline(scarf, OUTLINE)
+
+func _draw_backpack() -> void:
+	draw_rect(Rect2(-10.0, -18.0, 4.0, 12.0), Color(0.4, 0.3, 0.2, 1.0))
+	_draw_rect_outline(Rect2(-10.0, -18.0, 4.0, 12.0), OUTLINE)
+
+func _draw_face_details() -> void:
+	draw_line(Vector2(-2.0, -27.0), Vector2(2.0, -27.0), Color(0.8, 0.4, 0.4, 1.0), 1.0)
 
 func _draw_head() -> void:
 	var head_pos := Vector2(0.0, -30.0)

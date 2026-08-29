@@ -13,6 +13,23 @@ func _draw() -> void:
 	_draw_awning()
 	_draw_solar_panel()
 	_draw_ladder()
+	_draw_interior_details()
+
+
+func _draw_interior_details() -> void:
+	draw_rect(Rect2(-120.0, -180.0, 40.0, 30.0), Color(0.6, 0.4, 0.3, 1.0))
+	_draw_rect_outline(Rect2(-120.0, -180.0, 40.0, 30.0), Color(0.12, 0.10, 0.10, 1.0))
+	draw_circle(Vector2(-80.0, -160.0), 6.0, Color(1.0, 0.9, 0.6, 1.0))
+	draw_line(Vector2(-80.0, -160.0), Vector2(-80.0, -200.0), Color(0.12, 0.10, 0.10, 1.0), 1.0)
+	draw_rect(Rect2(80.0, -180.0, 60.0, 8.0), Color(0.5, 0.35, 0.25, 1.0))
+	_draw_rect_outline(Rect2(80.0, -180.0, 60.0, 8.0), Color(0.12, 0.10, 0.10, 1.0))
+	var book_colors := [Color(0.8, 0.3, 0.3, 1.0), Color(0.3, 0.6, 0.8, 1.0), Color(0.4, 0.7, 0.4, 1.0), Color(0.8, 0.7, 0.3, 1.0)]
+	for i in 4:
+		var bx: float = 84.0 + float(i) * 13.0
+		draw_rect(Rect2(bx, -188.0, 8.0, 12.0), book_colors[i])
+	draw_rect(Rect2(40.0, -30.0, 20.0, 30.0), Color(0.5, 0.35, 0.25, 1.0))
+	_draw_rect_outline(Rect2(40.0, -30.0, 20.0, 30.0), Color(0.12, 0.10, 0.10, 1.0))
+	draw_rect(Rect2(-30.0, -10.0, 60.0, 8.0), Color(0.7, 0.3, 0.3, 1.0))
 
 func _draw_awning() -> void:
 	var stripe_w: float = 14.0
