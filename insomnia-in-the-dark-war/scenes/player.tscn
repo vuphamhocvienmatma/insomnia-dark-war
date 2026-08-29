@@ -4,6 +4,9 @@
 [ext_resource type="Script" uid="uid://coebbogb2tvdq" path="res://scripts/camera_lofi.gd" id="3_camera"]
 [ext_resource type="Script" path="res://scripts/art_player.gd" id="2_art"]
 
+[sub_resource type="CircleShape2D" id="4_circle"]
+radius = 16.0
+
 [node name="Player" type="CharacterBody2D" unique_id=681441458]
 script = ExtResource("1_player")
 
@@ -16,6 +19,3 @@ script = ExtResource("2_art")
 [node name="Camera2D" type="Camera2D" parent="." unique_id=1833206607]
 position_smoothing_enabled = true
 script = ExtResource("3_camera")
-
-[sub_resource type="CircleShape2D" id="4_circle"]
-radius = 16.0
