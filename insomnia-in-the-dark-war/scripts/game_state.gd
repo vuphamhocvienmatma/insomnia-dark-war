@@ -52,13 +52,15 @@ func spend_water(amount: int) -> bool:
 	return true
 
 func start_new_day() -> void:
-	is_tired = breach_last_night and not meal_buff
+	var saved_meal: bool = meal_buff
+	var saved_breach: bool = breach_last_night
+	is_tired = saved_breach and not saved_meal
 	breach_last_night = false
 	meal_buff = false
 	tired_changed.emit(is_tired)
 	if is_tired:
 		print("Đêm qua mất ngủ... hôm nay đi chậm hơn một chút.")
-	elif breach_last_night == false and meal_buff == true:
+	elif saved_breach and saved_meal:
 		print("Bữa ăn ấm bụng đã giúp bạn ngủ ngon dù hàng rào bị hở!")
 
 func rest_well() -> void:

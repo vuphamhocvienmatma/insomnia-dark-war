@@ -93,14 +93,15 @@ func _craft(i: int) -> void:
 				GameState.meal_buff = true
 				print("Cất dành bữa ăn cho tối nay.")
 		"battery":
-			var tm: Node = get_tree().get_first_node_in_group("time_manager")
+			var tm := get_tree().get_first_node_in_group("time_manager")
 			if tm != null:
-				tm.max_solar_storage += 25.0
+				var cur: float = float(tm.get("max_solar_storage"))
+				tm.set("max_solar_storage", cur + 25.0)
 				print("Max solar +25!")
 		"cat_toy":
-			var cat: Node = get_tree().get_first_node_in_group("companion_cat")
+			var cat := get_tree().get_first_node_in_group("companion_cat")
 			if cat != null:
-				cat.loot_cooldown = 4.0
+				cat.set("loot_cooldown", 4.0)
 				cat_toy_done = true
 				print("Mèo có đồ chơi, chăm nhặt hơn!")
 	_refresh()
