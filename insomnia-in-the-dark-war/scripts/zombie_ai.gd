@@ -33,19 +33,26 @@ func _physics_process(_delta: float) -> void:
 	if is_attacking:
 		return
 
-	if navigation_agent.is_navigation_finished() and not is_attacking:
-		if not is_leaving:
-			if not has_looted:
-				has_looted = true
-				if GameState.spend_scrap(1):
-					print("Zombie lục lọi! Mất 1 phế liệu.")
-				else:
-					print("Zombie lục lọi nhưng bạn sạch túi... chúng chán nản bỏ đi.")
-			is_leaving = true
-			navigation_agent.target_position = spawn_position
-			return # <--- THÊM CHỮ RETURN NÀY VÀO ĐÂY ĐỂ NÓ KỊP DI CHUYỂN!
-		else:
+	if is_leaving:
+		navigation_agent.target_position = spawn_position
+		if global_position.distance_to(spawn_position) < 35.0:
 			queue_free()
+			return
+		var next_pos := navigation_agent.get_next_path_position()
+		var dir := global_position.direction_to(next_pos)
+		velocity = dir * speed
+		move_and_slide()
+		return
+
+	if navigation_agent.is_navigation_finished() and not is_attacking:
+		if not has_looted:
+			has_looted = true
+			if GameState.spend_scrap(1):
+				print("Zombie lục lọi! Mất 1 phế liệu.")
+			else:
+				print("Zombie lục lội nhưng bạn sạch túi... chúng chán nản bỏ đi.")
+		is_leaving = true
+		navigation_agent.target_position = spawn_position
 		return
 
 	var next_path_pos := navigation_agent.get_next_path_position()
@@ -82,4 +89,5 @@ func take_damage(amount: float) -> void:
 	print("Zombie chịu ", amount, " sát thương! Còn lại: ", current_health)
 	if current_health <= 0.0:
 		print("Zombie gục ngã và tan biến...")
+		JournalManager.track_progress("zombie_kill")
 		queue_free()

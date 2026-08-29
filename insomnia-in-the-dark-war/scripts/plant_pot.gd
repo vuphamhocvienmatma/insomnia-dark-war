@@ -1,39 +1,58 @@
-extends Area2D
+extends Node2D
 
-enum PotState { EMPTY, SEEDED, SPROUT, BLOOMED }
+enum PotState { EMPTY, PLANTED, BLOOMED }
+
+@export var growth_time: float = 30.0
 
 var current_state: PotState = PotState.EMPTY
-var player_inside: bool = false
+var growth_timer: float = 0.0
+
+@onready var sprite_2d: Sprite2D = $Sprite2D
 
 func _ready() -> void:
 	add_to_group("plant_pot")
-	body_entered.connect(_on_body_entered)
-	body_exited.connect(_on_body_exited)
 
-func _on_body_entered(body: Node2D) -> void:
-	if body.is_in_group("player"):
-		player_inside = true
+func _process(delta: float) -> void:
+	if current_state == PotState.PLANTED:
+		growth_timer += delta
+		if growth_timer >= growth_time:
+			current_state = PotState.BLOOMED
+			sprite_2d.modulate = Color("7fff7f")
+			print("Cây đã nở hoa! Đến thu hoạch thôi.")
 
-func _on_body_exited(body: Node2D) -> void:
-	if body.is_in_group("player"):
-		player_inside = false
+func plant_seed() -> bool:
+	if current_state != PotState.EMPTY:
+		return false
+	if GameState.spend_seeds(1) == false:
+		print("Không có hạt giống để trồng.")
+		return false
+	current_state = PotState.PLANTED
+	growth_timer = 0.0
+	sprite_2d.modulate = Color("c8a165")
+	print("Đã trồng hạt giống, chờ nở...")
+	return true
+
+func harvest() -> bool:
+	if current_state != PotState.BLOOMED:
+		return false
+	var reward: int = 2 + GameState.plant_harvest_bonus
+	GameState.add_scrap(reward)
+	current_state = PotState.EMPTY
+	sprite_2d.modulate = Color.WHITE
+	print("Thu hoạch hoa, nhận ", reward, " phế liệu! Thật chill...")
+	return true
+
+func water_plant() -> bool:
+	if current_state == PotState.PLANTED:
+		if GameState.spend_water(1):
+			growth_time = max(5.0, growth_time * 0.5)
+			print("Tưới nước! Cây lớn nhanh hơn.")
+			return true
+	return false
 
 func _unhandled_input(event: InputEvent) -> void:
-	if event.is_action_pressed("interact") and player_inside:
-		if current_state == PotState.EMPTY and GameState.spend_seeds(1) == true:
-			current_state = PotState.SEEDED
-			$Sprite2D.modulate = Color("8d6e63")
-			print("Đã gieo hạt mầm hy vọng...")
-		elif (current_state == PotState.SEEDED or current_state == PotState.SPROUT) and GameState.spend_water(1) == true:
-			if current_state == PotState.SEEDED:
-				current_state = PotState.SPROUT
-				$Sprite2D.modulate = Color("aed581")
-			elif current_state == PotState.SPROUT:
-				current_state = PotState.BLOOMED
-				$Sprite2D.modulate = Color("f48fb1")
-			print("Tưới nước... cây đang lớn!")
-		elif current_state == PotState.BLOOMED:
-			GameState.add_scrap(2)
-			current_state = PotState.EMPTY
-			$Sprite2D.modulate = Color.WHITE
-			print("Thu hoạch hoa, nhận 2 phế liệu! Thật chill...")
+	if event.is_action_pressed("interact"):
+		if current_state == PotState.BLOOMED:
+			harvest()
+		elif current_state == PotState.EMPTY:
+			plant_seed()

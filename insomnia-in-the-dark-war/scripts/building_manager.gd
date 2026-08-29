@@ -29,6 +29,7 @@ func _unhandled_input(event: InputEvent) -> void:
 	if event.is_action_pressed("click_build") and active_socket != null:
 		if GameState.spend_scrap(1) == true:
 			place_build_piece(active_socket)
+			JournalManager.track_progress("wall")
 		else:
 			print("Hết phế liệu!")
 

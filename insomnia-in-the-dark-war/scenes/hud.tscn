@@ -20,3 +20,30 @@ position = Vector2(16, 64)
 text = "😴 Mất ngủ - bước chân nặng trĩu"
 position = Vector2(16, 88)
 visible = false
+
+[node name="Task1Label" type="Label" parent="."]
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = -300.0
+offset_top = -96.0
+offset_right = -12.0
+offset_bottom = -68.0
+text = ""
+
+[node name="Task2Label" type="Label" parent="."]
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = -300.0
+offset_top = -64.0
+offset_right = -12.0
+offset_bottom = -36.0
+text = ""
+
+[node name="Task3Label" type="Label" parent="."]
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = -300.0
+offset_top = -32.0
+offset_right = -12.0
+offset_bottom = -4.0
+text = ""

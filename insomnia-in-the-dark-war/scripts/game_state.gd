@@ -4,12 +4,18 @@ signal scrap_changed(new_amount: int)
 signal seeds_changed(new_amount: int)
 signal water_changed(new_amount: int)
 signal tired_changed(is_tired: bool)
+signal relic_collected(type: String)
 
 var scrap_count: int = 0
 var seeds_count: int = 0
 var water_count: int = 0
 var breach_last_night: bool = false
 var is_tired: bool = false
+var relics_found: Array[String] = []
+
+var turret_damage_multiplier: float = 1.0
+var plant_harvest_bonus: int = 0
+var solar_charge_multiplier: float = 1.0
 
 func add_scrap(amount: int = 1) -> void:
 	scrap_count += amount
@@ -56,3 +62,16 @@ func rest_well() -> void:
 		is_tired = false
 		tired_changed.emit(false)
 		print("Hàng rào kín kẽ, tối nay sẽ ngủ ngon!")
+
+func add_relic(type: String) -> void:
+	if relics_found.has(type):
+		print("Di vật này đã được kích hoạt rồi.")
+		return
+	relics_found.append(type)
+	if type == "buff_turret":
+		turret_damage_multiplier = 1.5
+	elif type == "buff_plant":
+		plant_harvest_bonus = 2
+	elif type == "buff_solar":
+		solar_charge_multiplier = 1.5
+	relic_collected.emit(type)

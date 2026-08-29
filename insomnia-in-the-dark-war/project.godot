@@ -14,6 +14,13 @@ config/name="Insomnia in the Dark War"
 config/features=PackedStringArray("4.7", "Mobile")
 config/icon="res://icon.svg"
 
+[autoload]
+
+GameState="*res://scripts/game_state.gd"
+JournalManager="*res://scripts/journal_manager.gd"
+UnlockManager="*res://scripts/unlock_manager.gd"
+SaveManager="*res://scripts/save_manager.gd"
+
 [display]
 
 window/stretch/mode="canvas_items"
@@ -40,7 +47,3 @@ click_build={
 
 rendering_device/driver.windows="d3d12"
 renderer/rendering_method="mobile"
-
-[autoload]
-
-GameState="*res://scripts/game_state.gd"
