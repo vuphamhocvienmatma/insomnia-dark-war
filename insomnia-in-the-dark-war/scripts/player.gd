@@ -16,7 +16,7 @@ func _physics_process(_delta: float) -> void:
 	if direction != Vector2.ZERO:
 		direction = direction.normalized()
 
-	var effective_speed: float = speed * (0.85 if GameState.is_tired else 1.0)
+	var effective_speed: float = speed * (0.85 if (GameState and GameState.is_tired) else 1.0)
 	velocity = direction * effective_speed
 	move_and_slide()
 

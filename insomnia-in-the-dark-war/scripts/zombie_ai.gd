@@ -9,6 +9,7 @@ var current_health: float = 0.0
 var spawn_position: Vector2 = Vector2.ZERO
 var is_leaving: bool = false
 var has_looted: bool = false
+var loot_cooldown: float = 0.0
 
 @onready var navigation_agent: NavigationAgent2D = $NavigationAgent2D
 @onready var attack_area: Area2D = $AttackArea
@@ -31,6 +32,9 @@ func _ready() -> void:
 	attack_timer.timeout.connect(_on_attack_timer_timeout)
 
 func _physics_process(_delta: float) -> void:
+	if loot_cooldown > 0.0:
+		loot_cooldown -= _delta
+
 	if is_attacking:
 		return
 
@@ -46,12 +50,13 @@ func _physics_process(_delta: float) -> void:
 		return
 
 	if navigation_agent.is_navigation_finished() and not is_attacking:
-		if not has_looted:
+		if loot_cooldown <= 0.0 and not has_looted:
 			has_looted = true
-			if GameState.spend_scrap(1):
+			loot_cooldown = 10.0  # 10 giây cooldown
+			if GameState and GameState.spend_scrap(1):
 				print("Zombie lục lọi! Mất 1 phế liệu.")
 			else:
-				print("Zombie lục lội nhưng bạn sạch túi... chúng chán nản bỏ đi.")
+				print("Zombie lục lọi nhưng bạn sạch túi... chúng chán nản bỏ đi.")
 		is_leaving = true
 		navigation_agent.target_position = spawn_position
 		return
@@ -77,6 +82,10 @@ func _on_attack_area_body_exited(body: Node2D) -> void:
 func _on_attack_timer_timeout() -> void:
 	if current_target_fence and is_instance_valid(current_target_fence):
 		current_target_fence.call("take_damage", attack_damage)
+		# Flash đỏ khi attack
+		modulate = Color(1.0, 0.3, 0.3)
+		var tween := create_tween()
+		tween.tween_property(self, "modulate", Color.WHITE, 0.3)
 		var cam := get_tree().get_first_node_in_group("main_camera")
 		if cam and cam.has_method("trigger_shake"):
 			cam.call("trigger_shake", 8.0)

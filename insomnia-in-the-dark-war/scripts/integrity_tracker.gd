@@ -26,13 +26,14 @@ func check_perimeter_integrity() -> void:
 		is_breached = true
 		fort_breached.emit()
 		print("CẢNH BÁO: Phát hiện góc chết hàng rào!")
-		var tm = get_tree().get_first_node_in_group("time_manager")
-		if tm != null and tm.is_night:
-			GameState.breach_last_night = true
+		# Track breach bất kể ngày hay đêm
+		GameState.breach_last_night = true
 	elif open_blind_spots == 0 and is_breached:
 		is_breached = false
 		fort_secured.emit()
 		print("Pháo đài đã được trám kín. An toàn!")
+		# Reset breach flag khi hàng rào kín
+		GameState.breach_last_night = false
 		var tm = get_tree().get_first_node_in_group("time_manager")
 		if tm != null and not tm.is_night:
 			GameState.rest_well()

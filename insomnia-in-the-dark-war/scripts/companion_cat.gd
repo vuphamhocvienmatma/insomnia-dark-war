@@ -77,15 +77,17 @@ func _deliver_item() -> void:
 		is_carrying_item = false
 		return
 	var item_type: String = carried_item_node.get("item_type", "scrap")
-	match item_type:
-		"scrap":
-			GameState.add_scrap(1)
-		"seed":
-			GameState.add_seeds(1)
-			JournalManager.track_progress("seed")
-		"water":
-			GameState.add_water(1)
-	print("Mèo mang về 1 ", carried_item_node.item_type, "!")
+	if GameState:
+		match item_type:
+			"scrap":
+				GameState.add_scrap(1)
+			"seed":
+				GameState.add_seeds(1)
+				if JournalManager:
+					JournalManager.track_progress("seed")
+			"water":
+				GameState.add_water(1)
+	print("Mèo mang về 1 ", item_type, "!")
 	carried_item_node.queue_free()
 	carried_item_node = null
 	is_carrying_item = false

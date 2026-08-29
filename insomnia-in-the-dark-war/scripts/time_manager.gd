@@ -26,12 +26,13 @@ func _process(delta: float) -> void:
 	if not is_night:
 		var ratio := time_elapsed / day_duration_seconds
 		target_color = day_color.lerp(night_color, ratio)
-		current_solar_energy = clamp(
-			current_solar_energy + (delta * 5.0 * GameState.solar_charge_multiplier),
-			0.0,
-			max_solar_storage
-		)
-		solar_changed.emit(current_solar_energy)
+		if GameState:
+			current_solar_energy = clamp(
+				current_solar_energy + (delta * 5.0 * GameState.solar_charge_multiplier),
+				0.0,
+				max_solar_storage
+			)
+			solar_changed.emit(current_solar_energy)
 
 		if time_elapsed >= day_duration_seconds:
 			transition_to_night()
@@ -54,6 +55,7 @@ func transition_to_night() -> void:
 func transition_to_day() -> void:
 	is_night = false
 	time_elapsed = 0.0
+	current_solar_energy = 0.0  # Reset solar khi ngày mới bắt đầu
 	phase_changed.emit(false)
 	GameState.start_new_day()
 	if SaveManager:

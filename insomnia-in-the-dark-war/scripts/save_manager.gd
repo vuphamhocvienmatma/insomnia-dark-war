@@ -114,7 +114,10 @@ func load_game() -> bool:
 
 	# 3. Khôi phục Daily Tasks
 	if JournalManager != null and save_data.has("daily_tasks"):
-		JournalManager.daily_tasks = save_data["daily_tasks"]
+		var loaded_tasks: Array = save_data.get("daily_tasks", [])
+		JournalManager.daily_tasks.clear()
+		for task_data in loaded_tasks:
+			JournalManager.daily_tasks.append(task_data)
 		JournalManager.tasks_updated.emit()
 
 	print("📂 Đã load game thành công!")

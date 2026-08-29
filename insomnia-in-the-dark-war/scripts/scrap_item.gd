@@ -26,12 +26,15 @@ func _on_body_exited(body: Node2D) -> void:
 
 func _unhandled_input(event: InputEvent) -> void:
 	if event.is_action_pressed("interact") and player_inside:
+		if not GameState:
+			return
 		match item_type:
 			"scrap":
 				GameState.add_scrap(1)
 			"seed":
 				GameState.add_seeds(1)
-				JournalManager.track_progress("seed")
+				if JournalManager:
+					JournalManager.track_progress("seed")
 			"water":
 				GameState.add_water(1)
 		queue_free()

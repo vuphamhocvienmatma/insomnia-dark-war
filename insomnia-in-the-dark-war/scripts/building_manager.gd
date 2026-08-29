@@ -27,11 +27,16 @@ func _process(_delta: float) -> void:
 
 func _unhandled_input(event: InputEvent) -> void:
 	if event.is_action_pressed("click_build") and active_socket != null:
-		if GameState.spend_scrap(1) == true:
-			place_build_piece(active_socket)
-			JournalManager.track_progress("wall")
+		var player := get_tree().get_first_node_in_group("player") as Node2D
+		if player and global_position.distance_to(player.global_position) < 200.0:
+			if GameState and GameState.spend_scrap(1) == true:
+				place_build_piece(active_socket)
+				if JournalManager:
+					JournalManager.track_progress("wall")
+			else:
+				print("Hết phế liệu!")
 		else:
-			print("Hết phế liệu!")
+			print("Quá xa để xây dựng!")
 
 func place_build_piece(socket: BuildSocket2D) -> void:
 	var new_piece: Node2D = load("res://scenes/wall_piece.tscn").instantiate() as Node2D

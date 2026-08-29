@@ -72,7 +72,7 @@ func _spawn_scrap_field() -> void:
 	var relic_types := ["buff_turret", "buff_plant", "buff_solar"]
 	for i in relic_count:
 		var angle := randf() * TAU
-		var dist := 900.0
+		var dist := randf_range(850.0, 950.0)  # Randomize thay vì cố định 900.0
 		var pos := Vector2(cos(angle), sin(angle)) * dist
 
 		var relic := RELIC_SCENE.instantiate() as Node2D
