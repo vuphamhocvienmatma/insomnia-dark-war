@@ -1,5 +1,7 @@
 extends Camera2D
 
+const CAM_Y: float = -170.0
+
 var shake_intensity: float = 0.0
 var shake_decay: float = 5.0
 
@@ -9,6 +11,7 @@ func _ready() -> void:
 	limit_right = 1300
 	limit_top = -700
 	limit_bottom = 400
+	position = Vector2(0.0, CAM_Y)
 
 func _process(delta: float) -> void:
 	if shake_intensity > 0.0:
