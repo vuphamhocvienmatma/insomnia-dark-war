@@ -11,6 +11,7 @@ var seeds_count: int = 0
 var water_count: int = 0
 var breach_last_night: bool = false
 var is_tired: bool = false
+var meal_buff: bool = false
 var relics_found: Array[String] = []
 
 var turret_damage_multiplier: float = 1.0
@@ -51,7 +52,8 @@ func spend_water(amount: int) -> bool:
 	return true
 
 func start_new_day() -> void:
-	is_tired = breach_last_night
+	is_tired = breach_last_night and not meal_buff
+	meal_buff = false
 	breach_last_night = false
 	tired_changed.emit(is_tired)
 	if is_tired:
