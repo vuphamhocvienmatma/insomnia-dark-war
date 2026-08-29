@@ -22,7 +22,8 @@ func _ready() -> void:
 	current_health = max_health
 	add_to_group("zombie")
 	spawn_position = global_position
-	target_fort_center = get_tree().get_first_node_in_group("fort_center").global_position
+	var fort_node := get_tree().get_first_node_in_group("fort_center") as Node2D
+	target_fort_center = fort_node.global_position
 	navigation_agent.target_position = target_fort_center
 	attack_timer.wait_time = attack_cooldown
 	attack_area.body_entered.connect(_on_attack_area_body_entered)
@@ -75,10 +76,10 @@ func _on_attack_area_body_exited(body: Node2D) -> void:
 
 func _on_attack_timer_timeout() -> void:
 	if current_target_fence and is_instance_valid(current_target_fence):
-		current_target_fence.take_damage(attack_damage)
+		current_target_fence.call("take_damage", attack_damage)
 		var cam := get_tree().get_first_node_in_group("main_camera")
 		if cam and cam.has_method("trigger_shake"):
-			cam.trigger_shake(8.0)
+			cam.call("trigger_shake", 8.0)
 	else:
 		is_attacking = false
 		attack_timer.stop()

@@ -40,8 +40,8 @@ func _update_tasks() -> void:
 	var labels := [task1_label, task2_label, task3_label]
 	for i in labels.size():
 		if i < tasks.size():
-			var task: Dictionary = tasks[i]
-			var mark := "x" if task.progress >= task.target else " "
-			labels[i].text = "[" + mark + "] " + task.desc + " (" + str(task.progress) + "/" + str(task.target) + ")"
+		var task: Dictionary = tasks[i]
+		var mark := "x" if task["progress"] >= task["target"] else " "
+		labels[i].text = "[" + mark + "] " + str(task["desc"]) + " (" + str(task["progress"]) + "/" + str(task["target"]) + ")"
 		else:
 			labels[i].text = ""

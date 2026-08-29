@@ -12,6 +12,9 @@ func save_game() -> void:
 	save_data["relics"] = GameState.relics_found
 	save_data["breach_last_night"] = GameState.breach_last_night
 	save_data["is_tired"] = GameState.is_tired
+	save_data["turret_damage_multiplier"] = GameState.turret_damage_multiplier
+	save_data["plant_harvest_bonus"] = GameState.plant_harvest_bonus
+	save_data["solar_charge_multiplier"] = GameState.solar_charge_multiplier
 
 	# 2. Lưu vị trí các bức tường đã xây (để sáng hôm sau mở game rào vẫn còn)
 	var built_walls: Array = []
@@ -60,16 +63,34 @@ func load_game() -> bool:
 	GameState.scrap_count = save_data.get("scrap", 0)
 	GameState.seeds_count = save_data.get("seeds", 0)
 	GameState.water_count = save_data.get("water", 0)
-	GameState.relics_found = save_data.get("relics", [])
+
+	var loaded_relics: Array = save_data.get("relics", [])
+	GameState.relics_found.clear()
+	for relic in loaded_relics:
+		GameState.relics_found.append(str(relic))
+
 	GameState.breach_last_night = save_data.get("breach_last_night", false)
 	GameState.is_tired = save_data.get("is_tired", false)
+	GameState.turret_damage_multiplier = save_data.get("turret_damage_multiplier", 1.0)
+	GameState.plant_harvest_bonus = save_data.get("plant_harvest_bonus", 0)
+	GameState.solar_charge_multiplier = save_data.get("solar_charge_multiplier", 1.0)
+
+	# Tái áp dụng buff từ relics để tương thích save cũ (trước khi có 3 trường trên)
+	for relic in GameState.relics_found:
+		if relic == "buff_turret":
+			GameState.turret_damage_multiplier = max(GameState.turret_damage_multiplier, 1.5)
+		elif relic == "buff_plant":
+			GameState.plant_harvest_bonus = max(GameState.plant_harvest_bonus, 2)
+		elif relic == "buff_solar":
+			GameState.solar_charge_multiplier = max(GameState.solar_charge_multiplier, 1.5)
+
 	# Emit lại các signal để HUD cập nhật
 	GameState.scrap_changed.emit(GameState.scrap_count)
 	GameState.seeds_changed.emit(GameState.seeds_count)
 	GameState.water_changed.emit(GameState.water_count)
 	GameState.tired_changed.emit(GameState.is_tired)
 
-	# 2. Khôi phục các bức tường đã xây
+	# 2. Khôi phục các bức tưởng đã xây
 	var wall_scene := preload("res://scenes/wall_piece.tscn")
 	var walls_data: Array = save_data.get("built_walls", [])
 	for w_data in walls_data:
@@ -78,7 +99,7 @@ func load_game() -> bool:
 		get_tree().current_scene.add_child(wall)
 		wall.global_position = Vector2(w_data["pos_x"], w_data["pos_y"])
 		wall.global_rotation = w_data["rot"]
-		wall.current_health = w_data["health"]
+		wall.set("current_health", w_data["health"])
 		# Đánh dấu socket tương ứng là occupied (tìm socket gần nhất)
 		var closest_socket: BuildSocket2D = null
 		var min_dist: float = 9999.0

@@ -76,7 +76,8 @@ func _deliver_item() -> void:
 	if carried_item_node == null or not is_instance_valid(carried_item_node):
 		is_carrying_item = false
 		return
-	match carried_item_node.item_type:
+	var item_type: String = carried_item_node.get("item_type", "scrap")
+	match item_type:
 		"scrap":
 			GameState.add_scrap(1)
 		"seed":

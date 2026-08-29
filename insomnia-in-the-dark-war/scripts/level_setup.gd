@@ -65,7 +65,7 @@ func _spawn_scrap_field() -> void:
 
 		var scrap := SCRAP_SCENE.instantiate() as Node2D
 		scrap.position = pos
-		scrap.item_type = types[randi() % types.size()]
+		scrap.set("item_type", types[randi() % types.size()])
 		add_child(scrap)
 
 	var relic_count: int = 3
@@ -77,7 +77,7 @@ func _spawn_scrap_field() -> void:
 
 		var relic := RELIC_SCENE.instantiate() as Node2D
 		relic.position = pos
-		relic.relic_type = relic_types[randi() % relic_types.size()]
+		relic.set("relic_type", relic_types[randi() % relic_types.size()])
 		add_child(relic)
 
 func _on_phase_changed(is_night: bool) -> void:

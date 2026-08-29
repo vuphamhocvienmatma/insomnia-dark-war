@@ -31,7 +31,7 @@ func _on_fire_rate_timer_timeout() -> void:
 	if current_target != null and is_instance_valid(current_target):
 		if tm.spend_solar(solar_cost_per_shot):
 			var final_damage: float = attack_damage * GameState.turret_damage_multiplier
-			current_target.take_damage(final_damage)
+			current_target.call("take_damage", final_damage)
 			print("Turret phun lửa! Tiêu tốn ", solar_cost_per_shot, " Solar.")
 		else:
 			print("Hết năng lượng mặt trời! Turret ngừng bắn.")
