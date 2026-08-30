@@ -36,8 +36,8 @@ func _draw() -> void:
 		Vector2(55.0, -38.0),
 		Vector2(85.0, -10.0),
 		Vector2(95.0, 25.0),
-		Vector2(95.0, 42.0),
-		Vector2(-95.0, 42.0)
+		Vector2(95.0, 40.0),
+		Vector2(-95.0, 40.0)
 	])
 	draw_polygon(arch, [EARTH, EARTH, EARTH_SOFT, EARTH_SOFT, EARTH_SOFT, EARTH, EARTH, EARTH, EARTH])
 	var closed := arch.duplicate()
@@ -51,8 +51,16 @@ func _draw() -> void:
 	draw_circle(Vector2(0.0, -18.0), 8.0, GLOW)
 	draw_circle(Vector2(0.0, -18.0), 3.0, Color(1.0, 0.88, 0.55, 1.0))
 
+	# Mái hiên sọc trên cửa hầm
+	var awning_colors := [Color(0.85, 0.30, 0.28, 1.0), Color(0.95, 0.93, 0.88, 1.0)]
+	for i in 6:
+		var ax: float = -36.0 + float(i) * 12.0
+		var col: Color = awning_colors[i % 2]
+		_draw_soft_rect(Rect2(ax, -52.0, 12.0, 8.0), col, 2.0)
+
+	# Cỏ nhỏ
 	for x in [-70.0, -50.0, 52.0, 74.0]:
-		draw_line(Vector2(x, 42.0), Vector2(x + 4.0, 32.0), Color(0.35, 0.55, 0.32, 1.0), 2.0)
+		draw_line(Vector2(x, 40.0), Vector2(x + 4.0, 32.0), Color(0.35, 0.55, 0.32, 1.0), 2.0)
 
 
 func _draw_soft_rect(r: Rect2, col: Color, radius: float) -> void:

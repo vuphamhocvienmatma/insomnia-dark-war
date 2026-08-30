@@ -102,14 +102,14 @@ func _spawn_relics() -> void:
 func _spawn_ground_details() -> void:
 	for i in 8:
 		var rock := ColorRect.new()
-		var s := randf_range(6.0, 14.0)
+		var s := randf_range(4.0, 8.0)
 		rock.size = Vector2(s, s)
 		var side := -1.0 if randf() < 0.5 else 1.0
-		rock.position = Vector2(side * randf_range(500.0, 1150.0), randf_range(10.0, 80.0))
+		rock.position = Vector2(side * randf_range(500.0, 1150.0), randf_range(2.0, 10.0))
 		if randf() < 0.5:
-			rock.color = Color(0.18, 0.18, 0.18, 1.0)
+			rock.color = Color(0.36, 0.31, 0.26, 1.0)
 		else:
-			rock.color = Color(0.25, 0.25, 0.25, 1.0)
+			rock.color = Color(0.44, 0.39, 0.33, 1.0)
 		rock.z_index = -8
 		add_child(rock)
 

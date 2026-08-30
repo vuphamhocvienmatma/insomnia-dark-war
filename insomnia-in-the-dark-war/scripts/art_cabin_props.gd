@@ -10,7 +10,6 @@ func _ready() -> void:
 	z_index = -3
 
 func _draw() -> void:
-	_draw_awning()
 	_draw_solar_panel()
 	_draw_ladder()
 	_draw_interior_details()
@@ -35,19 +34,6 @@ func _draw_interior_details() -> void:
 	_draw_rect_outline(Rect2(40.0, -30.0, 20.0, 30.0), Color(0.12, 0.10, 0.10, 1.0))
 	draw_rect(Rect2(-30.0, -10.0, 60.0, 8.0), Color(0.7, 0.3, 0.3, 1.0))
 
-func _draw_awning() -> void:
-	var stripe_w: float = 14.0
-	var stripe_h: float = 10.0
-	var base_y: float = -180.0
-	var base_x: float = -182.0
-	for i in 6:
-		var color: Color = AWNING_RED if (i % 2 == 0) else AWNING_WHITE
-		var rx: float = base_x + stripe_w * float(i)
-		var rect := Rect2(rx, base_y, stripe_w, stripe_h)
-		_draw_rounded_rect(rect, color, 3.0)
-		_draw_rect_outline(rect, Color(0.12, 0.10, 0.10, 1.0))
-	draw_line(Vector2(base_x, base_y + stripe_h), Vector2(base_x + stripe_w * 6.0, base_y + stripe_h), Color(0.12, 0.10, 0.10, 1.0), 1.0)
-
 func _draw_solar_panel() -> void:
 	var panel := Rect2(-150.0, -246.0, 100.0, 14.0)
 	draw_rect(panel, SOLAR)
@@ -61,7 +47,7 @@ func _draw_solar_panel() -> void:
 func _draw_ladder() -> void:
 	var left_x: float = 246.0
 	var right_x: float = 258.0
-	var top_y: float = -232.0
+	var top_y: float = -200.0
 	draw_line(Vector2(left_x, 0.0), Vector2(left_x, top_y), WOOD, 3.0)
 	draw_line(Vector2(right_x, 0.0), Vector2(right_x, top_y), WOOD, 3.0)
 	var rung_y: float = -16.0
