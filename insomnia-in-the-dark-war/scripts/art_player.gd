@@ -1,6 +1,6 @@
 extends Node2D
 
-const OUTLINE := Color(0.12, 0.10, 0.10)
+const OUTLINE := Color(0.20, 0.18, 0.16)
 const BOOTS := Color(0.22, 0.16, 0.12)
 const PANTS := Color(0.28, 0.32, 0.38)
 const SWEATER := Color(0.95, 0.72, 0.15)
@@ -36,43 +36,55 @@ func _draw() -> void:
 	_draw_face_details()
 	_draw_hair()
 
+
+func _draw_rounded_rect(r: Rect2, col: Color, radius: float) -> void:
+	draw_rect(r, col)
+	draw_circle(Vector2(r.position.x + radius, r.position.y + radius), radius, col)
+	draw_circle(Vector2(r.position.x + r.size.x - radius, r.position.y + radius), radius, col)
+	draw_circle(Vector2(r.position.x + radius, r.position.y + r.size.y - radius), radius, col)
+	draw_circle(Vector2(r.position.x + r.size.x - radius, r.position.y + r.size.y - radius), radius, col)
+
+
 func _draw_boots() -> void:
 	var left := Rect2(-7.0, 0.0, 6.0, 6.0)
 	var right := Rect2(1.0, 0.0, 6.0, 6.0)
-	draw_rect(left, BOOTS)
-	draw_rect(right, BOOTS)
+	_draw_rounded_rect(left, BOOTS, 2.0)
+	_draw_rounded_rect(right, BOOTS, 2.0)
 	_draw_rect_outline(left, OUTLINE)
 	_draw_rect_outline(right, OUTLINE)
 
+
 func _draw_pants() -> void:
 	var pants := Rect2(-7.0, -8.0, 14.0, 8.0)
-	draw_rect(pants, PANTS)
+	_draw_rounded_rect(pants, PANTS, 3.0)
 	_draw_rect_outline(pants, OUTLINE)
+
 
 func _draw_sweater() -> void:
 	var body := Rect2(-8.0, -22.0, 16.0, 14.0)
-	draw_rect(body, SWEATER)
+	_draw_rounded_rect(body, SWEATER, 3.0)
 	_draw_rect_outline(body, OUTLINE)
 	var left_swing: float = sin(_walk_bob + PI) * 2.0
 	var right_swing: float = sin(_walk_bob) * 2.0
 	var left_arm := Rect2(-11.0, -20.0 + left_swing, 3.0, 10.0)
 	var right_arm := Rect2(8.0, -20.0 + right_swing, 3.0, 10.0)
-	draw_rect(left_arm, SWEATER)
-	draw_rect(right_arm, SWEATER)
+	_draw_rounded_rect(left_arm, SWEATER, 2.0)
+	_draw_rounded_rect(right_arm, SWEATER, 2.0)
 	_draw_rect_outline(left_arm, OUTLINE)
 	_draw_rect_outline(right_arm, OUTLINE)
 
+
 func _draw_scarf() -> void:
 	var scarf := Rect2(-6.0, -24.0, 12.0, 3.0)
-	draw_rect(scarf, SCARF)
+	_draw_rounded_rect(scarf, SCARF, 2.0)
 	_draw_rect_outline(scarf, OUTLINE)
 
-func _draw_backpack() -> void:
-	draw_rect(Rect2(-10.0, -18.0, 4.0, 12.0), Color(0.4, 0.3, 0.2, 1.0))
-	_draw_rect_outline(Rect2(-10.0, -18.0, 4.0, 12.0), OUTLINE)
 
-func _draw_face_details() -> void:
-	draw_line(Vector2(-2.0, -27.0), Vector2(2.0, -27.0), Color(0.8, 0.4, 0.4, 1.0), 1.0)
+func _draw_backpack() -> void:
+	var bag := Rect2(-10.0, -18.0, 4.0, 12.0)
+	_draw_rounded_rect(bag, Color(0.4, 0.3, 0.2, 1.0), 2.0)
+	_draw_rect_outline(bag, OUTLINE)
+
 
 func _draw_head() -> void:
 	var head_pos := Vector2(0.0, -30.0)
@@ -80,6 +92,11 @@ func _draw_head() -> void:
 	_draw_circle_outline(head_pos, 7.0, OUTLINE)
 	draw_circle(Vector2(-2.0, -30.0), 1.2, OUTLINE)
 	draw_circle(Vector2(2.0, -30.0), 1.2, OUTLINE)
+
+
+func _draw_face_details() -> void:
+	draw_line(Vector2(-2.0, -27.0), Vector2(2.0, -27.0), Color(0.8, 0.4, 0.4, 1.0), 1.0)
+
 
 func _draw_hair() -> void:
 	var dome_pts := PackedVector2Array()
@@ -90,14 +107,15 @@ func _draw_hair() -> void:
 	draw_polyline(dome_pts, HAIR, 2.0)
 	_draw_circle_outline(Vector2(0.0, -31.0), 7.5, OUTLINE)
 	var top := Rect2(-7.0, -34.0, 14.0, 3.0)
-	draw_rect(top, HAIR)
+	_draw_rounded_rect(top, HAIR, 2.0)
 	_draw_rect_outline(top, OUTLINE)
 	var left_strand := Rect2(-8.0, -32.0, 2.0, 10.0)
 	var right_strand := Rect2(6.0, -32.0, 2.0, 10.0)
-	draw_rect(left_strand, HAIR)
-	draw_rect(right_strand, HAIR)
+	_draw_rounded_rect(left_strand, HAIR, 2.0)
+	_draw_rounded_rect(right_strand, HAIR, 2.0)
 	_draw_rect_outline(left_strand, OUTLINE)
 	_draw_rect_outline(right_strand, OUTLINE)
+
 
 func _draw_rect_outline(r: Rect2, col: Color) -> void:
 	var pts := PackedVector2Array([
@@ -108,6 +126,7 @@ func _draw_rect_outline(r: Rect2, col: Color) -> void:
 		r.position
 	])
 	draw_polyline(pts, col, 2.0)
+
 
 func _draw_circle_outline(c: Vector2, rad: float, col: Color) -> void:
 	var pts := PackedVector2Array()

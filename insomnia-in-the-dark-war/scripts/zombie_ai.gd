@@ -17,10 +17,14 @@ var has_looted: bool = false
 
 var is_attacking: bool = false
 var current_target_fence: Node2D = null
+var safe_zone: Area2D = null
 
 func _ready() -> void:
 	current_health = max_health
 	add_to_group("zombie")
+	var sz := get_tree().get_first_node_in_group("safe_zone")
+	if sz != null:
+		safe_zone = sz as Area2D
 	position.y = GROUND_Y
 	spawn_position = global_position
 	attack_timer.wait_time = attack_cooldown
@@ -30,6 +34,14 @@ func _ready() -> void:
 
 func _physics_process(_delta: float) -> void:
 	position.y = GROUND_Y
+
+	if safe_zone != null and global_position.distance_to(safe_zone.global_position) < 100.0:
+		var away := global_position - safe_zone.global_position
+		if away.length() < 1.0:
+			away = Vector2(1.0, 0.0)
+		velocity = away.normalized() * speed
+		move_and_slide()
+		return
 
 	if state == "leave":
 		_do_leave()

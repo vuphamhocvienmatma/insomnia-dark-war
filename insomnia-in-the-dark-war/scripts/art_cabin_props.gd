@@ -1,6 +1,6 @@
 extends Node2D
 
-const WOOD := Color(0.45, 0.32, 0.22, 1.0)
+const WOOD := Color(0.55, 0.42, 0.30, 1.0)
 const AWNING_RED := Color(0.85, 0.30, 0.28, 1.0)
 const AWNING_WHITE := Color(0.95, 0.93, 0.88, 1.0)
 const SOLAR := Color(0.10, 0.16, 0.35, 1.0)
@@ -17,9 +17,10 @@ func _draw() -> void:
 
 
 func _draw_interior_details() -> void:
-	draw_rect(Rect2(-120.0, -180.0, 40.0, 30.0), Color(0.6, 0.4, 0.3, 1.0))
-	_draw_rect_outline(Rect2(-120.0, -180.0, 40.0, 30.0), Color(0.12, 0.10, 0.10, 1.0))
-	draw_circle(Vector2(-80.0, -160.0), 6.0, Color(1.0, 0.9, 0.6, 1.0))
+	var frame := Rect2(-120.0, -180.0, 40.0, 30.0)
+	_draw_rounded_rect(frame, Color(0.6, 0.4, 0.3, 1.0), 4.0)
+	_draw_rect_outline(frame, Color(0.6, 0.5, 0.4, 1.0))
+	draw_ellipse(Vector2(-80.0, -160.0), Vector2(7.2, 6.0), Color(1.0, 0.9, 0.6, 1.0))
 	draw_line(Vector2(-80.0, -160.0), Vector2(-80.0, -200.0), Color(0.12, 0.10, 0.10, 1.0), 1.0)
 	draw_rect(Rect2(80.0, -180.0, 60.0, 8.0), Color(0.5, 0.35, 0.25, 1.0))
 	_draw_rect_outline(Rect2(80.0, -180.0, 60.0, 8.0), Color(0.12, 0.10, 0.10, 1.0))
@@ -40,7 +41,7 @@ func _draw_awning() -> void:
 		var color: Color = AWNING_RED if (i % 2 == 0) else AWNING_WHITE
 		var rx: float = base_x + stripe_w * float(i)
 		var rect := Rect2(rx, base_y, stripe_w, stripe_h)
-		draw_rect(rect, color)
+		_draw_rounded_rect(rect, color, 3.0)
 		_draw_rect_outline(rect, Color(0.12, 0.10, 0.10, 1.0))
 	draw_line(Vector2(base_x, base_y + stripe_h), Vector2(base_x + stripe_w * 6.0, base_y + stripe_h), Color(0.12, 0.10, 0.10, 1.0), 1.0)
 
@@ -74,3 +75,10 @@ func _draw_rect_outline(r: Rect2, col: Color) -> void:
 		r.position
 	])
 	draw_polyline(pts, col, 2.0)
+
+func _draw_rounded_rect(r: Rect2, col: Color, radius: float) -> void:
+	draw_rect(r, col)
+	draw_circle(Vector2(r.position.x + radius, r.position.y + radius), radius, col)
+	draw_circle(Vector2(r.position.x + r.size.x - radius, r.position.y + radius), radius, col)
+	draw_circle(Vector2(r.position.x + radius, r.position.y + r.size.y - radius), radius, col)
+	draw_circle(Vector2(r.position.x + r.size.x - radius, r.position.y + r.size.y - radius), radius, col)
