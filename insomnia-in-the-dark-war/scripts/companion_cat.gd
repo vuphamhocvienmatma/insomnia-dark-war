@@ -25,7 +25,10 @@ func _ready() -> void:
 		cabin = get_node_or_null("../CabinStructure") as Node2D
 
 func _physics_process(_delta: float) -> void:
-	position.y = cabin.get_current_floor_y() if (cabin != null and not _cat_climbing) else GROUND_Y
+	if cabin != null and not _cat_climbing:
+		position.y = cabin.get_current_floor_y()
+	elif cabin == null:
+		position.y = GROUND_Y
 
 	if target_player == null or not is_instance_valid(target_player):
 		target_player = get_tree().get_first_node_in_group("player")
@@ -63,17 +66,18 @@ func _physics_process(_delta: float) -> void:
 	else:
 		_seek_x(target_player.global_position.x, 40.0)
 
-	if abs(velocity.x) < 1.0:
-		_idle_time += _delta
-		var idle_bob: float = sin(_idle_time * 2.0) * 1.5
-		var art := get_node_or_null("Art") as Node2D
-		if art != null:
-			art.position.y = idle_bob
+	_update_idle_art(_delta)
+
+func _update_idle_art(delta: float) -> void:
+	var art := get_node_or_null("Art") as Node2D
+	if art == null:
+		return
+	if abs(velocity.x) < 1.0 and not _cat_climbing:
+		_idle_time += delta
+		art.position.y = sin(_idle_time * 2.0) * 1.5
 	else:
 		_idle_time = 0.0
-		var art := get_node_or_null("Art") as Node2D
-		if art != null:
-			art.position.y = 0.0
+		art.position.y = lerp(art.position.y, 0.0, 8.0 * delta)
 
 func _seek_x(target_x: float, stop_dist: float) -> void:
 	if cabin != null and abs(global_position.x - 252.0) < 16.0:

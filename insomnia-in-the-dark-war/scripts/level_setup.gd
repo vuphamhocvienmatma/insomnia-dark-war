@@ -9,6 +9,7 @@ const RELIC_SCENE := preload("res://scenes/relic_item.tscn")
 const NIGHT_SKY_SCRIPT := preload("res://scripts/art_night_sky.gd")
 const SKYLINE_SCRIPT := preload("res://scripts/art_skyline.gd")
 const CABIN_PROPS_SCRIPT := preload("res://scripts/art_cabin_props.gd")
+const WEATHER_SCRIPT := preload("res://scripts/art_weather.gd")
 
 const GROUND_Y: float = 0.0
 
@@ -33,7 +34,8 @@ func _ready() -> void:
 	_spawn_ground_details()
 	_create_night_sky()
 	var weather := Node2D.new()
-	weather.set_script(preload("res://scripts/art_weather.gd"))
+	weather.name = "Weather"
+	weather.set_script(WEATHER_SCRIPT)
 	add_child(weather)
 	_weather = weather
 

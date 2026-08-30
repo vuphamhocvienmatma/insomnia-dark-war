@@ -1,6 +1,7 @@
 extends CharacterBody2D
 
 const GROUND_Y: float = 0.0
+const SAFE_RADIUS: float = 125.0
 
 @export var speed: float = 30.0
 @export var attack_damage: float = 10.0
@@ -35,13 +36,23 @@ func _ready() -> void:
 func _physics_process(_delta: float) -> void:
 	position.y = GROUND_Y
 
-	if safe_zone != null and global_position.distance_to(safe_zone.global_position) < 100.0:
-		var away := global_position - safe_zone.global_position
-		if away.length() < 1.0:
-			away = Vector2(1.0, 0.0)
-		velocity = away.normalized() * speed
-		move_and_slide()
-		return
+	if safe_zone == null:
+		var sz := get_tree().get_first_node_in_group("safe_zone")
+		if sz != null:
+			safe_zone = sz as Area2D
+
+	if safe_zone != null and is_instance_valid(safe_zone):
+		var dist_to_safe: float = global_position.distance_to(safe_zone.global_position)
+		if dist_to_safe < SAFE_RADIUS:
+			var away: Vector2 = global_position - safe_zone.global_position
+			if away.length() < 1.0:
+				away = Vector2(sign(spawn_position.x), 0.0)
+			velocity = away.normalized() * speed * 1.25
+			var art := get_node_or_null("Art") as Node2D
+			if art != null and velocity.x != 0.0:
+				art.scale.x = -1.0 if velocity.x < 0.0 else 1.0
+			move_and_slide()
+			return
 
 	if state == "leave":
 		_do_leave()

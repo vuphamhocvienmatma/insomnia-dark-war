@@ -24,9 +24,9 @@ func _on_phase_changed(is_night: bool) -> void:
 func generate_daily_tasks() -> void:
 	daily_tasks.clear()
 	var task_pool := [
-		{"desc": "Nhặt 5 Hạt giống", "type": "seed", "target": 5, "progress": 0},
-		{"desc": "Xây 3 Vách rào", "type": "wall", "target": 3, "progress": 0},
-		{"desc": "Bắn hạ 3 Zombie", "type": "zombie_kill", "target": 3, "progress": 0}
+		{"desc": "Nhặt 5 Hạt giống", "type": "seed", "target": 5, "progress": 0, "completed": false},
+		{"desc": "Xây 3 Vách rào", "type": "wall", "target": 3, "progress": 0, "completed": false},
+		{"desc": "Bắn hạ 3 Zombie", "type": "zombie_kill", "target": 3, "progress": 0, "completed": false}
 	]
 	task_pool.shuffle()
 	daily_tasks.assign(task_pool.slice(0, 3))
@@ -34,12 +34,24 @@ func generate_daily_tasks() -> void:
 
 func track_progress(task_type: String) -> void:
 	for task in daily_tasks:
-		if task["type"] == task_type and task["progress"] < task["target"]:
-			task["progress"] += 1
-		if task["progress"] == task["target"]:
-			task_completed.emit(task["desc"])
+		if str(task.get("type", "")) != task_type:
+			continue
+
+		var progress: int = int(task.get("progress", 0))
+		var target: int = int(task.get("target", 0))
+		var completed: bool = bool(task.get("completed", false))
+
+		if progress >= target:
+			break
+
+		progress += 1
+		task["progress"] = progress
+
+		if progress >= target and not completed:
+			task["completed"] = true
+			task_completed.emit(str(task.get("desc", "")))
 			GameState.add_scrap(5)
 			GameState.add_seeds(2)
-			print("🎉 Hoàn thành nhiệm vụ: ", task["desc"], "! Thưởng 5 phế liệu + 2 hạt giống.")
+			print("🎉 Hoàn thành nhiệm vụ: ", str(task.get("desc", "")), "! Thưởng 5 phế liệu + 2 hạt giống.")
 		break
 	tasks_updated.emit()
