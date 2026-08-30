@@ -18,6 +18,9 @@
 [ext_resource type="Script" path="res://scripts/art_clouds.gd" id="12_clouds"]
 [ext_resource type="Script" path="res://scripts/cabin_structure.gd" id="14_cabin"]
 
+[sub_resource type="RectangleShape2D" id="RectangleShapeSafe"]
+size = Vector2(180, 80)
+
 [node name="MainLevel" type="Node2D" unique_id=129172497]
 script = ExtResource("1_level")
 
@@ -217,6 +220,3 @@ offset_top = -40.0
 offset_right = 90.0
 offset_bottom = 40.0
 color = Color(0.3, 0.5, 0.3, 0.2)
-
-[sub_resource type="RectangleShape2D" id="RectangleShapeSafe"]
-size = Vector2(180, 80)
