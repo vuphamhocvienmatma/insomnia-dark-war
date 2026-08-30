@@ -9,6 +9,7 @@ const GROUND_Y: float = 0.0
 @onready var cabin: Node2D = get_tree().get_first_node_in_group("cabin_structure")
 var _cat_floor: String = "ground"
 var _cat_climbing: bool = false
+var _idle_time: float = 0.0
 
 var target_player: Node2D = null
 var is_carrying_item: bool = false
@@ -61,6 +62,18 @@ func _physics_process(_delta: float) -> void:
 			nearest.set("player_inside", false)
 	else:
 		_seek_x(target_player.global_position.x, 40.0)
+
+	if abs(velocity.x) < 1.0:
+		_idle_time += _delta
+		var idle_bob: float = sin(_idle_time * 2.0) * 1.5
+		var art := get_node_or_null("Art") as Node2D
+		if art != null:
+			art.position.y = idle_bob
+	else:
+		_idle_time = 0.0
+		var art := get_node_or_null("Art") as Node2D
+		if art != null:
+			art.position.y = 0.0
 
 func _seek_x(target_x: float, stop_dist: float) -> void:
 	if cabin != null and abs(global_position.x - 252.0) < 16.0:

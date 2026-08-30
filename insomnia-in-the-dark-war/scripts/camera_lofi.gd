@@ -17,11 +17,12 @@ func _process(delta: float) -> void:
 	global_position.y = CAM_Y
 
 	if shake_intensity > 0.0:
-		offset = Vector2(
-			randf_range(-shake_intensity, shake_intensity),
-			randf_range(-shake_intensity, shake_intensity)
-		)
-		shake_intensity = lerp(shake_intensity, 0.0, shake_decay * delta)
+		var offset_x := smoothstep(-shake_intensity, shake_intensity, randf() * 2.0 - 1.0) * shake_intensity
+		var offset_y := smoothstep(-shake_intensity, shake_intensity, randf() * 2.0 - 1.0) * shake_intensity
+		offset = Vector2(offset_x, offset_y)
+		shake_intensity *= pow(0.1, delta * shake_decay)
+		if shake_intensity < 0.5:
+			shake_intensity = 0.0
 	else:
 		offset = Vector2.ZERO
 

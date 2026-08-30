@@ -14,6 +14,7 @@ const GROUND_Y: float = 0.0
 
 var _spawned_zombies: Array[Node2D] = []
 var _night_sky: Node2D = null
+var _weather: Node2D = null
 var day_count: int = 1
 
 func _ready() -> void:
@@ -31,6 +32,10 @@ func _ready() -> void:
 	_spawn_relics()
 	_spawn_ground_details()
 	_create_night_sky()
+	var weather := Node2D.new()
+	weather.set_script(preload("res://scripts/art_weather.gd"))
+	add_child(weather)
+	_weather = weather
 
 	if SaveManager:
 		SaveManager.load_game()
@@ -119,6 +124,8 @@ func _on_phase_changed(is_night: bool) -> void:
 		day_count += 1
 	if _night_sky != null:
 		_night_sky.visible = is_night
+	if _weather != null:
+		_weather.visible = is_night
 
 	if is_night:
 		_respawn_zombie_wave()

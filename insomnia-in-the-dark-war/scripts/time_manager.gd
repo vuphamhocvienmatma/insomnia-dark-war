@@ -3,8 +3,8 @@ extends Node
 signal phase_changed(is_night: bool)
 signal solar_changed(new_amount: float)
 
-@export var day_duration_seconds: float = 120.0
-@export var night_duration_seconds: float = 60.0
+@export var day_duration_seconds: float = 180.0
+@export var night_duration_seconds: float = 90.0
 
 @export var day_color: Color = Color("ffe699")
 @export var night_color: Color = Color("1c1d3a")
@@ -25,7 +25,8 @@ func _process(delta: float) -> void:
 
 	if not is_night:
 		var ratio := time_elapsed / day_duration_seconds
-		target_color = day_color.lerp(night_color, ratio)
+		var eased_ratio := ease(ratio, 0.4)
+		target_color = day_color.lerp(night_color, eased_ratio)
 		if GameState:
 			current_solar_energy = clamp(
 				current_solar_energy + (delta * 5.0 * GameState.solar_charge_multiplier),
