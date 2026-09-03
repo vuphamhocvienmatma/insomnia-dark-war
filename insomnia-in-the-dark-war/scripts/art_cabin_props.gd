@@ -1,69 +1,330 @@
 extends Node2D
 
-const WOOD := Color(0.55, 0.42, 0.30, 1.0)
-const AWNING_RED := Color(0.85, 0.30, 0.28, 1.0)
-const AWNING_WHITE := Color(0.95, 0.93, 0.88, 1.0)
-const SOLAR := Color(0.10, 0.16, 0.35, 1.0)
-const SOLAR_LINE := Color(0.35, 0.50, 0.75, 1.0)
+const OUTLINE := Color(0.18, 0.14, 0.12, 1.0)
+const WOOD_PLANK_A: Color = Color(0.36, 0.25, 0.18, 1.0)
+const WOOD_PLANK_B: Color = Color(0.30, 0.20, 0.14, 1.0)
+const WOOD_LINE: Color = Color(0.18, 0.12, 0.08, 0.85)
+const WOOD_BEAM: Color = Color(0.22, 0.15, 0.10, 1.0)
+const SOLAR: Color = Color(0.12, 0.18, 0.36, 1.0)
+const SOLAR_LINE: Color = Color(0.35, 0.52, 0.78, 1.0)
+const WARM_GLOW: Color = Color(1.0, 0.88, 0.55, 0.9)
+const FAIRY_WIRE: Color = Color(0.15, 0.15, 0.15, 0.7)
+
+var _time: float = 0.0
+
 
 func _ready() -> void:
 	z_index = -3
 
+
+func _process(delta: float) -> void:
+	_time += delta * 2.5
+	queue_redraw()
+
+
 func _draw() -> void:
+	_draw_wall_planks()
+	_draw_mezzanine_bedding()
+	_draw_shelves_and_supplies()
+	_draw_steaming_mug()
+	_draw_guitar()
+	_draw_leather_armchair()
+	_draw_workbench_and_tools()
+	_draw_gun_rack()
+	_draw_turntable()
+	_draw_supply_crates()
+	_draw_window_curtains()
+	_draw_fairy_lights()
 	_draw_solar_panel()
+	_draw_rooftop_sandbags()
 	_draw_ladder()
-	_draw_interior_details()
 
 
-func _draw_interior_details() -> void:
-	var frame := Rect2(-120.0, -180.0, 40.0, 30.0)
-	_draw_rounded_rect(frame, Color(0.6, 0.4, 0.3, 1.0), 4.0)
-	_draw_rect_outline(frame, Color(0.6, 0.5, 0.4, 1.0))
-	draw_set_transform(Vector2(-80.0, -160.0), 0.0, Vector2(1.2, 1.0))
-	draw_circle(Vector2.ZERO, 6.0, Color(1.0, 0.9, 0.6, 1.0))
-	draw_set_transform(Vector2.ZERO, 0.0, Vector2.ONE)
-	draw_arc(Vector2(-80.0, -160.0), 7.2, 0.0, TAU, 16, Color(0.12, 0.10, 0.10, 1.0), 1.0)
-	draw_line(Vector2(-80.0, -160.0), Vector2(-80.0, -200.0), Color(0.12, 0.10, 0.10, 1.0), 1.0)
-	draw_rect(Rect2(80.0, -180.0, 60.0, 8.0), Color(0.5, 0.35, 0.25, 1.0))
-	_draw_rect_outline(Rect2(80.0, -180.0, 60.0, 8.0), Color(0.12, 0.10, 0.10, 1.0))
-	var book_colors := [Color(0.8, 0.3, 0.3, 1.0), Color(0.3, 0.6, 0.8, 1.0), Color(0.4, 0.7, 0.4, 1.0), Color(0.8, 0.7, 0.3, 1.0)]
-	for i in 4:
-		var bx: float = 84.0 + float(i) * 13.0
-		draw_rect(Rect2(bx, -188.0, 8.0, 12.0), book_colors[i])
-	draw_rect(Rect2(40.0, -30.0, 20.0, 30.0), Color(0.5, 0.35, 0.25, 1.0))
-	_draw_rect_outline(Rect2(40.0, -30.0, 20.0, 30.0), Color(0.12, 0.10, 0.10, 1.0))
-	draw_rect(Rect2(-30.0, -10.0, 60.0, 8.0), Color(0.7, 0.3, 0.3, 1.0))
+func _draw_wall_planks() -> void:
+	# 1. 2.5D Left Perspective Side Wall (Angled fanning forward towards camera)
+	var left_wall: PackedVector2Array = PackedVector2Array([
+		Vector2(-232.0, -215.0),
+		Vector2(-195.0, -195.0),
+		Vector2(-195.0, -12.0),
+		Vector2(-232.0, 18.0)
+	])
+	draw_colored_polygon(left_wall, WOOD_PLANK_B * 0.76)
+	_draw_polyline_loop(left_wall, OUTLINE)
+	# Left perspective wall studs
+	for p_idx in 3:
+		var t: float = float(p_idx + 1) / 4.0
+		var top_pt: Vector2 = Vector2(-232.0, -215.0).lerp(Vector2(-195.0, -195.0), t)
+		var bot_pt: Vector2 = Vector2(-232.0, 18.0).lerp(Vector2(-195.0, -12.0), t)
+		draw_line(top_pt, bot_pt, WOOD_LINE, 1.5)
+
+	# 2. 2.5D Right Perspective Side Wall (Angled fanning forward towards camera)
+	var right_wall: PackedVector2Array = PackedVector2Array([
+		Vector2(195.0, -195.0),
+		Vector2(232.0, -215.0),
+		Vector2(232.0, 18.0),
+		Vector2(195.0, -12.0)
+	])
+	draw_colored_polygon(right_wall, WOOD_PLANK_B * 0.70)
+	_draw_polyline_loop(right_wall, OUTLINE)
+	# Right perspective wall studs
+	for p_idx in 3:
+		var t: float = float(p_idx + 1) / 4.0
+		var top_pt: Vector2 = Vector2(195.0, -195.0).lerp(Vector2(232.0, -215.0), t)
+		var bot_pt: Vector2 = Vector2(195.0, -12.0).lerp(Vector2(232.0, 18.0), t)
+		draw_line(top_pt, bot_pt, WOOD_LINE, 1.5)
+
+	# 3. 2.5D Perspective Ceiling Rafters
+	var ceiling: PackedVector2Array = PackedVector2Array([
+		Vector2(-232.0, -215.0),
+		Vector2(232.0, -215.0),
+		Vector2(195.0, -195.0),
+		Vector2(-195.0, -195.0)
+	])
+	draw_colored_polygon(ceiling, WOOD_PLANK_B * 0.62)
+	_draw_polyline_loop(ceiling, OUTLINE)
+	for r_idx in 7:
+		var rt: float = float(r_idx + 1) / 8.0
+		var f_pt: Vector2 = Vector2(-232.0, -215.0).lerp(Vector2(232.0, -215.0), rt)
+		var b_pt: Vector2 = Vector2(-195.0, -195.0).lerp(Vector2(195.0, -195.0), rt)
+		draw_line(f_pt, b_pt, WOOD_BEAM, 2.5)
+
+	# 4. 2.5D Back Wall with horizontal wooden planks [-195, 195] x [-195, -12]
+	var plank_h: float = 18.0
+	var y: float = -195.0
+	var i: int = 0
+	while y < -12.0:
+		var col: Color = WOOD_PLANK_A if (i % 2 == 0) else WOOD_PLANK_B
+		draw_rect(Rect2(-195.0, y, 390.0, plank_h), col)
+		draw_line(Vector2(-195.0, y), Vector2(195.0, y), WOOD_LINE, 1.2)
+		var seam_x: float = -110.0 if (i % 2 == 0) else 70.0
+		draw_line(Vector2(seam_x, y), Vector2(seam_x, y + plank_h), WOOD_LINE, 1.0)
+		draw_circle(Vector2(seam_x - 6.0, y + plank_h * 0.5), 1.2, OUTLINE)
+		draw_circle(Vector2(seam_x + 6.0, y + plank_h * 0.5), 1.2, OUTLINE)
+		y += plank_h
+		i += 1
+
+	# 5. 2.5D Perspective Ground Floorboards (Fanning forward from y = -12 to y = 18)
+	var floor_poly: PackedVector2Array = PackedVector2Array([
+		Vector2(-195.0, -12.0),
+		Vector2(195.0, -12.0),
+		Vector2(228.0, 18.0),
+		Vector2(-228.0, 18.0)
+	])
+	draw_colored_polygon(floor_poly, WOOD_PLANK_A * 0.88)
+	_draw_polyline_loop(floor_poly, OUTLINE)
+
+	# Perspective floor plank lines fanning outwards
+	for f_idx in 12:
+		var ft: float = float(f_idx) / 12.0
+		var back_x: float = lerpf(-195.0, 195.0, ft)
+		var front_x: float = lerpf(-228.0, 228.0, ft)
+		draw_line(Vector2(back_x, -12.0), Vector2(front_x, 18.0), WOOD_LINE, 1.4)
+
+	# 6. Front Cutaway Foundation Timber Beam at y = 18
+	var rim_beam: Rect2 = Rect2(-230.0, 18.0, 460.0, 7.0)
+	draw_rect(rim_beam, WOOD_BEAM)
+	_draw_rect_outline(rim_beam, OUTLINE)
+	for bolt_x in [-210.0, -140.0, -70.0, 0.0, 70.0, 140.0, 210.0]:
+		draw_circle(Vector2(bolt_x, 21.5), 1.5, Color(0.45, 0.48, 0.52, 1.0))
+
+
+func _draw_mezzanine_bedding() -> void:
+	# 2.5D Mezzanine Loft Floor Surface: depth strip from y = -158 to -140
+	var loft_poly: PackedVector2Array = PackedVector2Array([
+		Vector2(-195.0, -158.0),
+		Vector2(195.0, -158.0),
+		Vector2(202.0, -140.0),
+		Vector2(-202.0, -140.0)
+	])
+	draw_colored_polygon(loft_poly, WOOD_PLANK_A * 0.85)
+	_draw_polyline_loop(loft_poly, OUTLINE)
+	# Front supporting timber beam
+	var beam: Rect2 = Rect2(-204.0, -140.0, 408.0, 8.0)
+	draw_rect(beam, WOOD_BEAM)
+	_draw_rect_outline(beam, OUTLINE)
+	for b_x in [-180.0, -100.0, -20.0, 60.0, 140.0, 180.0]:
+		draw_circle(Vector2(b_x, -136.0), 1.4, Color(0.45, 0.48, 0.52, 1.0))
+
+	# 2.5D Bed with perspective mattress and fluffy pillow
+	draw_circle(Vector2(-150.0, -138.0), 25.0, Color(0.0, 0.0, 0.0, 0.3))
+	var mattress: Rect2 = Rect2(-188.0, -154.0, 68.0, 14.0)
+	_draw_rounded_rect(mattress, Color(0.24, 0.28, 0.36, 1.0), 3.0)
+	_draw_rect_outline(mattress, OUTLINE)
+	var quilt: Rect2 = Rect2(-172.0, -153.0, 50.0, 13.0)
+	_draw_rounded_rect(quilt, Color(0.72, 0.32, 0.28, 1.0), 3.0)
+	_draw_rect_outline(quilt, OUTLINE)
+	draw_line(Vector2(-155.0, -153.0), Vector2(-155.0, -140.0), Color(0.90, 0.82, 0.65, 1.0), 2.0)
+	draw_line(Vector2(-138.0, -153.0), Vector2(-138.0, -140.0), Color(0.90, 0.82, 0.65, 1.0), 2.0)
+	var pillow: Rect2 = Rect2(-186.0, -158.0, 18.0, 12.0)
+	_draw_rounded_rect(pillow, Color(0.96, 0.94, 0.88, 1.0), 4.0)
+	_draw_rect_outline(pillow, OUTLINE)
+
+
+func _draw_shelves_and_supplies() -> void:
+	# Sturdy wooden shelf on upper right wall [50, 185] at y = -165
+	var shelf: Rect2 = Rect2(50.0, -165.0, 135.0, 7.0)
+	draw_rect(shelf, WOOD_BEAM)
+	_draw_rect_outline(shelf, OUTLINE)
+	
+	# Vintage books
+	var book_cols: Array[Color] = [
+		Color(0.82, 0.32, 0.28, 1.0),
+		Color(0.28, 0.52, 0.65, 1.0),
+		Color(0.35, 0.62, 0.38, 1.0),
+		Color(0.85, 0.65, 0.24, 1.0)
+	]
+	for idx in 4:
+		var bx: float = 56.0 + float(idx) * 11.0
+		var h: float = 14.0 if (idx % 2 == 0) else 17.0
+		var br: Rect2 = Rect2(bx, -165.0 - h, 9.0, h)
+		draw_rect(br, book_cols[idx])
+		_draw_rect_outline(br, OUTLINE)
+		draw_line(Vector2(bx + 4.5, -165.0 - h), Vector2(bx + 4.5, -165.0), Color(1, 1, 1, 0.25), 1.0)
+	
+	# Canned food tins / Mason jars
+	var can_cols: Array[Color] = [Color(0.72, 0.74, 0.78, 1.0), Color(0.82, 0.40, 0.25, 1.0), Color(0.92, 0.78, 0.40, 1.0)]
+	for c_idx in 3:
+		var cx: float = 110.0 + float(c_idx) * 14.0
+		var cr: Rect2 = Rect2(cx, -177.0, 11.0, 12.0)
+		_draw_rounded_rect(cr, can_cols[c_idx], 2.0)
+		_draw_rect_outline(cr, OUTLINE)
+		# Label strip
+		draw_rect(Rect2(cx + 1.0, -173.0, 9.0, 4.0), Color(0.95, 0.95, 0.90, 0.9))
+	
+	# Small glass water jar with blue tint
+	var jar: Rect2 = Rect2(160.0, -180.0, 13.0, 15.0)
+	_draw_rounded_rect(jar, Color(0.65, 0.85, 0.95, 0.7), 3.0)
+	_draw_rect_outline(jar, OUTLINE)
+	draw_rect(Rect2(162.0, -182.0, 9.0, 2.5), WOOD_BEAM)
+
+
+func _draw_steaming_mug() -> void:
+	# Cute steaming tea mug on the window shelf at x = 145, y = -140
+	var mug: Rect2 = Rect2(142.0, -150.0, 10.0, 10.0)
+	_draw_rounded_rect(mug, Color(0.95, 0.88, 0.78, 1.0), 2.0)
+	_draw_rect_outline(mug, OUTLINE)
+	# Handle
+	draw_arc(Vector2(152.0, -145.0), 3.0, -PI * 0.5, PI * 0.5, 8, OUTLINE, 1.5)
+	
+	# Rising steam wiggles
+	for s in 2:
+		var sx: float = 145.0 + float(s) * 4.0
+		var off1: float = sin(_time * 2.0 + float(s)) * 2.0
+		var off2: float = cos(_time * 2.0 + float(s)) * 2.5
+		var steam_pts: PackedVector2Array = PackedVector2Array([
+			Vector2(sx, -152.0),
+			Vector2(sx + off1, -158.0),
+			Vector2(sx + off2, -164.0)
+		])
+		draw_polyline(steam_pts, Color(1.0, 1.0, 1.0, 0.45), 1.2)
+
+
+func _draw_window_curtains() -> void:
+	# Warm checkered curtains flanking the cabin window [-168, -112] x [-168, -104]
+	var drape_col: Color = Color(0.85, 0.45, 0.40, 0.95)
+	
+	# Left curtain
+	draw_colored_polygon(
+		PackedVector2Array([
+			Vector2(-172.0, -170.0),
+			Vector2(-158.0, -170.0),
+			Vector2(-163.0, -135.0),
+			Vector2(-156.0, -102.0),
+			Vector2(-172.0, -102.0)
+		]),
+		drape_col
+	)
+	_draw_polyline_loop([
+		Vector2(-172.0, -170.0),
+		Vector2(-158.0, -170.0),
+		Vector2(-163.0, -135.0),
+		Vector2(-156.0, -102.0),
+		Vector2(-172.0, -102.0)
+	], OUTLINE)
+	
+	# Right curtain
+	draw_colored_polygon(
+		PackedVector2Array([
+			Vector2(-122.0, -170.0),
+			Vector2(-108.0, -170.0),
+			Vector2(-108.0, -102.0),
+			Vector2(-124.0, -102.0),
+			Vector2(-117.0, -135.0)
+		]),
+		drape_col
+	)
+	_draw_polyline_loop([
+		Vector2(-122.0, -170.0),
+		Vector2(-108.0, -170.0),
+		Vector2(-108.0, -102.0),
+		Vector2(-124.0, -102.0),
+		Vector2(-117.0, -135.0)
+	], OUTLINE)
+	
+	# Curtain rod
+	draw_line(Vector2(-176.0, -171.0), Vector2(-104.0, -171.0), WOOD_BEAM, 3.0)
+
+
+func _draw_fairy_lights() -> void:
+	# String of cozy fairy lights hanging under the ceiling with a gentle catenary droop
+	var wire_pts: PackedVector2Array = PackedVector2Array()
+	var bulb_count: int = 12
+	var bulb_colors: Array[Color] = [
+		Color(1.0, 0.82, 0.40, 1.0), # warm yellow
+		Color(1.0, 0.55, 0.45, 1.0), # soft peach
+		Color(0.60, 0.88, 0.75, 1.0), # cozy mint
+		Color(1.0, 0.90, 0.65, 1.0)  # golden
+	]
+	
+	for i in bulb_count:
+		var t: float = float(i) / float(bulb_count - 1)
+		var x: float = lerpf(-190.0, 190.0, t)
+		var sag: float = sin(t * PI) * 14.0
+		var y: float = -194.0 + sag
+		wire_pts.append(Vector2(x, y))
+		
+		# Draw bulb
+		var flicker: float = 0.7 + sin(_time * 3.0 + float(i) * 1.5) * 0.3
+		var b_col: Color = bulb_colors[i % bulb_colors.size()]
+		# Outer glow halo
+		draw_circle(Vector2(x, y + 3.0), 4.5, Color(b_col.r, b_col.g, b_col.b, 0.28 * flicker))
+		# Inner bulb
+		draw_circle(Vector2(x, y + 3.0), 2.2, Color(b_col.r, b_col.g, b_col.b, flicker))
+		draw_circle(Vector2(x, y + 2.5), 0.8, Color(1.0, 1.0, 1.0, 0.8))
+	
+	draw_polyline(wire_pts, FAIRY_WIRE, 1.2)
+
 
 func _draw_solar_panel() -> void:
-	var panel := Rect2(-150.0, -246.0, 100.0, 14.0)
+	var panel: Rect2 = Rect2(-155.0, -248.0, 110.0, 16.0)
 	draw_rect(panel, SOLAR)
-	_draw_rect_outline(panel, Color(0.12, 0.10, 0.10, 1.0))
-	var px: float = -150.0
-	while px < -50.0:
-		draw_line(Vector2(px, -246.0), Vector2(px, -232.0), SOLAR_LINE, 1.0)
-		px += 20.0
-	draw_line(Vector2(-150.0, -239.0), Vector2(-50.0, -239.0), SOLAR_LINE, 1.0)
+	_draw_rect_outline(panel, OUTLINE)
+	var px: float = -155.0
+	while px < -45.0:
+		draw_line(Vector2(px, -248.0), Vector2(px, -232.0), SOLAR_LINE, 1.0)
+		px += 18.0
+	draw_line(Vector2(-155.0, -240.0), Vector2(-45.0, -240.0), SOLAR_LINE, 1.0)
+
 
 func _draw_ladder() -> void:
 	var left_x: float = 246.0
 	var right_x: float = 258.0
 	var top_y: float = -200.0
-	draw_line(Vector2(left_x, 0.0), Vector2(left_x, top_y), WOOD, 3.0)
-	draw_line(Vector2(right_x, 0.0), Vector2(right_x, top_y), WOOD, 3.0)
+	draw_line(Vector2(left_x, 0.0), Vector2(left_x, top_y), WOOD_BEAM, 3.5)
+	draw_line(Vector2(right_x, 0.0), Vector2(right_x, top_y), WOOD_BEAM, 3.5)
 	var rung_y: float = -16.0
 	while rung_y > top_y:
-		draw_line(Vector2(left_x, rung_y), Vector2(right_x, rung_y), WOOD, 2.0)
+		draw_line(Vector2(left_x - 1.0, rung_y), Vector2(right_x + 1.0, rung_y), WOOD_PLANK_A, 2.5)
+		draw_circle(Vector2(left_x, rung_y), 1.2, OUTLINE)
+		draw_circle(Vector2(right_x, rung_y), 1.2, OUTLINE)
 		rung_y -= 16.0
 
-func _draw_rect_outline(r: Rect2, col: Color) -> void:
-	var pts := PackedVector2Array([
-		r.position,
-		Vector2(r.position.x + r.size.x, r.position.y),
-		Vector2(r.position.x + r.size.x, r.position.y + r.size.y),
-		Vector2(r.position.x, r.position.y + r.size.y),
-		r.position
-	])
-	draw_polyline(pts, col, 2.0)
+
+func _draw_polyline_loop(pts_array: PackedVector2Array, col: Color) -> void:
+	var p: PackedVector2Array = pts_array.duplicate()
+	p.append(pts_array[0])
+	draw_polyline(p, col, 1.5)
+
 
 func _draw_rounded_rect(r: Rect2, col: Color, radius: float) -> void:
 	draw_rect(r, col)
@@ -71,3 +332,255 @@ func _draw_rounded_rect(r: Rect2, col: Color, radius: float) -> void:
 	draw_circle(Vector2(r.position.x + r.size.x - radius, r.position.y + radius), radius, col)
 	draw_circle(Vector2(r.position.x + radius, r.position.y + r.size.y - radius), radius, col)
 	draw_circle(Vector2(r.position.x + r.size.x - radius, r.position.y + r.size.y - radius), radius, col)
+
+
+func _draw_rect_outline(r: Rect2, col: Color) -> void:
+	var pts: PackedVector2Array = PackedVector2Array([
+		r.position,
+		Vector2(r.position.x + r.size.x, r.position.y),
+		Vector2(r.position.x + r.size.x, r.position.y + r.size.y),
+		Vector2(r.position.x, r.position.y + r.size.y),
+		r.position
+	])
+	draw_polyline(pts, col, 1.5)
+
+
+func _draw_circle_outline(c: Vector2, rad: float, col: Color) -> void:
+	var pts: PackedVector2Array = PackedVector2Array()
+	for i in 16:
+		var a: float = TAU * float(i) / 16.0
+		pts.append(c + Vector2(cos(a), sin(a)) * rad)
+	pts.append(pts[0])
+	draw_polyline(pts, col, 1.5)
+
+
+func _draw_leather_armchair() -> void:
+	# Leather armchair near stove at x = -38.0, y = 0.0
+	var cx: float = -38.0
+	var cy: float = 0.0
+	# 2.5D perspective contact shadow on floor
+	draw_colored_polygon(
+		PackedVector2Array([
+			Vector2(cx - 16.0, cy + 2.0),
+			Vector2(cx + 16.0, cy + 2.0),
+			Vector2(cx + 12.0, cy + 8.0),
+			Vector2(cx - 12.0, cy + 8.0)
+		]),
+		Color(0.0, 0.0, 0.0, 0.35)
+	)
+	# Wooden feet
+	draw_line(Vector2(cx - 10.0, cy), Vector2(cx - 12.0, cy + 4.0), WOOD_LINE, 2.0)
+	draw_line(Vector2(cx + 10.0, cy), Vector2(cx + 12.0, cy + 4.0), WOOD_LINE, 2.0)
+	# 2.5D Main seat cushion with top plane and front plane
+	var seat_top: PackedVector2Array = PackedVector2Array([
+		Vector2(cx - 12.0, cy - 16.0),
+		Vector2(cx + 12.0, cy - 16.0),
+		Vector2(cx + 14.0, cy - 10.0),
+		Vector2(cx - 14.0, cy - 10.0)
+	])
+	draw_colored_polygon(seat_top, Color(0.46, 0.30, 0.20, 1.0))
+	_draw_polyline_loop(seat_top, OUTLINE)
+	var seat_front: Rect2 = Rect2(cx - 14.0, cy - 10.0, 28.0, 8.0)
+	_draw_rounded_rect(seat_front, Color(0.38, 0.24, 0.16, 1.0), 2.0)
+	_draw_rect_outline(seat_front, OUTLINE)
+	# Backrest with 3D bevel
+	var back: Rect2 = Rect2(cx - 12.0, cy - 32.0, 24.0, 18.0)
+	_draw_rounded_rect(back, Color(0.44, 0.28, 0.18, 1.0), 4.0)
+	_draw_rect_outline(back, OUTLINE)
+	# Button tufting on backrest
+	draw_circle(Vector2(cx - 5.0, cy - 24.0), 1.2, OUTLINE)
+	draw_circle(Vector2(cx + 5.0, cy - 24.0), 1.2, OUTLINE)
+	draw_circle(Vector2(cx, cy - 18.0), 1.2, OUTLINE)
+	# 2.5D Armrests with top planes
+	var arm_l: Rect2 = Rect2(cx - 16.0, cy - 22.0, 5.0, 14.0)
+	var arm_r: Rect2 = Rect2(cx + 11.0, cy - 22.0, 5.0, 14.0)
+	_draw_rounded_rect(arm_l, Color(0.34, 0.20, 0.14, 1.0), 2.0)
+	_draw_rect_outline(arm_l, OUTLINE)
+	_draw_rounded_rect(arm_r, Color(0.34, 0.20, 0.14, 1.0), 2.0)
+	_draw_rect_outline(arm_r, OUTLINE)
+	# Cozy tartan throw blanket draped over armrest
+	var blanket: Rect2 = Rect2(cx + 10.0, cy - 20.0, 7.0, 12.0)
+	draw_rect(blanket, Color(0.68, 0.28, 0.22, 1.0))
+	draw_line(Vector2(cx + 10.0, cy - 15.0), Vector2(cx + 17.0, cy - 15.0), Color(0.85, 0.72, 0.38, 1.0), 1.2)
+
+
+func _draw_workbench_and_tools() -> void:
+	# Heavy carpenter workbench at x = 115.0, y = 0.0
+	var wx: float = 115.0
+	var wy: float = 0.0
+	# 2.5D shadow under workbench
+	draw_colored_polygon(
+		PackedVector2Array([
+			Vector2(wx - 24.0, wy + 2.0),
+			Vector2(wx + 24.0, wy + 2.0),
+			Vector2(wx + 20.0, wy + 8.0),
+			Vector2(wx - 20.0, wy + 8.0)
+		]),
+		Color(0.0, 0.0, 0.0, 0.35)
+	)
+	# Sturdy wooden legs in perspective
+	draw_rect(Rect2(wx - 20.0, wy - 18.0, 5.0, 20.0), WOOD_BEAM)
+	draw_rect(Rect2(wx + 15.0, wy - 18.0, 5.0, 20.0), WOOD_BEAM)
+	draw_rect(Rect2(wx - 14.0, wy - 20.0, 4.0, 18.0), WOOD_BEAM * 0.75) # back leg
+	draw_rect(Rect2(wx + 9.0, wy - 20.0, 4.0, 18.0), WOOD_BEAM * 0.75)  # back leg
+	draw_line(Vector2(wx - 20.0, wy - 4.0), Vector2(wx + 20.0, wy - 4.0), WOOD_BEAM, 2.5)
+	# 2.5D Tabletop (Perspective top plane + front fascia edge)
+	var top_surface: PackedVector2Array = PackedVector2Array([
+		Vector2(wx - 22.0, wy - 26.0),
+		Vector2(wx + 22.0, wy - 26.0),
+		Vector2(wx + 25.0, wy - 20.0),
+		Vector2(wx - 25.0, wy - 20.0)
+	])
+	draw_colored_polygon(top_surface, WOOD_PLANK_A * 1.05)
+	_draw_polyline_loop(top_surface, OUTLINE)
+	var front_fascia: Rect2 = Rect2(wx - 25.0, wy - 20.0, 50.0, 5.0)
+	draw_rect(front_fascia, WOOD_PLANK_B)
+	_draw_rect_outline(front_fascia, OUTLINE)
+
+	# Blueprint map unrolled on table
+	var bp: PackedVector2Array = PackedVector2Array([
+		Vector2(wx - 14.0, wy - 25.0),
+		Vector2(wx + 4.0, wy - 25.0),
+		Vector2(wx + 6.0, wy - 21.0),
+		Vector2(wx - 12.0, wy - 21.0)
+	])
+	draw_colored_polygon(bp, Color(0.25, 0.45, 0.70, 1.0))
+	draw_line(Vector2(wx - 11.0, wy - 23.0), Vector2(wx + 4.0, wy - 23.0), Color(0.70, 0.85, 1.0, 0.8), 1.0)
+	# Brass oil desk lamp
+	draw_rect(Rect2(wx + 11.0, wy - 27.0, 6.0, 6.0), Color(0.85, 0.70, 0.30, 1.0))
+	draw_circle(Vector2(wx + 14.0, wy - 29.0), 3.5, Color(1.0, 0.90, 0.50, 0.6))
+	# Hanging tools on the wall behind
+	draw_line(Vector2(wx - 14.0, wy - 36.0), Vector2(wx - 14.0, wy - 46.0), Color(0.6, 0.62, 0.65, 1.0), 2.0)
+	draw_circle(Vector2(wx - 14.0, wy - 46.0), 1.5, WOOD_BEAM)
+	draw_line(Vector2(wx - 6.0, wy - 36.0), Vector2(wx - 6.0, wy - 44.0), Color(0.5, 0.52, 0.55, 1.0), 1.8)
+	draw_line(Vector2(wx + 2.0, wy - 35.0), Vector2(wx + 2.0, wy - 45.0), WOOD_PLANK_B, 2.0)
+	draw_rect(Rect2(wx, wy - 46.0, 6.0, 3.0), Color(0.4, 0.42, 0.45, 1.0))
+
+
+func _draw_gun_rack() -> void:
+	var gx: float = 115.0
+	var gy: float = -56.0
+	draw_line(Vector2(gx - 16.0, gy - 8.0), Vector2(gx - 16.0, gy + 8.0), WOOD_BEAM, 3.0)
+	draw_line(Vector2(gx + 16.0, gy - 8.0), Vector2(gx + 16.0, gy + 8.0), WOOD_BEAM, 3.0)
+	draw_line(Vector2(gx - 18.0, gy - 4.0), Vector2(gx + 18.0, gy - 4.0), Color(0.35, 0.38, 0.40, 1.0), 1.8)
+	draw_line(Vector2(gx - 18.0, gy - 3.5), Vector2(gx - 8.0, gy - 3.5), WOOD_PLANK_A, 2.8)
+	draw_rect(Rect2(gx - 4.0, gy - 7.0, 7.0, 2.0), Color(0.2, 0.22, 0.25, 1.0))
+	draw_line(Vector2(gx - 16.0, gy + 4.0), Vector2(gx + 16.0, gy + 4.0), Color(0.32, 0.34, 0.36, 1.0), 2.2)
+	draw_line(Vector2(gx - 16.0, gy + 4.5), Vector2(gx - 7.0, gy + 4.5), WOOD_PLANK_A, 3.0)
+
+
+func _draw_turntable() -> void:
+	var tx: float = 52.0
+	var ty: float = 0.0
+	# 2.5D contact shadow
+	draw_colored_polygon(
+		PackedVector2Array([
+			Vector2(tx - 12.0, ty + 2.0),
+			Vector2(tx + 12.0, ty + 2.0),
+			Vector2(tx + 10.0, ty + 7.0),
+			Vector2(tx - 10.0, ty + 7.0)
+		]),
+		Color(0.0, 0.0, 0.0, 0.35)
+	)
+	var stand: Rect2 = Rect2(tx - 9.0, ty - 18.0, 18.0, 18.0)
+	draw_rect(stand, WOOD_BEAM)
+	_draw_rect_outline(stand, OUTLINE)
+	draw_circle(Vector2(tx, ty - 9.0), 1.2, Color(0.85, 0.70, 0.30, 1.0))
+	# 2.5D Turntable box with angled top
+	var box_top: PackedVector2Array = PackedVector2Array([
+		Vector2(tx - 8.0, ty - 26.0),
+		Vector2(tx + 8.0, ty - 26.0),
+		Vector2(tx + 9.0, ty - 22.0),
+		Vector2(tx - 9.0, ty - 22.0)
+	])
+	draw_colored_polygon(box_top, Color(0.52, 0.38, 0.26, 1.0))
+	_draw_polyline_loop(box_top, OUTLINE)
+	var box_front: Rect2 = Rect2(tx - 9.0, ty - 22.0, 18.0, 4.0)
+	draw_rect(box_front, Color(0.42, 0.28, 0.18, 1.0))
+	_draw_rect_outline(box_front, OUTLINE)
+	# Angled vinyl record
+	draw_circle(Vector2(tx - 1.0, ty - 24.0), 4.5, Color(0.12, 0.12, 0.14, 1.0))
+	draw_circle(Vector2(tx - 1.0, ty - 24.0), 1.8, Color(0.85, 0.30, 0.25, 1.0))
+	for note_idx in 2:
+		var n_phase: float = fmod(_time * 0.8 + float(note_idx) * 1.5, 3.0) / 3.0
+		var ny: float = ty - 28.0 - n_phase * 22.0
+		var nx: float = tx + sin(_time * 2.0 + float(note_idx)) * 4.0
+		var n_alpha: float = sin(n_phase * PI) * 0.85
+		var n_col: Color = Color(1.0, 0.88, 0.65, n_alpha)
+		draw_circle(Vector2(nx, ny), 1.5, n_col)
+		draw_line(Vector2(nx + 1.2, ny), Vector2(nx + 1.2, ny - 4.5), n_col, 1.2)
+		draw_line(Vector2(nx + 1.2, ny - 4.5), Vector2(nx + 3.5, ny - 3.5), n_col, 1.2)
+
+
+func _draw_supply_crates() -> void:
+	# True 2.5D Isometric wooden cargo crates at x = 175.0, y = 0.0
+	var cx: float = 175.0
+	var cy: float = 0.0
+	# 2.5D contact shadow
+	draw_colored_polygon(
+		PackedVector2Array([
+			Vector2(cx - 15.0, cy + 2.0),
+			Vector2(cx + 15.0, cy + 2.0),
+			Vector2(cx + 12.0, cy + 8.0),
+			Vector2(cx - 12.0, cy + 8.0)
+		]),
+		Color(0.0, 0.0, 0.0, 0.35)
+	)
+	# Bottom crate: Front face + Top face + Side face
+	var b_front: Rect2 = Rect2(cx - 12.0, cy - 18.0, 22.0, 18.0)
+	draw_rect(b_front, WOOD_PLANK_A)
+	_draw_rect_outline(b_front, OUTLINE)
+	draw_line(Vector2(cx - 12.0, cy - 18.0), Vector2(cx + 10.0, cy), OUTLINE, 1.2)
+	# Bottom crate top face
+	var b_top: PackedVector2Array = PackedVector2Array([
+		Vector2(cx - 12.0, cy - 18.0),
+		Vector2(cx + 10.0, cy - 18.0),
+		Vector2(cx + 14.0, cy - 23.0),
+		Vector2(cx - 8.0, cy - 23.0)
+	])
+	draw_colored_polygon(b_top, WOOD_PLANK_A * 1.1)
+	_draw_polyline_loop(b_top, OUTLINE)
+	# Iron corner braces
+	draw_circle(Vector2(cx - 9.0, cy - 15.0), 1.5, Color(0.4, 0.42, 0.45, 1.0))
+	draw_circle(Vector2(cx + 7.0, cy - 15.0), 1.5, Color(0.4, 0.42, 0.45, 1.0))
+	
+	# Top smaller crate with 2.5D top face
+	var t_front: Rect2 = Rect2(cx - 8.0, cy - 36.0, 18.0, 14.0)
+	draw_rect(t_front, WOOD_PLANK_B)
+	_draw_rect_outline(t_front, OUTLINE)
+	draw_line(Vector2(cx + 10.0, cy - 36.0), Vector2(cx - 8.0, cy - 22.0), OUTLINE, 1.2)
+	var t_top: PackedVector2Array = PackedVector2Array([
+		Vector2(cx - 8.0, cy - 36.0),
+		Vector2(cx + 10.0, cy - 36.0),
+		Vector2(cx + 13.0, cy - 40.0),
+		Vector2(cx - 5.0, cy - 40.0)
+	])
+	draw_colored_polygon(t_top, WOOD_PLANK_B * 1.1)
+	_draw_polyline_loop(t_top, OUTLINE)
+
+
+func _draw_guitar() -> void:
+	# Acoustic guitar leaning at x = -125.0, y = -140.0
+	var gx: float = -125.0
+	var gy: float = -140.0
+	# Guitar body
+	draw_circle(Vector2(gx, gy - 8.0), 7.0, Color(0.78, 0.52, 0.28, 1.0))
+	draw_circle(Vector2(gx + 1.5, gy - 16.0), 5.5, Color(0.78, 0.52, 0.28, 1.0))
+	_draw_circle_outline(Vector2(gx, gy - 8.0), 7.0, OUTLINE)
+	_draw_circle_outline(Vector2(gx + 1.5, gy - 16.0), 5.5, OUTLINE)
+	# Soundhole
+	draw_circle(Vector2(gx + 1.0, gy - 12.0), 2.2, Color(0.2, 0.14, 0.10, 1.0))
+	# Neck and headstock
+	draw_line(Vector2(gx + 2.0, gy - 16.0), Vector2(gx + 7.0, gy - 32.0), WOOD_BEAM, 2.5)
+	draw_rect(Rect2(gx + 6.0, gy - 36.0, 4.0, 5.0), WOOD_BEAM)
+
+
+func _draw_rooftop_sandbags() -> void:
+	# Sandbag parapets on roof edges
+	var sandbag_col: Color = Color(0.46, 0.44, 0.34, 1.0)
+	for rx in [-220.0, -200.0, -182.0, 182.0, 200.0, 220.0]:
+		_draw_rounded_rect(Rect2(rx - 8.0, -240.0, 16.0, 8.0), sandbag_col, 2.0)
+		_draw_rect_outline(Rect2(rx - 8.0, -240.0, 16.0, 8.0), OUTLINE)
+		_draw_rounded_rect(Rect2(rx - 7.0, -246.0, 14.0, 7.0), sandbag_col, 2.0)
+		_draw_rect_outline(Rect2(rx - 7.0, -246.0, 14.0, 7.0), OUTLINE)
+

@@ -10,6 +10,7 @@ const NIGHT_SKY_SCRIPT := preload("res://scripts/art_night_sky.gd")
 const SKYLINE_SCRIPT := preload("res://scripts/art_skyline.gd")
 const CABIN_PROPS_SCRIPT := preload("res://scripts/art_cabin_props.gd")
 const WEATHER_SCRIPT := preload("res://scripts/art_weather.gd")
+const GROUND_PROPS_SCRIPT := preload("res://scripts/art_ground_props.gd")
 
 const GROUND_Y: float = 0.0
 
@@ -17,6 +18,7 @@ var _spawned_zombies: Array[Node2D] = []
 var _night_sky: Node2D = null
 var _weather: Node2D = null
 var day_count: int = 1
+
 
 func _ready() -> void:
 	var skyline := Node2D.new()
@@ -100,18 +102,9 @@ func _spawn_relics() -> void:
 		add_child(relic)
 
 func _spawn_ground_details() -> void:
-	for i in 8:
-		var rock := ColorRect.new()
-		var s := randf_range(4.0, 8.0)
-		rock.size = Vector2(s, s)
-		var side := -1.0 if randf() < 0.5 else 1.0
-		rock.position = Vector2(side * randf_range(500.0, 1150.0), randf_range(2.0, 10.0))
-		if randf() < 0.5:
-			rock.color = Color(0.36, 0.31, 0.26, 1.0)
-		else:
-			rock.color = Color(0.44, 0.39, 0.33, 1.0)
-		rock.z_index = -8
-		add_child(rock)
+	var ground_props := Node2D.new()
+	ground_props.set_script(GROUND_PROPS_SCRIPT)
+	add_child(ground_props)
 
 func _create_night_sky() -> void:
 	_night_sky = Node2D.new()

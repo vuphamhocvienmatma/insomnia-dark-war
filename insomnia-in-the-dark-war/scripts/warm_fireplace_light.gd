@@ -1,7 +1,7 @@
 extends PointLight2D
 
-@export var base_energy: float = 1.2
-@export var flicker_speed: float = 12.0
+@export var base_energy: float = 0.55
+@export var flicker_speed: float = 8.0
 
 var noise: FastNoiseLite
 var noise_time: float = 0.0

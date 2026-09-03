@@ -51,7 +51,7 @@ func _physics_process(_delta: float) -> void:
 			_deliver_item()
 		return
 
-	var nearest := _find_nearest_scrap()
+	var nearest: Node2D = _find_nearest_scrap()
 	if now > next_loot_time and nearest != null:
 		_seek_x(nearest.global_position.x, 20.0)
 		if abs(nearest.global_position.x - global_position.x) < 20.0:
@@ -69,7 +69,7 @@ func _physics_process(_delta: float) -> void:
 	_update_idle_art(_delta)
 
 func _update_idle_art(delta: float) -> void:
-	var art := get_node_or_null("Art") as Node2D
+	var art: Node2D = get_node_or_null("Art") as Node2D
 	if art == null:
 		return
 	if abs(velocity.x) < 1.0 and not _cat_climbing:
@@ -77,7 +77,7 @@ func _update_idle_art(delta: float) -> void:
 		art.position.y = sin(_idle_time * 2.0) * 1.5
 	else:
 		_idle_time = 0.0
-		art.position.y = lerp(art.position.y, 0.0, 8.0 * delta)
+		art.position.y = lerpf(art.position.y, 0.0, 8.0 * delta)
 
 func _seek_x(target_x: float, stop_dist: float) -> void:
 	if cabin != null and abs(global_position.x - 252.0) < 16.0:
@@ -94,7 +94,7 @@ func _seek_x(target_x: float, stop_dist: float) -> void:
 		velocity = Vector2(sign(diff) * follow_speed, 0.0)
 	else:
 		velocity = Vector2.ZERO
-	var art := get_node_or_null("Art") as Node2D
+	var art: Node2D = get_node_or_null("Art") as Node2D
 	if art and velocity.x != 0.0:
 		art.scale.x = -1.0 if velocity.x < 0.0 else 1.0
 	move_and_slide()
@@ -110,11 +110,11 @@ func _start_cat_climb() -> void:
 
 func _find_nearest_scrap() -> Node2D:
 	var best: Node2D = null
-	var best_dist := loot_radius
+	var best_dist: float = loot_radius
 	for scrap in get_tree().get_nodes_in_group("scrap"):
 		if not is_instance_valid(scrap):
 			continue
-		var d := global_position.distance_to(scrap.global_position)
+		var d: float = global_position.distance_to(scrap.global_position)
 		if d < best_dist:
 			best_dist = d
 			best = scrap

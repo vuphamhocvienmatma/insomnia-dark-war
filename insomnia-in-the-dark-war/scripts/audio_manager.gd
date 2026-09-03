@@ -11,12 +11,36 @@ func _ready() -> void:
 	bgm_night = AudioStreamPlayer.new()
 	add_child(bgm_day)
 	add_child(bgm_night)
-	bgm_day.stream = load("res://assets/bgm/day_lofi.ogg")
-	bgm_night.stream = load("res://assets/bgm/night_ambient.ogg")
+	var day_path: String = ""
+	if ResourceLoader.exists("res://assets/bgm/day_lofi.wav"):
+		day_path = "res://assets/bgm/day_lofi.wav"
+	elif ResourceLoader.exists("res://assets/bgm/day_lofi.ogg"):
+		day_path = "res://assets/bgm/day_lofi.ogg"
+		
+	if day_path != "":
+		var s_day: AudioStream = load(day_path) as AudioStream
+		if s_day != null:
+			if s_day is AudioStreamWAV:
+				(s_day as AudioStreamWAV).loop_mode = AudioStreamWAV.LOOP_FORWARD
+			bgm_day.stream = s_day
+			bgm_day.play()
+
+	var night_path: String = ""
+	if ResourceLoader.exists("res://assets/bgm/night_ambient.wav"):
+		night_path = "res://assets/bgm/night_ambient.wav"
+	elif ResourceLoader.exists("res://assets/bgm/night_ambient.ogg"):
+		night_path = "res://assets/bgm/night_ambient.ogg"
+		
+	if night_path != "":
+		var s_night: AudioStream = load(night_path) as AudioStream
+		if s_night != null:
+			if s_night is AudioStreamWAV:
+				(s_night as AudioStreamWAV).loop_mode = AudioStreamWAV.LOOP_FORWARD
+			bgm_night.stream = s_night
+			bgm_night.play()
+
 	bgm_day.volume_db = -80.0
 	bgm_night.volume_db = -80.0
-	bgm_day.play()
-	bgm_night.play()
 	var tm = get_tree().get_first_node_in_group("time_manager")
 	if tm != null:
 		tm.phase_changed.connect(crossfade_bgm)
@@ -35,20 +59,22 @@ func crossfade_bgm(is_night: bool) -> void:
 func _fade(player: AudioStreamPlayer, up: bool) -> void:
 	var tw := create_tween()
 	if up:
-		tw.tween_property(player, "volume_db", 0.0, 2.0)
+		tw.tween_property(player, "volume_db", -6.0, 2.0)
 	else:
 		tw.tween_property(player, "volume_db", -80.0, 2.0)
 
 
-func play_sfx(name: String, pos: Vector2 = Vector2.ZERO) -> void:
+func play_sfx(sfx_name: String, pos: Vector2 = Vector2.ZERO) -> void:
 	var player: AudioStreamPlayer = null
-	if sfx_pool.has(name):
-		player = sfx_pool[name]
+	if sfx_pool.has(sfx_name):
+		player = sfx_pool[sfx_name]
 	else:
 		player = AudioStreamPlayer.new()
 		add_child(player)
-		sfx_pool[name] = player
-	var stream := load("res://assets/sfx/" + name + ".ogg") as AudioStream
-	if stream != null:
-		player.stream = stream
-	player.play()
+		sfx_pool[sfx_name] = player
+	var sfx_path: String = "res://assets/sfx/" + sfx_name + ".ogg"
+	if ResourceLoader.exists(sfx_path):
+		var stream: AudioStream = load(sfx_path) as AudioStream
+		if stream != null:
+			player.stream = stream
+			player.play()

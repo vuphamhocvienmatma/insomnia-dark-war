@@ -19,10 +19,12 @@ var has_looted: bool = false
 var is_attacking: bool = false
 var current_target_fence: Node2D = null
 var safe_zone: Area2D = null
+var _art_node: Node2D = null
 
 func _ready() -> void:
 	current_health = max_health
 	add_to_group("zombie")
+	_art_node = get_node_or_null("Art") as Node2D
 	var sz := get_tree().get_first_node_in_group("safe_zone")
 	if sz != null:
 		safe_zone = sz as Area2D
@@ -48,9 +50,8 @@ func _physics_process(_delta: float) -> void:
 			if away.length() < 1.0:
 				away = Vector2(sign(spawn_position.x), 0.0)
 			velocity = away.normalized() * speed * 1.25
-			var art := get_node_or_null("Art") as Node2D
-			if art != null and velocity.x != 0.0:
-				art.scale.x = -1.0 if velocity.x < 0.0 else 1.0
+			if _art_node != null and velocity.x != 0.0:
+				_art_node.scale.x = -1.0 if velocity.x < 0.0 else 1.0
 			move_and_slide()
 			return
 
@@ -66,17 +67,15 @@ func _physics_process(_delta: float) -> void:
 		move_and_slide()
 		return
 
-	var art := get_node_or_null("Art") as Node2D
-
 	if abs(global_position.x) > 232.0:
 		var dir: float = -sign(global_position.x)
 		velocity = Vector2(dir * speed, 0.0)
-		if art != null:
-			art.scale.x = -1.0 if global_position.x > 0.0 else 1.0
+		if _art_node != null:
+			_art_node.scale.x = -1.0 if global_position.x > 0.0 else 1.0
 		move_and_slide()
 	else:
 		var side: float = sign(global_position.x)
-		var has_gap := false
+		var has_gap: bool = false
 		for socket in get_tree().get_nodes_in_group("critical_socket"):
 			if socket is BuildSocket2D and not socket.is_occupied:
 				if sign(socket.global_position.x) == side:
@@ -106,11 +105,10 @@ func _has_wall_in_front() -> bool:
 	return false
 
 func _do_leave() -> void:
-	var art := get_node_or_null("Art") as Node2D
 	var dir: float = sign(spawn_position.x)
 	velocity = Vector2(dir * speed, 0.0)
-	if art != null:
-		art.scale.x = -1.0 if dir < 0.0 else 1.0
+	if _art_node != null:
+		_art_node.scale.x = -1.0 if dir < 0.0 else 1.0
 	move_and_slide()
 	if abs(global_position.x - spawn_position.x) < 35.0:
 		queue_free()

@@ -6,8 +6,9 @@ signal solar_changed(new_amount: float)
 @export var day_duration_seconds: float = 180.0
 @export var night_duration_seconds: float = 90.0
 
-@export var day_color: Color = Color("ffe699")
-@export var night_color: Color = Color("1c1d3a")
+@export var day_color: Color = Color("baa890")
+@export var sunset_color: Color = Color("92584a")
+@export var night_color: Color = Color("1a1c2c")
 
 @export var environmental_light: CanvasModulate
 
@@ -24,9 +25,17 @@ func _process(delta: float) -> void:
 	var target_color: Color
 
 	if not is_night:
-		var ratio := time_elapsed / day_duration_seconds
-		var eased_ratio := ease(ratio, 0.4)
-		target_color = day_color.lerp(night_color, eased_ratio)
+		var ratio: float = time_elapsed / day_duration_seconds
+		if ratio < 0.65:
+			# Morning to late afternoon golden transition
+			var sub_t: float = ratio / 0.65
+			target_color = day_color.lerp(sunset_color, sub_t * 0.5)
+		else:
+			# Sunset to twilight transition
+			var sub_t: float = (ratio - 0.65) / 0.35
+			var eased_dusk: float = ease(sub_t, 0.6)
+			target_color = sunset_color.lerp(night_color, eased_dusk)
+			
 		if GameState:
 			current_solar_energy = clamp(
 				current_solar_energy + (delta * 5.0 * GameState.solar_charge_multiplier),
@@ -38,8 +47,9 @@ func _process(delta: float) -> void:
 		if time_elapsed >= day_duration_seconds:
 			transition_to_night()
 	else:
-		var ratio := time_elapsed / night_duration_seconds
-		target_color = night_color.lerp(day_color, ratio * 0.1)
+		var ratio: float = time_elapsed / night_duration_seconds
+		# Late night pre-dawn blue tint
+		target_color = night_color.lerp(sunset_color, ratio * 0.15)
 
 		if time_elapsed >= night_duration_seconds:
 			transition_to_day()

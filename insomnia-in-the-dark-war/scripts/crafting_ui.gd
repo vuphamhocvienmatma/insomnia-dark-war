@@ -31,9 +31,10 @@ func _ready() -> void:
 	GameState.water_changed.connect(_on_resource_changed)
 	craft_sound = AudioStreamPlayer.new()
 	add_child(craft_sound)
-	var sfx := load("res://assets/sfx/craft_success.ogg") as AudioStream
-	if sfx != null:
-		craft_sound.stream = sfx
+	if ResourceLoader.exists("res://assets/sfx/craft_success.ogg"):
+		var sfx: AudioStream = load("res://assets/sfx/craft_success.ogg") as AudioStream
+		if sfx != null:
+			craft_sound.stream = sfx
 
 
 func _unhandled_input(event: InputEvent) -> void:
