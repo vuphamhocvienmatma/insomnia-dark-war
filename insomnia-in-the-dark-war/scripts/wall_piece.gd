@@ -11,6 +11,9 @@ func _ready() -> void:
 func take_damage(amount: float) -> void:
 	current_health -= amount
 	print("Rào chắn chịu ", amount, " sát thương! Còn lại: ", current_health)
+	var art: Node = get_node_or_null("Art")
+	if art != null and art.has_method("set_health_ratio"):
+		art.call("set_health_ratio", current_health / max_health)
 	if current_health <= 0.0:
 		_spawn_break_fx()
 		queue_free()

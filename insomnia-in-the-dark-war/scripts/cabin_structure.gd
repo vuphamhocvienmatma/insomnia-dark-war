@@ -2,8 +2,8 @@ extends Node2D
 
 const GROUND_Y: float = 0.0
 const MEZZANINE_Y: float = -140.0
-const LADDER_X_MIN: float = 244.0
-const LADDER_X_MAX: float = 260.0
+const LADDER_X_MIN: float = 135.0
+const LADDER_X_MAX: float = 165.0
 
 var current_floor: String = "ground"
 

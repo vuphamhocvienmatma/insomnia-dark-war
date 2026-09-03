@@ -17,9 +17,16 @@ const EYE := Color(0.14, 0.10, 0.10, 1.0)
 const WHITE := Color(1.0, 1.0, 1.0, 1.0)
 
 var _walk_bob: float = 0.0
+var _climb_bob: float = 0.0
 var _idle_time: float = 0.0
 var _blink_timer: float = 0.0
 var _is_moving: bool = false
+var is_climbing: bool = false
+
+
+func set_climbing(c: bool) -> void:
+	is_climbing = c
+	queue_redraw()
 
 
 func _process(delta: float) -> void:
@@ -30,7 +37,9 @@ func _process(delta: float) -> void:
 		vx = v.x
 	
 	_is_moving = absf(vx) > 5.0
-	if _is_moving:
+	if is_climbing:
+		_climb_bob += delta * 12.0
+	elif _is_moving:
 		_walk_bob += delta * 9.0
 	else:
 		_walk_bob = 0.0
@@ -100,8 +109,14 @@ func _draw_backpack() -> void:
 
 
 func _draw_boots() -> void:
-	var left_y: float = sin(_walk_bob + PI) * 2.0 if _is_moving else 0.0
-	var right_y: float = sin(_walk_bob) * 2.0 if _is_moving else 0.0
+	var left_y: float = 0.0
+	var right_y: float = 0.0
+	if is_climbing:
+		left_y = sin(_climb_bob) * 4.5
+		right_y = -sin(_climb_bob) * 4.5
+	elif _is_moving:
+		left_y = sin(_walk_bob + PI) * 2.0
+		right_y = sin(_walk_bob) * 2.0
 	
 	var lb := Rect2(-8.0, 0.0 + left_y, 7.0, 5.0)
 	_draw_rounded_rect(lb, BOOTS, 1.5)
@@ -133,8 +148,15 @@ func _draw_torso() -> void:
 	_draw_rounded_rect(pocket, HOODIE_SHADOW, 2.0)
 	_draw_rect_outline(pocket, OUTLINE)
 	
-	var left_swing: float = sin(_walk_bob + PI) * 3.5 if _is_moving else 0.0
-	var right_swing: float = sin(_walk_bob) * 3.5 if _is_moving else 0.0
+	var left_swing: float = 0.0
+	var right_swing: float = 0.0
+	if is_climbing:
+		# Alternating climbing arm reach grasping rungs
+		left_swing = -sin(_climb_bob) * 6.5 - 4.0
+		right_swing = sin(_climb_bob) * 6.5 - 4.0
+	elif _is_moving:
+		left_swing = sin(_walk_bob + PI) * 3.5
+		right_swing = sin(_walk_bob) * 3.5
 	
 	var left_arm := Rect2(-12.0, -22.0 + left_swing, 4.0, 12.0)
 	_draw_rounded_rect(left_arm, HOODIE, 2.0)

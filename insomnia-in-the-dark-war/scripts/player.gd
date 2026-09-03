@@ -44,6 +44,12 @@ func _physics_process(_delta: float) -> void:
 
 	move_and_slide()
 
+	# Clamp movement bounds: On mezzanine cannot walk into air; on ground cannot leave map
+	if cabin != null and cabin.current_floor == "mezzanine":
+		position.x = clampf(position.x, -182.0, 248.0)
+	else:
+		position.x = clampf(position.x, -1600.0, 1600.0)
+
 	if not _climbing:
 		position.y = cabin.get_current_floor_y() if cabin != null else GROUND_Y
 
@@ -52,7 +58,17 @@ func _on_floor_changed(_floor_name: String) -> void:
 	if cabin == null:
 		return
 	_climbing = true
+	# Center on ladder while climbing
+	position.x = 150.0
+	velocity = Vector2.ZERO
+	if art != null and art.has_method("set_climbing"):
+		art.call("set_climbing", true)
+
 	var target_y: float = cabin.get_current_floor_y()
-	var tw := create_tween()
-	tw.tween_property(self, "position:y", target_y, 0.3)
-	tw.tween_callback(func() -> void: _climbing = false)
+	var tw: Tween = create_tween()
+	tw.tween_property(self, "position:y", target_y, 0.7).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN_OUT)
+	tw.tween_callback(func() -> void:
+		_climbing = false
+		if art != null and art.has_method("set_climbing"):
+			art.call("set_climbing", false)
+	)

@@ -2,6 +2,7 @@ extends Node
 
 signal phase_changed(is_night: bool)
 signal solar_changed(new_amount: float)
+signal sunset_warning
 
 @export var day_duration_seconds: float = 180.0
 @export var night_duration_seconds: float = 90.0
@@ -16,6 +17,7 @@ var current_solar_energy: float = 0.0
 var max_solar_storage: float = 100.0
 var is_night: bool = false
 var time_elapsed: float = 0.0
+var _warned_sunset: bool = false
 
 func _ready() -> void:
 	add_to_group("time_manager")
@@ -44,6 +46,10 @@ func _process(delta: float) -> void:
 			)
 			solar_changed.emit(current_solar_energy)
 
+		if not _warned_sunset and (day_duration_seconds - time_elapsed) <= 10.0:
+			_warned_sunset = true
+			sunset_warning.emit()
+
 		if time_elapsed >= day_duration_seconds:
 			transition_to_night()
 	else:
@@ -65,6 +71,7 @@ func transition_to_night() -> void:
 
 func transition_to_day() -> void:
 	is_night = false
+	_warned_sunset = false
 	time_elapsed = 0.0
 	current_solar_energy = 0.0  # Reset solar khi ngày mới bắt đầu
 	phase_changed.emit(false)

@@ -11,6 +11,7 @@ const SKYLINE_SCRIPT := preload("res://scripts/art_skyline.gd")
 const CABIN_PROPS_SCRIPT := preload("res://scripts/art_cabin_props.gd")
 const WEATHER_SCRIPT := preload("res://scripts/art_weather.gd")
 const GROUND_PROPS_SCRIPT := preload("res://scripts/art_ground_props.gd")
+const MAILBOX_SCENE := preload("res://scenes/mailbox.tscn")
 
 const GROUND_Y: float = 0.0
 
@@ -29,6 +30,7 @@ func _ready() -> void:
 	cabin_props.set_script(CABIN_PROPS_SCRIPT)
 	add_child(cabin_props)
 
+	_spawn_mailbox()
 	_spawn_sockets()
 	_spawn_turrets()
 	_spawn_scrap_field()
@@ -70,7 +72,7 @@ func _spawn_sockets() -> void:
 			socket.add_child(art_node)
 
 func _spawn_turrets() -> void:
-	var positions: Array[Vector2] = [Vector2(-120.0, -240.0), Vector2(120.0, -240.0)]
+	var positions: Array[Vector2] = [Vector2(-130.0, -215.0), Vector2(130.0, -215.0)]
 	for pos in positions:
 		var turret := TURRET_SCENE.instantiate() as Node2D
 		turret.position = pos
@@ -142,3 +144,9 @@ func _respawn_zombie_wave() -> void:
 		zombie.set("speed", 30.0 * speed_multiplier)
 		add_child(zombie)
 		_spawned_zombies.append(zombie)
+
+
+func _spawn_mailbox() -> void:
+	var m_box := MAILBOX_SCENE.instantiate() as Node2D
+	m_box.position = Vector2(-225.0, 0.0)
+	add_child(m_box)

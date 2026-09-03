@@ -1,32 +1,53 @@
 extends Node2D
 
-const CLOUD_COLOR := Color(1.0, 1.0, 1.0, 0.75)
-const CLOUD_SPEED: float = 6.0
-const SCROLL_RESET: float = -1300.0
-const SCROLL_LIMIT: float = 1300.0
+const CLOUD_FOREGROUND: Color = Color(1.0, 0.98, 0.95, 0.65)
+const CLOUD_DISTANT: Color = Color(0.92, 0.88, 0.90, 0.40)
+const SPEED_NEAR: float = 7.0
+const SPEED_FAR: float = 3.5
+const SCROLL_RESET: float = -2600.0
+const SCROLL_LIMIT: float = 2600.0
 
-var _cloud_a: Vector2 = Vector2(-800.0, -420.0)
-var _cloud_b: Vector2 = Vector2(0.0, -500.0)
-var _cloud_c: Vector2 = Vector2(700.0, -380.0)
+# Near clouds (comfortably inside viewport between y = -360 and -270)
+var _near_clouds: Array[Vector2] = [
+	Vector2(-900.0, -310.0),
+	Vector2(-100.0, -340.0),
+	Vector2(850.0, -290.0)
+]
+
+# Distant smaller parallax clouds
+var _far_clouds: Array[Vector2] = [
+	Vector2(-1400.0, -370.0),
+	Vector2(300.0, -360.0),
+	Vector2(1600.0, -375.0)
+]
+
 
 func _process(delta: float) -> void:
-	_cloud_a.x += CLOUD_SPEED * delta
-	_cloud_b.x += CLOUD_SPEED * delta
-	_cloud_c.x += CLOUD_SPEED * delta
-	if _cloud_a.x > SCROLL_LIMIT:
-		_cloud_a.x = SCROLL_RESET
-	if _cloud_b.x > SCROLL_LIMIT:
-		_cloud_b.x = SCROLL_RESET
-	if _cloud_c.x > SCROLL_LIMIT:
-		_cloud_c.x = SCROLL_RESET
+	for i in _near_clouds.size():
+		_near_clouds[i].x += SPEED_NEAR * delta
+		if _near_clouds[i].x > SCROLL_LIMIT:
+			_near_clouds[i].x = SCROLL_RESET
+
+	for i in _far_clouds.size():
+		_far_clouds[i].x += SPEED_FAR * delta
+		if _far_clouds[i].x > SCROLL_LIMIT:
+			_far_clouds[i].x = SCROLL_RESET
+
 	queue_redraw()
 
-func _draw() -> void:
-	_draw_cloud(_cloud_a)
-	_draw_cloud(_cloud_b)
-	_draw_cloud(_cloud_c)
 
-func _draw_cloud(origin: Vector2) -> void:
-	draw_circle(origin, 14.0, CLOUD_COLOR)
-	draw_circle(origin + Vector2(16.0, -4.0), 18.0, CLOUD_COLOR)
-	draw_circle(origin + Vector2(32.0, 2.0), 12.0, CLOUD_COLOR)
+func _draw() -> void:
+	# Draw distant clouds first
+	for pos in _far_clouds:
+		_draw_cloud(pos, 0.65, CLOUD_DISTANT)
+
+	# Draw foreground clouds
+	for pos in _near_clouds:
+		_draw_cloud(pos, 1.0, CLOUD_FOREGROUND)
+
+
+func _draw_cloud(origin: Vector2, scale_fac: float, col: Color) -> void:
+	draw_circle(origin, 14.0 * scale_fac, col)
+	draw_circle(origin + Vector2(16.0, -4.0) * scale_fac, 19.0 * scale_fac, col)
+	draw_circle(origin + Vector2(34.0, 2.0) * scale_fac, 13.0 * scale_fac, col)
+	draw_circle(origin + Vector2(48.0, 4.0) * scale_fac, 9.0 * scale_fac, col)

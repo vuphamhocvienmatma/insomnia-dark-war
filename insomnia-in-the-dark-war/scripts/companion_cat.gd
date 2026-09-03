@@ -80,7 +80,7 @@ func _update_idle_art(delta: float) -> void:
 		art.position.y = lerpf(art.position.y, 0.0, 8.0 * delta)
 
 func _seek_x(target_x: float, stop_dist: float) -> void:
-	if cabin != null and abs(global_position.x - 252.0) < 16.0:
+	if cabin != null and abs(global_position.x - 150.0) < 16.0:
 		if cabin.current_floor == "mezzanine" and _cat_floor == "ground":
 			cabin.climb_up()
 			_cat_floor = "mezzanine"
@@ -98,6 +98,10 @@ func _seek_x(target_x: float, stop_dist: float) -> void:
 	if art and velocity.x != 0.0:
 		art.scale.x = -1.0 if velocity.x < 0.0 else 1.0
 	move_and_slide()
+	if cabin != null and cabin.current_floor == "mezzanine":
+		position.x = clampf(position.x, -180.0, 248.0)
+	else:
+		position.x = clampf(position.x, -1580.0, 1580.0)
 
 func _start_cat_climb() -> void:
 	if cabin == null:

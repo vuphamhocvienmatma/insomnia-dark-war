@@ -21,15 +21,17 @@ func _process(delta: float) -> void:
 	
 	if player != null:
 		global_position.x = lerpf(global_position.x, player.global_position.x, 3.5 * delta)
+		global_position.x = clampf(global_position.x, -1100.0, 1100.0)
 		is_in_cabin = absf(player.global_position.x) < CABIN_HALF_WIDTH
 		
 	# Solid steady camera height
 	global_position.y = CAM_Y
 	
-	# Smooth contextual zoom: slightly closer inside cabin, wider in wasteland
-	var target_zoom_val: float = 1.08 if is_in_cabin else 0.98
+	# Contextual base zoom + User manual zoom offset
+	var base_zoom_val: float = 1.05 if is_in_cabin else 0.95
+	var target_zoom_val: float = clampf(base_zoom_val + user_zoom_offset, 0.60, 1.70)
 	var target_zoom: Vector2 = Vector2(target_zoom_val, target_zoom_val)
-	zoom = zoom.lerp(target_zoom, 1.5 * delta)
+	zoom = zoom.lerp(target_zoom, 5.0 * delta)
 
 	if shake_intensity > 0.0:
 		var t: float = randf()
@@ -42,6 +44,35 @@ func _process(delta: float) -> void:
 			offset = Vector2.ZERO
 	else:
 		offset = Vector2.ZERO
+
+
+var user_zoom_offset: float = 0.0
+
+
+func _unhandled_input(event: InputEvent) -> void:
+	if event is InputEventMouseButton:
+		var mb: InputEventMouseButton = event as InputEventMouseButton
+		if mb.is_pressed():
+			if mb.button_index == MOUSE_BUTTON_WHEEL_UP:
+				zoom_in()
+			elif mb.button_index == MOUSE_BUTTON_WHEEL_DOWN:
+				zoom_out()
+
+
+func zoom_in() -> void:
+	user_zoom_offset = clampf(user_zoom_offset + 0.10, -0.45, 0.65)
+
+
+func zoom_out() -> void:
+	user_zoom_offset = clampf(user_zoom_offset - 0.10, -0.45, 0.65)
+
+
+func reset_zoom() -> void:
+	user_zoom_offset = 0.0
+
+
+func get_zoom_level() -> float:
+	return 1.0 + user_zoom_offset
 
 
 func trigger_shake(intensity: float) -> void:

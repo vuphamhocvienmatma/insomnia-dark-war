@@ -22,9 +22,9 @@ func _ready() -> void:
 	var rng: RandomNumberGenerator = RandomNumberGenerator.new()
 	rng.seed = 88
 	
-	# Far buildings
-	var x: float = -1250.0
-	while x < 1250.0:
+	# Far buildings across entire wide world [-3200, 3200]
+	var x: float = -3200.0
+	while x < 3200.0:
 		var w: float = rng.randf_range(80.0, 160.0)
 		var h: float = rng.randf_range(70.0, 180.0)
 		if not (x + w > -420.0 and x < 420.0):
@@ -32,8 +32,8 @@ func _ready() -> void:
 		x += rng.randf_range(90.0, 180.0)
 		
 	# Mid buildings with broken windows/towers
-	x = -1250.0
-	while x < 1250.0:
+	x = -3200.0
+	while x < 3200.0:
 		var w: float = rng.randf_range(60.0, 120.0)
 		var h: float = rng.randf_range(40.0, 130.0)
 		if not (x + w > -420.0 and x < 420.0):

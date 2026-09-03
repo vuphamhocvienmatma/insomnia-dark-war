@@ -23,8 +23,10 @@ func _process(delta: float) -> void:
 
 
 func _draw() -> void:
+	_draw_ground_window_light_shaft()
 	_draw_wall_planks()
 	_draw_mezzanine_bedding()
+	_draw_mezzanine_railing()
 	_draw_shelves_and_supplies()
 	_draw_steaming_mug()
 	_draw_guitar()
@@ -35,8 +37,7 @@ func _draw() -> void:
 	_draw_supply_crates()
 	_draw_window_curtains()
 	_draw_fairy_lights()
-	_draw_solar_panel()
-	_draw_rooftop_sandbags()
+	_draw_pitched_roof_and_rooftop_stations()
 	_draw_ladder()
 
 
@@ -138,12 +139,28 @@ func _draw_mezzanine_bedding() -> void:
 	])
 	draw_colored_polygon(loft_poly, WOOD_PLANK_A * 0.85)
 	_draw_polyline_loop(loft_poly, OUTLINE)
-	# Front supporting timber beam
-	var beam: Rect2 = Rect2(-204.0, -140.0, 408.0, 8.0)
-	draw_rect(beam, WOOD_BEAM)
-	_draw_rect_outline(beam, OUTLINE)
-	for b_x in [-180.0, -100.0, -20.0, 60.0, 140.0, 180.0]:
+
+	# --- Cutaway Hatchway Opening for Interior Ladder at [136, 164] ---
+	var hatch_rect: Rect2 = Rect2(136.0, -158.0, 28.0, 18.0)
+	draw_rect(hatch_rect, Color(0.10, 0.07, 0.05, 1.0)) # Dark cutaway depth
+	# Hatch timber framing & brass corner brackets
+	draw_line(Vector2(136.0, -158.0), Vector2(164.0, -158.0), WOOD_BEAM, 3.0)
+	draw_line(Vector2(136.0, -158.0), Vector2(136.0, -140.0), WOOD_BEAM, 3.0)
+	draw_line(Vector2(164.0, -158.0), Vector2(164.0, -140.0), WOOD_BEAM, 3.0)
+	draw_circle(Vector2(137.5, -156.5), 1.5, Color(0.85, 0.70, 0.30, 1.0))
+	draw_circle(Vector2(162.5, -156.5), 1.5, Color(0.85, 0.70, 0.30, 1.0))
+
+	# Front supporting timber beam (with gap for the ladder hatch)
+	var left_beam: Rect2 = Rect2(-204.0, -140.0, 340.0, 8.0) # -204 to 136
+	draw_rect(left_beam, WOOD_BEAM)
+	_draw_rect_outline(left_beam, OUTLINE)
+	for b_x in [-180.0, -100.0, -20.0, 60.0, 120.0]:
 		draw_circle(Vector2(b_x, -136.0), 1.4, Color(0.45, 0.48, 0.52, 1.0))
+
+	var right_beam: Rect2 = Rect2(164.0, -140.0, 38.0, 8.0) # 164 to 202
+	draw_rect(right_beam, WOOD_BEAM)
+	_draw_rect_outline(right_beam, OUTLINE)
+	draw_circle(Vector2(182.0, -136.0), 1.4, Color(0.45, 0.48, 0.52, 1.0))
 
 	# 2.5D Bed with perspective mattress and fluffy pillow
 	draw_circle(Vector2(-150.0, -138.0), 25.0, Color(0.0, 0.0, 0.0, 0.3))
@@ -220,7 +237,15 @@ func _draw_steaming_mug() -> void:
 
 
 func _draw_window_curtains() -> void:
-	# Warm checkered curtains flanking the cabin window [-168, -112] x [-168, -104]
+	# 1. Warm glowing cabin window behind curtains (Eliminates the dark hole!)
+	var win_rect: Rect2 = Rect2(-168.0, -166.0, 56.0, 62.0)
+	draw_rect(win_rect, Color(0.98, 0.85, 0.52, 0.90))
+	draw_circle(Vector2(-140.0, -135.0), 18.0, Color(1.0, 0.95, 0.72, 0.95))
+	draw_line(Vector2(-168.0, -135.0), Vector2(-112.0, -135.0), WOOD_BEAM, 2.0)
+	draw_line(Vector2(-140.0, -166.0), Vector2(-140.0, -104.0), WOOD_BEAM, 2.0)
+	_draw_rect_outline(win_rect, WOOD_BEAM)
+
+	# 2. Warm checkered curtains flanking the cabin window
 	var drape_col: Color = Color(0.85, 0.45, 0.40, 0.95)
 	
 	# Left curtain
@@ -265,8 +290,63 @@ func _draw_window_curtains() -> void:
 	draw_line(Vector2(-176.0, -171.0), Vector2(-104.0, -171.0), WOOD_BEAM, 3.0)
 
 
+func _draw_mezzanine_railing() -> void:
+	# Low timber safety railing on mezzanine floor edge, opening at [136, 164] for ladder
+	# Left railing section: -185.0 to 136.0
+	var left_top_rail: Rect2 = Rect2(-185.0, -149.0, 321.0, 3.5)
+	draw_rect(left_top_rail, WOOD_BEAM)
+	_draw_rect_outline(left_top_rail, OUTLINE)
+
+	# Vertical timber balusters along left section
+	var bx: float = -180.0
+	while bx < 132.0:
+		draw_line(Vector2(bx, -140.0), Vector2(bx, -149.0), WOOD_LINE, 1.8)
+		bx += 16.0
+	# Sturdy gatepost at hatch edge x = 136
+	draw_line(Vector2(136.0, -140.0), Vector2(136.0, -152.0), WOOD_BEAM, 3.5)
+	draw_circle(Vector2(136.0, -152.0), 2.0, Color(0.85, 0.70, 0.30, 1.0)) # Brass post finial
+
+	# Right railing section: 164.0 to 195.0
+	var right_top_rail: Rect2 = Rect2(164.0, -149.0, 31.0, 3.5)
+	draw_rect(right_top_rail, WOOD_BEAM)
+	_draw_rect_outline(right_top_rail, OUTLINE)
+	draw_line(Vector2(164.0, -140.0), Vector2(164.0, -152.0), WOOD_BEAM, 3.5)
+	draw_circle(Vector2(164.0, -152.0), 2.0, Color(0.85, 0.70, 0.30, 1.0))
+	draw_line(Vector2(180.0, -140.0), Vector2(180.0, -149.0), WOOD_LINE, 1.8)
+
+	# Cozy dangling fairy lights along the left railing edge
+	var r_wire: PackedVector2Array = PackedVector2Array()
+	var r_count: int = 10
+	for i in r_count:
+		var t: float = float(i) / float(r_count - 1)
+		var lx: float = lerpf(-180.0, 130.0, t)
+		var sag: float = sin(t * PI * 2.5) * 5.0
+		var ly: float = -142.0 + sag
+		r_wire.append(Vector2(lx, ly))
+		var pulse: float = 0.7 + sin(_time * 2.8 + float(i) * 1.8) * 0.3
+		draw_circle(Vector2(lx, ly + 2.0), 2.0, Color(1.0, 0.86, 0.50, pulse))
+		draw_circle(Vector2(lx, ly + 2.0), 4.5, Color(1.0, 0.75, 0.35, 0.22 * pulse))
+	draw_polyline(r_wire, FAIRY_WIRE, 1.0)
+
+
+func _draw_ground_window_light_shaft() -> void:
+	var tm: Node = get_tree().get_first_node_in_group("time_manager")
+	if tm == null or not bool(tm.get("is_night")):
+		return
+	# Warm light shaft shining outside on the left ground
+	var shaft_poly: PackedVector2Array = PackedVector2Array([
+		Vector2(-232.0, -70.0),
+		Vector2(-232.0, 0.0),
+		Vector2(-310.0, 16.0),
+		Vector2(-340.0, -10.0)
+	])
+	draw_colored_polygon(shaft_poly, Color(0.98, 0.82, 0.40, 0.14))
+
+
 func _draw_fairy_lights() -> void:
-	# String of cozy fairy lights hanging under the ceiling with a gentle catenary droop
+	# String of cozy fairy lights hanging under the ceiling
+	var tm: Node = get_tree().get_first_node_in_group("time_manager")
+	var is_night: bool = tm != null and bool(tm.get("is_night"))
 	var wire_pts: PackedVector2Array = PackedVector2Array()
 	var bulb_count: int = 12
 	var bulb_colors: Array[Color] = [
@@ -286,8 +366,11 @@ func _draw_fairy_lights() -> void:
 		# Draw bulb
 		var flicker: float = 0.7 + sin(_time * 3.0 + float(i) * 1.5) * 0.3
 		var b_col: Color = bulb_colors[i % bulb_colors.size()]
+		# Extra night bloom halo
+		if is_night:
+			draw_circle(Vector2(x, y + 3.0), 9.5, Color(b_col.r, b_col.g, b_col.b, 0.38 * flicker))
 		# Outer glow halo
-		draw_circle(Vector2(x, y + 3.0), 4.5, Color(b_col.r, b_col.g, b_col.b, 0.28 * flicker))
+		draw_circle(Vector2(x, y + 3.0), 4.5, Color(b_col.r, b_col.g, b_col.b, 0.35 * flicker))
 		# Inner bulb
 		draw_circle(Vector2(x, y + 3.0), 2.2, Color(b_col.r, b_col.g, b_col.b, flicker))
 		draw_circle(Vector2(x, y + 2.5), 0.8, Color(1.0, 1.0, 1.0, 0.8))
@@ -295,29 +378,130 @@ func _draw_fairy_lights() -> void:
 	draw_polyline(wire_pts, FAIRY_WIRE, 1.2)
 
 
-func _draw_solar_panel() -> void:
-	var panel: Rect2 = Rect2(-155.0, -248.0, 110.0, 16.0)
-	draw_rect(panel, SOLAR)
-	_draw_rect_outline(panel, OUTLINE)
-	var px: float = -155.0
-	while px < -45.0:
-		draw_line(Vector2(px, -248.0), Vector2(px, -232.0), SOLAR_LINE, 1.0)
-		px += 18.0
-	draw_line(Vector2(-155.0, -240.0), Vector2(-45.0, -240.0), SOLAR_LINE, 1.0)
+func _draw_pitched_roof_and_rooftop_stations() -> void:
+	# 1. Timber Gable Triangle Wall [(-234, -215), (0, -284), (234, -215)]
+	var gable_poly: PackedVector2Array = PackedVector2Array([
+		Vector2(-234.0, -215.0),
+		Vector2(0.0, -284.0),
+		Vector2(234.0, -215.0)
+	])
+	draw_colored_polygon(gable_poly, WOOD_PLANK_A * 0.92)
+	_draw_polyline_loop(gable_poly, OUTLINE)
+
+	# Horizontal planks inside the gable
+	var gy: float = -222.0
+	while gy > -280.0:
+		var t_fac: float = (gy - (-215.0)) / (-284.0 - (-215.0))
+		var cur_w: float = lerpf(234.0, 0.0, t_fac)
+		draw_line(Vector2(-cur_w, gy), Vector2(cur_w, gy), WOOD_LINE, 1.2)
+		gy -= 14.0
+
+	# Vertical ridge support beam
+	draw_line(Vector2(0.0, -215.0), Vector2(0.0, -284.0), WOOD_BEAM, 3.0)
+
+	# 2. Cozy Round Attic Window
+	var win_center: Vector2 = Vector2(0.0, -248.0)
+	draw_circle(win_center, 14.0, WOOD_BEAM)
+	_draw_circle_outline(win_center, 14.0, OUTLINE)
+	draw_circle(win_center, 10.5, Color(0.98, 0.82, 0.45, 0.8))
+	draw_line(Vector2(-10.5, -248.0), Vector2(10.5, -248.0), OUTLINE, 1.5)
+	draw_line(Vector2(0.0, -258.5), Vector2(0.0, -237.5), OUTLINE, 1.5)
+
+	# 3. 2.5D Slanted Roof Covering & Eaves
+	var left_slope: PackedVector2Array = PackedVector2Array([
+		Vector2(0.0, -284.0),
+		Vector2(4.0, -287.0),
+		Vector2(-258.0, -211.0),
+		Vector2(-254.0, -206.0),
+		Vector2(-234.0, -215.0)
+	])
+	draw_colored_polygon(left_slope, Color(0.24, 0.16, 0.12, 1.0))
+	_draw_polyline_loop(left_slope, OUTLINE)
+
+	var right_slope: PackedVector2Array = PackedVector2Array([
+		Vector2(0.0, -284.0),
+		Vector2(-4.0, -287.0),
+		Vector2(258.0, -211.0),
+		Vector2(254.0, -206.0),
+		Vector2(234.0, -215.0)
+	])
+	draw_colored_polygon(right_slope, Color(0.20, 0.13, 0.09, 1.0))
+	_draw_polyline_loop(right_slope, OUTLINE)
+
+	# Overhang rafter brackets under eaves
+	for bx in [-240.0, -200.0, 200.0, 240.0]:
+		var by: float = lerpf(-211.0, -284.0, absf(bx) / 258.0)
+		draw_line(Vector2(bx, by), Vector2(bx, by + 8.0), WOOD_BEAM, 2.5)
+
+	# 4. Metal Chimney Pipe with Dense Smooth Smoke Stream
+	var cx: float = -90.0
+	draw_line(Vector2(cx, -215.0), Vector2(cx, -295.0), Color(0.28, 0.30, 0.32, 1.0), 5.0)
+	draw_line(Vector2(cx, -215.0), Vector2(cx, -295.0), OUTLINE, 1.2)
+	var cap: Rect2 = Rect2(cx - 5.0, -298.0, 10.0, 3.5)
+	draw_rect(cap, Color(0.35, 0.38, 0.40, 1.0))
+	_draw_rect_outline(cap, OUTLINE)
+
+	# Smooth, dense connected stream of overlapping smoke puffs
+	var tm_n: Node = get_tree().get_first_node_in_group("time_manager")
+	var is_night_smoke: bool = tm_n != null and bool(tm_n.get("is_night"))
+	var puff_count: int = 12
+	for s_idx in puff_count:
+		var p: float = fmod(_time * 0.35 + float(s_idx) / float(puff_count), 1.0)
+		var sx: float = cx + p * 24.0 + sin(_time * 1.2 + float(s_idx) * 0.7) * 4.5
+		var sy: float = -300.0 - p * 42.0
+		var s_rad: float = 3.2 + p * 11.0
+		var alpha_base: float = 0.55 if is_night_smoke else 0.35
+		var s_alpha: float = sin(p * PI) * alpha_base
+		draw_circle(Vector2(sx, sy), s_rad, Color(0.92, 0.89, 0.84, s_alpha))
+
+	# 5. Two Fortified Rooftop AK Platforms with Beveled Roof Wedges
+	# Left AK Station Platform at x = -130.0
+	var lp: Rect2 = Rect2(-158.0, -217.0, 56.0, 5.0)
+	draw_rect(lp, WOOD_BEAM)
+	_draw_rect_outline(lp, OUTLINE)
+	for sb_x in [-152.0, -132.0, -112.0]:
+		_draw_rounded_rect(Rect2(sb_x, -223.0, 18.0, 7.0), Color(0.46, 0.44, 0.34, 1.0), 2.0)
+		_draw_rect_outline(Rect2(sb_x, -223.0, 18.0, 7.0), OUTLINE)
+
+	# Right AK Station Platform at x = 130.0
+	var rp: Rect2 = Rect2(102.0, -217.0, 56.0, 5.0)
+	draw_rect(rp, WOOD_BEAM)
+	_draw_rect_outline(rp, OUTLINE)
+	for sb_x in [108.0, 128.0, 148.0]:
+		_draw_rounded_rect(Rect2(sb_x, -223.0, 18.0, 7.0), Color(0.46, 0.44, 0.34, 1.0), 2.0)
+		_draw_rect_outline(Rect2(sb_x, -223.0, 18.0, 7.0), OUTLINE)
 
 
 func _draw_ladder() -> void:
-	var left_x: float = 246.0
-	var right_x: float = 258.0
-	var top_y: float = -200.0
-	draw_line(Vector2(left_x, 0.0), Vector2(left_x, top_y), WOOD_BEAM, 3.5)
-	draw_line(Vector2(right_x, 0.0), Vector2(right_x, top_y), WOOD_BEAM, 3.5)
-	var rung_y: float = -16.0
-	while rung_y > top_y:
-		draw_line(Vector2(left_x - 1.0, rung_y), Vector2(right_x + 1.0, rung_y), WOOD_PLANK_A, 2.5)
-		draw_circle(Vector2(left_x, rung_y), 1.2, OUTLINE)
-		draw_circle(Vector2(right_x, rung_y), 1.2, OUTLINE)
-		rung_y -= 16.0
+	# Interior Cabin Ladder at x = 150.0 rising through mezzanine hatch [136, 164]
+	var left_x: float = 142.0
+	var right_x: float = 158.0
+	var top_y: float = -140.0
+	var handle_top: float = -158.0
+
+	# 1. Contact shadow on ground floor
+	draw_ellipse(Vector2(150.0, 2.0), 12.0, 4.0, Color(0.0, 0.0, 0.0, 0.35))
+
+	# 2. Arched wooden safety handrails extending above mezzanine floor
+	draw_line(Vector2(left_x, top_y), Vector2(left_x, handle_top + 4.0), WOOD_BEAM, 3.5)
+	draw_arc(Vector2(left_x - 3.0, handle_top + 4.0), 3.0, -PI, 0.0, 6, WOOD_BEAM, 3.0)
+	draw_line(Vector2(right_x, top_y), Vector2(right_x, handle_top + 4.0), WOOD_BEAM, 3.5)
+	draw_arc(Vector2(right_x + 3.0, handle_top + 4.0), 3.0, -PI, 0.0, 6, WOOD_BEAM, 3.0)
+
+	# 3. Main vertical ladder rails from ground y = 0.0 to mezzanine y = -140.0
+	draw_line(Vector2(left_x, 0.0), Vector2(left_x, top_y), WOOD_BEAM, 4.0)
+	draw_line(Vector2(left_x, 0.0), Vector2(left_x, top_y), OUTLINE, 1.2)
+	draw_line(Vector2(right_x, 0.0), Vector2(right_x, top_y), WOOD_BEAM, 4.0)
+	draw_line(Vector2(right_x, 0.0), Vector2(right_x, top_y), OUTLINE, 1.2)
+
+	# 4. Wooden rungs with brass rivet fasteners
+	var rung_y: float = -14.0
+	while rung_y >= top_y:
+		draw_line(Vector2(left_x - 2.0, rung_y), Vector2(right_x + 2.0, rung_y), WOOD_PLANK_A, 3.0)
+		draw_line(Vector2(left_x - 2.0, rung_y), Vector2(right_x + 2.0, rung_y), OUTLINE, 1.0)
+		draw_circle(Vector2(left_x, rung_y), 1.3, Color(0.85, 0.70, 0.30, 1.0))
+		draw_circle(Vector2(right_x, rung_y), 1.3, Color(0.85, 0.70, 0.30, 1.0))
+		rung_y -= 14.0
 
 
 func _draw_polyline_loop(pts_array: PackedVector2Array, col: Color) -> void:
@@ -573,14 +757,4 @@ func _draw_guitar() -> void:
 	# Neck and headstock
 	draw_line(Vector2(gx + 2.0, gy - 16.0), Vector2(gx + 7.0, gy - 32.0), WOOD_BEAM, 2.5)
 	draw_rect(Rect2(gx + 6.0, gy - 36.0, 4.0, 5.0), WOOD_BEAM)
-
-
-func _draw_rooftop_sandbags() -> void:
-	# Sandbag parapets on roof edges
-	var sandbag_col: Color = Color(0.46, 0.44, 0.34, 1.0)
-	for rx in [-220.0, -200.0, -182.0, 182.0, 200.0, 220.0]:
-		_draw_rounded_rect(Rect2(rx - 8.0, -240.0, 16.0, 8.0), sandbag_col, 2.0)
-		_draw_rect_outline(Rect2(rx - 8.0, -240.0, 16.0, 8.0), OUTLINE)
-		_draw_rounded_rect(Rect2(rx - 7.0, -246.0, 14.0, 7.0), sandbag_col, 2.0)
-		_draw_rect_outline(Rect2(rx - 7.0, -246.0, 14.0, 7.0), OUTLINE)
 

@@ -40,13 +40,15 @@ func _ready() -> void:
 			"phase": rng.randf_range(0.0, TAU)
 		})
 
-	# Subterranean cross-section rocks in the cliff face
-	for i in 25:
+	# Subterranean organic rock strata & buried relics
+	for i in 22:
+		var rot: float = rng.randf_range(-0.35, 0.35)
 		_sub_rocks.append({
-			"x": rng.randf_range(-1100.0, 1100.0),
-			"y": rng.randf_range(35.0, 260.0),
-			"w": rng.randf_range(14.0, 38.0),
-			"h": rng.randf_range(8.0, 22.0)
+			"x": rng.randf_range(-2800.0, 2800.0),
+			"y": rng.randf_range(40.0, 240.0),
+			"w": rng.randf_range(16.0, 42.0),
+			"h": rng.randf_range(8.0, 18.0),
+			"rot": rot
 		})
 
 
@@ -62,39 +64,55 @@ func _draw() -> void:
 
 
 func _draw_25d_ground_plane() -> void:
-	# 2.5D Walkable Ground Plane: Depth strip from y = -6.0 to y = 18.0
-	# Fills across the whole wasteland
-	draw_rect(Rect2(-1250.0, -6.0, 2500.0, 24.0), GROUND_SURFACE)
+	# 2.5D Walkable Ground Plane: Widen across entire wasteland [-3200, 3200]
+	draw_rect(Rect2(-3200.0, -6.0, 6400.0, 24.0), GROUND_SURFACE)
 	
 	# Angled path strips & perspective stepping stones
-	for step_idx in 30:
-		var sx: float = -1150.0 + float(step_idx) * 78.0
-		# Don't draw under the cabin [-220, 220]
-		if absf(sx) > 230.0:
+	for step_idx in 70:
+		var sx: float = -2800.0 + float(step_idx) * 80.0
+		# Don't draw under the cabin [-230, 230]
+		if absf(sx) > 235.0:
 			draw_line(Vector2(sx, 16.0), Vector2(sx + 12.0, -4.0), GROUND_PATH, 1.5)
-			# Small pathway flagstone
 			var stone_rect: Rect2 = Rect2(sx - 8.0, 2.0, 16.0, 6.0)
 			draw_rect(stone_rect, Color(0.24, 0.19, 0.14, 0.6))
 
 
 func _draw_cutaway_cliff_face() -> void:
-	# Front Cutaway Cliff Drop from y = 18.0 to 300.0
-	draw_rect(Rect2(-1250.0, 18.0, 2500.0, 4.0), CLIFF_EDGE) # 3D cliff edge highlight/shadow
-	draw_rect(Rect2(-1250.0, 22.0, 2500.0, 50.0), DIRT_STRATA_A)
-	draw_rect(Rect2(-1250.0, 72.0, 2500.0, 230.0), DIRT_STRATA_B)
+	# Front Cutaway Cliff Drop across [-3200, 3200]
+	draw_rect(Rect2(-3200.0, 18.0, 6400.0, 4.0), CLIFF_EDGE)
+	draw_rect(Rect2(-3200.0, 22.0, 6400.0, 50.0), DIRT_STRATA_A)
+	draw_rect(Rect2(-3200.0, 72.0, 6400.0, 230.0), DIRT_STRATA_B)
 
-	# Subterranean embedded rocks
+	# Organic, tilted subterranean rock boulders with dark outline (NO floating UI boxes!)
 	for rock in _sub_rocks:
 		var rx: float = float(rock["x"])
 		var ry: float = float(rock["y"])
 		var rw: float = float(rock["w"])
 		var rh: float = float(rock["h"])
-		draw_rect(Rect2(rx, ry, rw, rh), ROCK_SUB)
-		draw_line(Vector2(rx, ry), Vector2(rx + rw, ry), Color(0.35, 0.30, 0.25, 0.8), 1.2)
-		draw_line(Vector2(rx, ry + rh), Vector2(rx + rw, ry + rh), Color(0.12, 0.09, 0.06, 0.8), 1.2)
+		var r_rot: float = float(rock.get("rot", 0.0))
+		
+		# Draw natural tilted polygonal boulder
+		var half_w: float = rw * 0.5
+		var half_h: float = rh * 0.5
+		var pts: PackedVector2Array = PackedVector2Array([
+			Vector2(rx - half_w, ry - half_h + r_rot * 10.0),
+			Vector2(rx + half_w * 0.8, ry - half_h - r_rot * 8.0),
+			Vector2(rx + half_w, ry + half_h + r_rot * 5.0),
+			Vector2(rx - half_w * 0.7, ry + half_h - r_rot * 6.0)
+		])
+		draw_colored_polygon(pts, ROCK_SUB)
+		pts.append(pts[0])
+		draw_polyline(pts, Color(0.12, 0.09, 0.06, 0.9), 1.2)
+		# Internal sediment vein
+		draw_line(
+			Vector2(rx - half_w * 0.6, ry),
+			Vector2(rx + half_w * 0.5, ry + r_rot * 6.0),
+			Color(0.38, 0.32, 0.26, 0.6),
+			1.0
+		)
 
-	# Cross-section tree roots penetrating the soil
-	for root_x in [-600.0, -320.0, 420.0, 750.0]:
+	# Cross-section tree roots penetrating the soil across the wider terrain
+	for root_x in [-1800.0, -1100.0, -600.0, -320.0, 420.0, 750.0, 1350.0, 2100.0]:
 		draw_line(Vector2(root_x, 18.0), Vector2(root_x + 8.0, 45.0), ROOT_COL, 2.5)
 		draw_line(Vector2(root_x + 8.0, 45.0), Vector2(root_x + 18.0, 85.0), ROOT_COL, 1.8)
 		draw_line(Vector2(root_x + 8.0, 45.0), Vector2(root_x - 12.0, 75.0), ROOT_COL, 1.4)

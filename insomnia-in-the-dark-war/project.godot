@@ -21,6 +21,7 @@ GameState="*res://scripts/game_state.gd"
 JournalManager="*res://scripts/journal_manager.gd"
 UnlockManager="*res://scripts/unlock_manager.gd"
 SaveManager="*res://scripts/save_manager.gd"
+MailboxManager="*res://scripts/mailbox_manager.gd"
 
 [display]
 
