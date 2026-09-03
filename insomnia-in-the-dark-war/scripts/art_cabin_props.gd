@@ -237,57 +237,67 @@ func _draw_steaming_mug() -> void:
 
 
 func _draw_window_curtains() -> void:
-	# 1. Warm glowing cabin window behind curtains (Eliminates the dark hole!)
-	var win_rect: Rect2 = Rect2(-168.0, -166.0, 56.0, 62.0)
-	draw_rect(win_rect, Color(0.98, 0.85, 0.52, 0.90))
-	draw_circle(Vector2(-140.0, -135.0), 18.0, Color(1.0, 0.95, 0.72, 0.95))
-	draw_line(Vector2(-168.0, -135.0), Vector2(-112.0, -135.0), WOOD_BEAM, 2.0)
-	draw_line(Vector2(-140.0, -166.0), Vector2(-140.0, -104.0), WOOD_BEAM, 2.0)
-	_draw_rect_outline(win_rect, WOOD_BEAM)
+	# 1. Mezzanine Loft Window (Positioned cleanly above the 2nd floor at y = -196 to -160)
+	var loft_win: Rect2 = Rect2(-162.0, -196.0, 44.0, 36.0)
+	draw_rect(loft_win, Color(0.98, 0.85, 0.52, 0.90))
+	draw_circle(Vector2(-140.0, -178.0), 12.0, Color(1.0, 0.95, 0.72, 0.95))
+	draw_line(Vector2(-162.0, -178.0), Vector2(-118.0, -178.0), WOOD_BEAM, 1.8)
+	draw_line(Vector2(-140.0, -196.0), Vector2(-140.0, -160.0), WOOD_BEAM, 1.8)
+	_draw_rect_outline(loft_win, WOOD_BEAM)
 
-	# 2. Warm checkered curtains flanking the cabin window
+	# Timber windowsill shelf at y = -160 (rests 20px above mezzanine floor y = -140)
+	var loft_sill: Rect2 = Rect2(-166.0, -160.0, 52.0, 3.5)
+	draw_rect(loft_sill, WOOD_BEAM)
+	_draw_rect_outline(loft_sill, OUTLINE)
+
+	# 2. Loft Curtains flanking the window
 	var drape_col: Color = Color(0.85, 0.45, 0.40, 0.95)
-	
-	# Left curtain
-	draw_colored_polygon(
-		PackedVector2Array([
-			Vector2(-172.0, -170.0),
-			Vector2(-158.0, -170.0),
-			Vector2(-163.0, -135.0),
-			Vector2(-156.0, -102.0),
-			Vector2(-172.0, -102.0)
-		]),
-		drape_col
-	)
+	# Left drape
+	draw_colored_polygon(PackedVector2Array([
+		Vector2(-168.0, -200.0),
+		Vector2(-156.0, -200.0),
+		Vector2(-160.0, -178.0),
+		Vector2(-155.0, -158.0),
+		Vector2(-168.0, -158.0)
+	]), drape_col)
 	_draw_polyline_loop([
-		Vector2(-172.0, -170.0),
-		Vector2(-158.0, -170.0),
-		Vector2(-163.0, -135.0),
-		Vector2(-156.0, -102.0),
-		Vector2(-172.0, -102.0)
+		Vector2(-168.0, -200.0),
+		Vector2(-156.0, -200.0),
+		Vector2(-160.0, -178.0),
+		Vector2(-155.0, -158.0),
+		Vector2(-168.0, -158.0)
 	], OUTLINE)
-	
-	# Right curtain
-	draw_colored_polygon(
-		PackedVector2Array([
-			Vector2(-122.0, -170.0),
-			Vector2(-108.0, -170.0),
-			Vector2(-108.0, -102.0),
-			Vector2(-124.0, -102.0),
-			Vector2(-117.0, -135.0)
-		]),
-		drape_col
-	)
+
+	# Right drape
+	draw_colored_polygon(PackedVector2Array([
+		Vector2(-124.0, -200.0),
+		Vector2(-112.0, -200.0),
+		Vector2(-112.0, -158.0),
+		Vector2(-125.0, -158.0),
+		Vector2(-120.0, -178.0)
+	]), drape_col)
 	_draw_polyline_loop([
-		Vector2(-122.0, -170.0),
-		Vector2(-108.0, -170.0),
-		Vector2(-108.0, -102.0),
-		Vector2(-124.0, -102.0),
-		Vector2(-117.0, -135.0)
+		Vector2(-124.0, -200.0),
+		Vector2(-112.0, -200.0),
+		Vector2(-112.0, -158.0),
+		Vector2(-125.0, -158.0),
+		Vector2(-120.0, -178.0)
 	], OUTLINE)
-	
+
 	# Curtain rod
-	draw_line(Vector2(-176.0, -171.0), Vector2(-104.0, -171.0), WOOD_BEAM, 3.0)
+	draw_line(Vector2(-172.0, -200.0), Vector2(-108.0, -200.0), WOOD_BEAM, 2.5)
+
+	# 3. Ground Floor Window (Above stove/armchair from y = -70 to -30)
+	var gnd_win: Rect2 = Rect2(-155.0, -68.0, 42.0, 36.0)
+	draw_rect(gnd_win, Color(0.98, 0.85, 0.52, 0.85))
+	draw_circle(Vector2(-134.0, -50.0), 10.0, Color(1.0, 0.95, 0.72, 0.90))
+	draw_line(Vector2(-155.0, -50.0), Vector2(-113.0, -50.0), WOOD_BEAM, 1.8)
+	draw_line(Vector2(-134.0, -68.0), Vector2(-134.0, -32.0), WOOD_BEAM, 1.8)
+	_draw_rect_outline(gnd_win, WOOD_BEAM)
+
+	var gnd_sill: Rect2 = Rect2(-158.0, -32.0, 48.0, 3.0)
+	draw_rect(gnd_sill, WOOD_BEAM)
+	_draw_rect_outline(gnd_sill, OUTLINE)
 
 
 func _draw_mezzanine_railing() -> void:

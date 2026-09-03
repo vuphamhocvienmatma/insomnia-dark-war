@@ -12,6 +12,8 @@ const CABIN_PROPS_SCRIPT := preload("res://scripts/art_cabin_props.gd")
 const WEATHER_SCRIPT := preload("res://scripts/art_weather.gd")
 const GROUND_PROPS_SCRIPT := preload("res://scripts/art_ground_props.gd")
 const MAILBOX_SCENE := preload("res://scenes/mailbox.tscn")
+const CABIN_DOOR_SCENE := preload("res://scenes/cabin_door.tscn")
+const CURSOR_SCRIPT := preload("res://scripts/interactive_cursor.gd")
 
 const GROUND_Y: float = 0.0
 
@@ -22,6 +24,10 @@ var day_count: int = 1
 
 
 func _ready() -> void:
+	var cursor_layer: CanvasLayer = CanvasLayer.new()
+	cursor_layer.set_script(CURSOR_SCRIPT)
+	add_child(cursor_layer)
+
 	var skyline := Node2D.new()
 	skyline.set_script(SKYLINE_SCRIPT)
 	add_child(skyline)
@@ -30,6 +36,7 @@ func _ready() -> void:
 	cabin_props.set_script(CABIN_PROPS_SCRIPT)
 	add_child(cabin_props)
 
+	_spawn_cabin_door()
 	_spawn_mailbox()
 	_spawn_sockets()
 	_spawn_turrets()
@@ -150,3 +157,9 @@ func _spawn_mailbox() -> void:
 	var m_box := MAILBOX_SCENE.instantiate() as Node2D
 	m_box.position = Vector2(-225.0, 0.0)
 	add_child(m_box)
+
+
+func _spawn_cabin_door() -> void:
+	var door := CABIN_DOOR_SCENE.instantiate() as Node2D
+	door.position = Vector2(-195.0, 0.0)
+	add_child(door)

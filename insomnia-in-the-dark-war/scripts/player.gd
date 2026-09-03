@@ -18,6 +18,20 @@ func _ready() -> void:
 	if cabin != null:
 		cabin.floor_changed.connect(_on_floor_changed)
 
+	ladder_prompt = Label.new()
+	ladder_prompt.visible = false
+	ladder_prompt.add_theme_font_size_override("font_size", 11)
+	ladder_prompt.add_theme_color_override("font_color", Color(0.98, 0.88, 0.58, 1.0))
+	ladder_prompt.offset_left = -70.0
+	ladder_prompt.offset_top = -58.0
+	ladder_prompt.offset_right = 70.0
+	ladder_prompt.offset_bottom = -38.0
+	ladder_prompt.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	add_child(ladder_prompt)
+
+
+var ladder_prompt: Label
+
 
 func _physics_process(_delta: float) -> void:
 	var direction: Vector2 = Vector2.ZERO
@@ -29,12 +43,24 @@ func _physics_process(_delta: float) -> void:
 	if direction != Vector2.ZERO:
 		direction = direction.normalized()
 
-	if cabin != null and Input.is_action_just_pressed("ui_up"):
-		if cabin.can_climb_up(global_position.x):
-			cabin.climb_up()
-	if cabin != null and Input.is_action_just_pressed("ui_down"):
-		if cabin.can_climb_down(global_position.x):
-			cabin.climb_down()
+	# Ladder interaction only triggered by pressing E when near the ladder (x = 150)
+	var near_ladder: bool = absf(position.x - 150.0) < 22.0
+	if ladder_prompt != null:
+		if near_ladder and not _climbing:
+			ladder_prompt.visible = true
+			if cabin != null and cabin.current_floor == "mezzanine":
+				ladder_prompt.text = "🪜 [E] Leo xuống tầng 1"
+			else:
+				ladder_prompt.text = "🪜 [E] Leo lên gác xép"
+		else:
+			ladder_prompt.visible = false
+
+	if near_ladder and not _climbing and Input.is_action_just_pressed("interact"):
+		if cabin != null:
+			if cabin.current_floor == "ground":
+				cabin.climb_up()
+			else:
+				cabin.climb_down()
 
 	var effective_speed: float = speed * (0.85 if (GameState and GameState.is_tired) else 1.0)
 	velocity = Vector2(direction.x * effective_speed, 0.0)
@@ -46,7 +72,7 @@ func _physics_process(_delta: float) -> void:
 
 	# Clamp movement bounds: On mezzanine cannot walk into air; on ground cannot leave map
 	if cabin != null and cabin.current_floor == "mezzanine":
-		position.x = clampf(position.x, -182.0, 248.0)
+		position.x = clampf(position.x, -180.0, 180.0)
 	else:
 		position.x = clampf(position.x, -1600.0, 1600.0)
 
