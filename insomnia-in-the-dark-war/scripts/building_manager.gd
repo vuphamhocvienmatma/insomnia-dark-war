@@ -8,32 +8,41 @@ func _ready() -> void:
 	ghost_preview = Node2D.new()
 	ghost_preview.set_script(preload("res://scripts/art_wall.gd"))
 	ghost_preview.modulate = Color(1, 1, 1, 0.4)
+	ghost_preview.visible = false
 	add_child(ghost_preview)
 
 func _process(_delta: float) -> void:
 	var mouse_pos := get_global_mouse_position()
-	active_socket = _find_closest_valid_socket(mouse_pos)
+	var socket: BuildSocket2D = _find_closest_valid_socket(mouse_pos)
+	var player := get_tree().get_first_node_in_group("player") as Node2D
 
-	if active_socket != null:
+	var player_near := false
+	if player != null and socket != null:
+		player_near = player.global_position.distance_to(socket.global_position) < 180.0
+
+	if socket != null and player_near:
+		active_socket = socket
 		var pose := active_socket.get_snap_pose()
 		ghost_preview.global_position = pose.position
 		ghost_preview.global_rotation = pose.rotation
-		ghost_preview.modulate = Color(0, 1, 0, 0.5)
+		ghost_preview.modulate = Color(0.35, 1.0, 0.45, 0.65)
+		ghost_preview.visible = true
 	else:
-		ghost_preview.global_position = mouse_pos
-		ghost_preview.global_rotation = 0.0
-		ghost_preview.modulate = Color(1, 1, 1, 0.4)
+		active_socket = null
+		ghost_preview.visible = false
 
 func _unhandled_input(event: InputEvent) -> void:
-	if event.is_action_pressed("click_build") and active_socket != null:
+	if event.is_action_pressed("click_build") and active_socket != null and ghost_preview.visible:
 		var player := get_tree().get_first_node_in_group("player") as Node2D
-		if player and global_position.distance_to(player.global_position) < 200.0:
+		if player and player.global_position.distance_to(active_socket.global_position) < 180.0:
 			if GameState and GameState.spend_scrap(1) == true:
 				place_build_piece(active_socket)
 				if JournalManager:
 					JournalManager.track_progress("wall")
 			else:
-				print("Hết phế liệu!")
+				var hud: Node = get_tree().get_first_node_in_group("hud")
+				if hud != null and hud.has_method("show_toast"):
+					hud.call("show_toast", "⚠️ Không đủ phế liệu! Cần 1 phế liệu để xây tường.", 2.5, true)
 		else:
 			print("Quá xa để xây dựng!")
 

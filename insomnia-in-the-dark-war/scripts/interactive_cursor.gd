@@ -33,85 +33,101 @@ func _process(delta: float) -> void:
 func _detect_hover_action() -> void:
 	var cam: Camera2D = get_tree().root.get_camera_2d()
 	var w_pos: Vector2 = cam.get_global_mouse_position() if cam != null else Vector2.ZERO
+	var player: Node2D = get_tree().get_first_node_in_group("player") as Node2D
 
 	current_action_type = ""
 	current_action_title = ""
 	current_hover_target = null
 
-	# 1. Check Cabin Door at x = -195
+	if player == null or not is_instance_valid(player):
+		return
+
+	# 1. Check Build Sockets (via BuildingManager - only when close to socket!)
+	var bm: Node = get_tree().root.find_child("BuildingManager", true, false)
+	if bm != null:
+		var sock = bm.get("active_socket")
+		if sock != null and is_instance_valid(sock):
+			var sock_node: Node2D = sock as Node2D
+			if player.global_position.distance_to(sock_node.global_position) < 180.0:
+				current_action_type = "build"
+				current_action_title = "🔨 [Click] Xây Tường Rào (-1 Phế liệu)"
+				current_hover_target = sock_node
+				return
+
+	# 2. Check Companion Cat (checked before door to prevent door overlap)
+	var cat: Node2D = get_tree().get_first_node_in_group("companion_cat") as Node2D
+	if cat != null and is_instance_valid(cat):
+		if player.global_position.distance_to(cat.global_position) < 120.0:
+			if cat.global_position.distance_to(w_pos) < 26.0:
+				current_action_type = "cat"
+				current_action_title = "🐱 [Click] Vuốt ve mèo cưng"
+				current_hover_target = cat
+				return
+
+	# 3. Check Cabin Door at x = -195 (only inside door frame bounds)
 	for door in get_tree().get_nodes_in_group("cabin_door"):
 		if is_instance_valid(door) and door is Node2D:
 			var d_node: Node2D = door as Node2D
-			if d_node.global_position.distance_to(w_pos) < 38.0 or absf(w_pos.x - (-195.0)) < 18.0 and w_pos.y >= -55.0 and w_pos.y <= 5.0:
-				current_action_type = "door"
-				var is_open: bool = bool(d_node.get("is_open"))
-				current_action_title = "🚪 [Click] " + ("Đóng cửa" if is_open else "Mở cửa") + " | [Chuột Phải] Gia cố"
-				current_hover_target = d_node
-				return
+			if absf(player.global_position.x - (-195.0)) < 130.0:
+				if absf(w_pos.x - (-195.0)) <= 15.0 and w_pos.y >= -52.0 and w_pos.y <= 2.0:
+					current_action_type = "door"
+					var is_open: bool = bool(d_node.get("is_open"))
+					current_action_title = "🚪 [Click] " + ("Đóng cửa" if is_open else "Mở cửa") + " | [Chuột Phải] Gia cố"
+					current_hover_target = d_node
+					return
 
-	# 2. Check Ladder at x = 150
-	if absf(w_pos.x - 150.0) < 18.0 and w_pos.y >= -155.0 and w_pos.y <= 8.0:
-		current_action_type = "ladder"
-		var cabin: Node2D = get_tree().get_first_node_in_group("cabin_structure") as Node2D
-		var to_floor: String = "Lên gác lửng" if (cabin != null and cabin.get("current_floor") == "ground") else "Xuống tầng 1"
-		current_action_title = "🪜 [Click] " + to_floor
-		return
+	# 4. Check Ladder at x = 150
+	if absf(player.global_position.x - 150.0) < 80.0:
+		if absf(w_pos.x - 150.0) < 16.0 and w_pos.y >= -155.0 and w_pos.y <= 8.0:
+			current_action_type = "ladder"
+			var cabin: Node2D = get_tree().get_first_node_in_group("cabin_structure") as Node2D
+			var to_floor: String = "Lên gác lửng" if (cabin != null and cabin.get("current_floor") == "ground") else "Xuống tầng 1"
+			current_action_title = "🪜 [Click] " + to_floor
+			return
 
-	# 3. Check Mailbox at x = -225
+	# 5. Check Mailbox at x = -225
 	for mb in get_tree().get_nodes_in_group("mailbox"):
 		if is_instance_valid(mb) and mb is Node2D:
 			var m_node: Node2D = mb as Node2D
-			if m_node.global_position.distance_to(w_pos) < 32.0:
-				current_action_type = "mailbox"
-				current_action_title = "✉️ [Click] Mở Hòm Thư"
-				current_hover_target = m_node
-				return
+			if player.global_position.distance_to(m_node.global_position) < 120.0:
+				if m_node.global_position.distance_to(w_pos) < 28.0:
+					current_action_type = "mailbox"
+					current_action_title = "✉️ [Click] Mở Hòm Thư"
+					current_hover_target = m_node
+					return
 
-	# 3b. Check Merchant Dog at x = -265
+	# 6. Check Merchant Dog at x = -265
 	for dog in get_tree().get_nodes_in_group("merchant_dog"):
 		if is_instance_valid(dog) and dog is Node2D:
 			var d_node: Node2D = dog as Node2D
-			if d_node.global_position.distance_to(w_pos) < 36.0:
-				current_action_type = "merchant"
-				current_action_title = "🤖 [Click] Cửa Hàng Chó Robot"
-				current_hover_target = d_node
-				return
+			if player.global_position.distance_to(d_node.global_position) < 130.0:
+				if d_node.global_position.distance_to(w_pos) < 32.0:
+					current_action_type = "merchant"
+					current_action_title = "🤖 [Click] Cửa Hàng Chó Robot"
+					current_hover_target = d_node
+					return
 
-	# 4. Check Build Sockets (via BuildingManager)
-	var bm: Node = get_tree().root.find_child("BuildingManager", true, false)
-	if bm != null and bm.get("active_socket") != null:
-		current_action_type = "build"
-		current_action_title = "🔨 [Click] Xây Tường Rào (-1 Phế liệu)"
-		return
-
-	# 5. Check Plant Pots
+	# 7. Check Plant Pots
 	for pot in get_tree().get_nodes_in_group("plant_pot"):
 		if is_instance_valid(pot) and pot is Node2D:
 			var p_node: Node2D = pot as Node2D
-			if p_node.global_position.distance_to(w_pos) < 28.0:
-				current_action_type = "plant"
-				current_action_title = "🌱 [Click] Chăm sóc / Thu hoạch cây"
-				current_hover_target = p_node
-				return
+			if player.global_position.distance_to(p_node.global_position) < 110.0:
+				if p_node.global_position.distance_to(w_pos) < 24.0:
+					current_action_type = "plant"
+					current_action_title = "🌱 [Click] Chăm sóc / Thu hoạch cây"
+					current_hover_target = p_node
+					return
 
-	# 6. Check Stove
+	# 8. Check Stove
 	for stove in get_tree().get_nodes_in_group("stove"):
 		if is_instance_valid(stove) and stove is Node2D:
 			var s_node: Node2D = stove as Node2D
-			if s_node.global_position.distance_to(w_pos) < 30.0:
-				current_action_type = "stove"
-				current_action_title = "🍲 [Click] Nấu súp lò sưởi"
-				current_hover_target = s_node
-				return
-
-	# 7. Check Companion Cat
-	var cat: Node2D = get_tree().get_first_node_in_group("companion_cat") as Node2D
-	if cat != null and is_instance_valid(cat):
-		if cat.global_position.distance_to(w_pos) < 26.0:
-			current_action_type = "cat"
-			current_action_title = "🐱 [Click] Vuốt ve mèo cưng"
-			current_hover_target = cat
-			return
+			if player.global_position.distance_to(s_node.global_position) < 110.0:
+				if s_node.global_position.distance_to(w_pos) < 28.0:
+					current_action_type = "stove"
+					current_action_title = "🍲 [Click] Nấu súp lò sưởi"
+					current_hover_target = s_node
+					return
 
 
 func _unhandled_input(event: InputEvent) -> void:

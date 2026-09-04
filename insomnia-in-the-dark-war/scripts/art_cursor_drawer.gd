@@ -40,19 +40,7 @@ func _draw() -> void:
 	var action_title: String = str(parent.get("current_action_title"))
 	var pulse: float = float(parent.get("_pulse_time"))
 
-	# --- 1. Target World Highlight (if actionable target exists) ---
-	var hover_target: Node2D = parent.get("current_hover_target") as Node2D
-	if hover_target != null and is_instance_valid(hover_target):
-		var cam: Camera2D = get_viewport().get_camera_2d()
-		if cam != null:
-			# Project target world position to viewport screen space
-			var screen_pos: Vector2 = (hover_target.global_position - cam.global_position) * cam.zoom + (get_viewport_rect().size * 0.5)
-			var ring_rad: float = 24.0 + sin(pulse * 3.0) * 3.0
-			var alpha: float = 0.45 + sin(pulse * 3.0) * 0.25
-			draw_arc(screen_pos + Vector2(0.0, -18.0), ring_rad, 0.0, TAU, 24, Color(1.0, 0.85, 0.40, alpha), 2.0)
-			draw_circle(screen_pos + Vector2(0.0, -18.0), ring_rad * 0.7, Color(1.0, 0.80, 0.30, 0.12 * alpha))
-
-	# --- 2. Action Mode Cursor vs Default Cursor ---
+	# --- Action Mode Cursor vs Default Cursor ---
 	if action_type != "":
 		# Glowing action ring at cursor tip
 		var halo_rad: float = 12.0 + sin(pulse * 4.0) * 2.5
