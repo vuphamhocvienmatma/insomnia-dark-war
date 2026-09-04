@@ -23,14 +23,16 @@ Mục tiêu: Sống sót qua các chu kỳ ngày-đêm, gắn kết tình bạn 
 | Hệ thống | Mô tả chi tiết |
 |----------|----------------|
 | **2.5D Diorama Cutaway** | Không gian đa tầng có chiều sâu 2.5D, mặt vách địa chất trầm tích tự nhiên, hầm trú ẩn ngầm và cabin gỗ cắt lớp ấm cúng. |
-| **Thang Trong Nhà & Lỗ Sàn Tầng 2** | Thang gỗ dã chiến đặt ngay trong cabin (`x = 150`), khoét lỗ sàn gác xép (cutaway hatchway) với viền gỗ chịu lực; nhân vật trèo thang có **hoạt ảnh tay chân phối hợp nhịp nhàng**. |
-| **Camera Zoom Đa Dụng** | Phóng to / thu nhỏ linh hoạt bằng **cuộn chuột (Mouse Wheel)** hoặc qua **cụm nút điều khiển `[ -  1.0x  + ]`** trên HUD. |
-| **Hòm Thư Dã Chiến & Thư Phương Xa** | Hòm thư ngoài hiên với cờ đỏ 🚩 giương lên khi có thư; nhận thư ngẫu nhiên với 4 chủ đề (Hài hước, Kinh dị tận thế, Động viên ấm áp, Tiếp tế linh kiện); tính năng **hồi âm tăng/giảm độ thân mật** và **mở khóa gói quà bất ngờ**. |
-| **Đồng Hồ Lofi & Pin Solar** | Widget mặt trời/mặt trăng chạy theo thanh cung tiến trình thời gian thực cùng thanh đo năng lượng pin mặt trời ⚡ Solar trực quan. |
-| **Cặp Súng AK-47 Mái Nhà** | 2 khẩu AK-47 đặt trên ổ bao cát có bệ gỗ vát nghiêng theo góc dốc mái nhà, kèm hiệu ứng tia lửa nòng súng (muzzle flash) khi bắn đêm. |
-| **Mèo Đồng Hành (Companion Cat)** | Mèo tam thể lông xù tự động đi nhặt đồ, biết leo thang lên xuống tầng 2, tương tác vuốt ve tăng hạnh phúc. |
-| **Âm Nhạc Lofi & Âm Thanh Môi Trường** | Bản nhạc electric piano Rhodes lofi êm dịu ban ngày (tích hợp tiếng vinyl crackle) tự động crossfade sang ambient gió lạnh ban đêm. |
-| **Trạng Thái Tường Nứt 3 Giai Đoạn** | Hàng rào phản ánh độ bền thực tế: Nứt chân chim (>75%) → Toạc sâu đứt đai (>50%) → Thủng lỗ toang hoang rách kẽm gai (<25%). |
+| **Zombie Đột Biến Ban Đêm** | 4 chủng loại: Normal, **Runner** (nhanh, mắt rực lửa, máu giấy), **Brute** (khổng lồ, giáp thép, đập đau x3), **Thief** (lén lút cuỗm 2 phế liệu, hạ gục thu hồi lại). |
+| **Đêm Ác Mộng Mỗi 5 Ngày** | Cảnh báo trước qua Radio: Zombie tăng tốc 30%, Jackpot phế liệu x2, Nhật thực sụt 50% Solar, hoặc Sương mù che mắt. |
+| **Thương Nhân Chó Robot** | Chó robot balo ghé hiên mỗi 3 ngày, bán hạt giống, nước, đồ decor Cozy Score, Blueprint công sự và Băng cassette lofi. |
+| **Hòm Thư Story Arc & Mini-Endings** | Chuỗi 6-8 thư cốt truyện, lựa chọn cộng dồn thân mật; kết thúc bằng 4 bảo vật vĩnh viễn (Cần Câu Vàng, Kính Nhìn Đêm, Bình Tưới Thần Kỳ, Nòng AK Mạ Crom). |
+| **Thời Tiết Có Hệ Quả** | Bão cát sa mạc (+4 scrap rơi, mèo ở nhà sưởi), Mưa axit (cây lớn x2, solar -50%), Mưa sao băng (rơi +12 scrap quý hiếm). |
+| **Tường Huy Chương Gỗ** | Bảng gỗ chạm khắc 7 huân chương thành tựu treo trên tường gác xép tầng 2 (Sống sót 7 ngày, 50 kill, Tri kỷ, Nông dân, Thợ xây, Bếp trưởng, Vua ấm cúng). |
+| **Cá Nhân Hóa Cabin & Cozy Score** | Thảm len dệt thổ cẩm, Quả cầu disco lấp lánh, Tranh poster hoài niệm, Đổi màu đèn fairy lights pastel; buff tốc độ cho mèo và bớt mệt mỏi. |
+| **Nấu Ăn 2.0 (Strategic Cooking)** | 4 món ăn nấu từ thảo dược: Canh măng (+tốc độ chạy), Trà hoa cúc (+sạc Solar), Súp kiên cố (+HP tường và cửa), Bánh hạt (+mèo may mắn x2 tài nguyên). |
+| **Cửa Chính Ra Vào & Gia Cố 3 Cấp** | Cửa gỗ dã chiến có thể Đóng/Mở chặn zombie; gia cố bằng phế liệu lên Cấp 2 (Nẹp sắt 250 HP) và Cấp 3 (Thiết giáp 500 HP). |
+| **Thang Trong Nhà & Chuột Tương Tác** | Leo thang bằng phím [E] mượt mà; con trỏ chuột lofi phát sáng đổi hình `👆` khi hover action và click trực tiếp. |
 
 ---
 
@@ -116,3 +118,22 @@ Hòm thư đặt trước hiên cabin (`x = -225`). Khi có thư mới, **lá c�
 1. Khởi chạy **Godot 4.7** (hoặc bản 4.x tương thích).
 2. Chọn `Import` trỏ đến thư mục `insomnia-in-the-dark-war/project.godot`.
 3. Nhấn **F5** (hoặc nút Run Project) để khởi chạy `scenes/main_level.tscn`.
+
+---
+
+## 7. Tối Ưu Hóa HTML5 / WebGL & Chế Độ Tiết Kiệm (Eco Mode)
+
+Dự án được tối ưu sâu cho xuất bản Web (HTML5 / WASM) và phần cứng yếu:
+
+- **Nút Bật/Tắt Eco Mode (`[⚡ Eco: BẬT/TẮT]`)**: Tích hợp trên HUD góc trên bên phải. Khi bật, game sẽ tắt lớp shader hậu kỳ (film grain, chromatic aberration, vignette) và tắt nhấp nháy đèn lò sưởi, giảm tải GPU tới 60%. Game tự động nhận diện và kích hoạt Eco Mode khi chạy trên trình duyệt Web.
+- **Triệt tiêu Redraw lặp lại mỗi frame (`queue_redraw`)**:
+  - `art_skyline.gd` & `art_ground_props.gd`: Tách nền tĩnh (vẽ 1 lần) khỏi hiệu ứng chuyển động (chim, lá bay, cỏ lay) và giảm tần số vẽ xuống 15-20 fps.
+  - `art_scrap.gd`: Chuyển hiệu ứng nhấp nhô sang GPU transform (`position.y`), giảm 1.560 lần gọi redraw mỗi giây xuống còn 0 lần trong gameplay!
+  - `art_plantpot.gd`, `art_zombie.gd`, `art_player.gd`, `art_cat.gd`, `art_clouds.gd`, `art_night_sky.gd`, `art_merchant_dog.gd`, `art_cursor_drawer.gd`, `art_stove.gd`: Đều được throttle và kiểm tra trạng thái hiển thị / di chuột thông minh.
+- **Bộ nhớ âm thanh siêu gọn**: Chuyển đổi toàn bộ nhạc nền BGM từ PCM .WAV (5.2 MB) sang Vorbis .OGG (360 KB), giảm dung lượng tới 15 lần và nạp tức thì trên web.
+- **Tối ưu Physics & Giới hạn Zombie**:
+  - Giới hạn tối đa đàn zombie mỗi đêm là 18 con, tránh drop FPS ở các ngày sinh tồn cao.
+  - Thu hẹp bán kính quét Area2D của tháp pháo AK từ 320px xuống 260px.
+  - Chuyển hạt máu zombie sang `CPUParticles2D` tương thích 100% chuẩn WebGL.
+- **Caching chuỗi giao diện HUD**: Không tạo mới chuỗi văn bản mỗi frame; chỉ cập nhật text của nhãn mặt trời/trăng, pin solar và zoom khi chỉ số thực sự thay đổi.
+

@@ -17,6 +17,7 @@ var carried_item_node: Node2D = null
 var next_loot_time: float = 0.0
 var is_being_pet: bool = false
 var pet_happiness: float = 0.0
+var lucky_loot: bool = false
 
 func _ready() -> void:
 	add_to_group("companion_cat")
@@ -41,6 +42,12 @@ func _physics_process(_delta: float) -> void:
 		return
 
 	var now := Time.get_ticks_msec() / 1000.0
+
+	var ls: Node = get_tree().root.find_child("LevelSetup", true, false)
+	if ls != null and str(ls.get("current_weather")) == "sandstorm":
+		# Stay inside cabin near stove keeping warm during sandstorm
+		_seek_x(-60.0, 15.0)
+		return
 
 	if is_carrying_item:
 		if not is_instance_valid(carried_item_node):
@@ -128,17 +135,18 @@ func _deliver_item() -> void:
 		return
 
 	var item_type: String = str(carried_item_node.get("item_type")) if "item_type" in carried_item_node else "scrap"
+	var amount: int = 2 if lucky_loot else 1
 
 	match item_type:
 		"scrap":
-			GameState.add_scrap(1)
+			GameState.add_scrap(amount)
 		"seed":
-			GameState.add_seeds(1)
+			GameState.add_seeds(amount)
 			JournalManager.track_progress("seed")
 		"water":
-			GameState.add_water(1)
+			GameState.add_water(amount)
 
-	print("Mèo mang về 1 ", item_type, "!")
+	print("Mèo mang về ", amount, " ", item_type, "!")
 	carried_item_node.queue_free()
 	carried_item_node = null
 	is_carrying_item = false

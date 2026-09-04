@@ -45,6 +45,9 @@ func toggle_door() -> void:
 	_update_prompt()
 	door_state_changed.emit(is_open)
 
+	if art != null:
+		art.queue_redraw()
+
 	var am: Node = get_tree().get_first_node_in_group("audio_manager")
 	if am != null and am.has_method("play_sfx"):
 		am.call("play_sfx", "item_pickup")
@@ -101,6 +104,8 @@ func reinforce_door() -> void:
 				hud.call("show_toast", "✨ Cửa đã đạt cấp độ gia cố tối đa!", 2.5, false)
 
 	_update_prompt()
+	if art != null:
+		art.queue_redraw()
 
 
 func take_damage(amount: float) -> void:
@@ -119,6 +124,8 @@ func take_damage(amount: float) -> void:
 		if hud != null and hud.has_method("show_toast"):
 			hud.call("show_toast", "⚠️ CỬA CHÍNH ĐÃ BỊ ZOMBIE PHÁ THỦNG!", 4.0, true)
 	_update_prompt()
+	if art != null:
+		art.queue_redraw()
 
 
 func _update_collision() -> void:

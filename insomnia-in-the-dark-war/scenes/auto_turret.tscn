@@ -4,7 +4,7 @@
 [ext_resource type="Script" path="res://scripts/art_turret.gd" id="2_art"]
 
 [sub_resource type="CircleShape2D" id="3_circle"]
-radius = 320.0
+radius = 260.0
 
 [node name="AutoTurret" type="Area2D"]
 script = ExtResource("1_turret")

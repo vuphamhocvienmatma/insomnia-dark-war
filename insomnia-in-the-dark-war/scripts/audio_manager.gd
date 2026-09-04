@@ -12,30 +12,34 @@ func _ready() -> void:
 	add_child(bgm_day)
 	add_child(bgm_night)
 	var day_path: String = ""
-	if ResourceLoader.exists("res://assets/bgm/day_lofi.wav"):
-		day_path = "res://assets/bgm/day_lofi.wav"
-	elif ResourceLoader.exists("res://assets/bgm/day_lofi.ogg"):
+	if ResourceLoader.exists("res://assets/bgm/day_lofi.ogg"):
 		day_path = "res://assets/bgm/day_lofi.ogg"
+	elif ResourceLoader.exists("res://assets/bgm/day_lofi.wav"):
+		day_path = "res://assets/bgm/day_lofi.wav"
 		
 	if day_path != "":
 		var s_day: AudioStream = load(day_path) as AudioStream
 		if s_day != null:
 			if s_day is AudioStreamWAV:
 				(s_day as AudioStreamWAV).loop_mode = AudioStreamWAV.LOOP_FORWARD
+			elif s_day is AudioStreamOggVorbis:
+				(s_day as AudioStreamOggVorbis).loop = true
 			bgm_day.stream = s_day
 			bgm_day.play()
 
 	var night_path: String = ""
-	if ResourceLoader.exists("res://assets/bgm/night_ambient.wav"):
-		night_path = "res://assets/bgm/night_ambient.wav"
-	elif ResourceLoader.exists("res://assets/bgm/night_ambient.ogg"):
+	if ResourceLoader.exists("res://assets/bgm/night_ambient.ogg"):
 		night_path = "res://assets/bgm/night_ambient.ogg"
+	elif ResourceLoader.exists("res://assets/bgm/night_ambient.wav"):
+		night_path = "res://assets/bgm/night_ambient.wav"
 		
 	if night_path != "":
 		var s_night: AudioStream = load(night_path) as AudioStream
 		if s_night != null:
 			if s_night is AudioStreamWAV:
 				(s_night as AudioStreamWAV).loop_mode = AudioStreamWAV.LOOP_FORWARD
+			elif s_night is AudioStreamOggVorbis:
+				(s_night as AudioStreamOggVorbis).loop = true
 			bgm_night.stream = s_night
 			bgm_night.play()
 

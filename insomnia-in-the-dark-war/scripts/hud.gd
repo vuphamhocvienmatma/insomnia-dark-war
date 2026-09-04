@@ -94,12 +94,15 @@ func _ready() -> void:
 	_setup_clock_and_solar_widget()
 	_setup_vignette_and_toasts()
 	_setup_zoom_controls()
+	_setup_eco_toggle_button()
 	_setup_mailbox_modal()
 
 	GameState.scrap_changed.connect(_on_scrap_changed)
 	GameState.seeds_changed.connect(_on_seeds_changed)
 	GameState.water_changed.connect(_on_water_changed)
 	GameState.tired_changed.connect(_on_tired_changed)
+	GameState.eco_mode_changed.connect(_on_eco_mode_changed)
+	_apply_eco_mode(GameState.eco_mode)
 	JournalManager.tasks_updated.connect(_on_tasks_updated)
 
 	if MailboxManager != null:
@@ -370,43 +373,116 @@ func _update_tasks() -> void:
 
 
 var _tm_connected: bool = false
+var _cached_tm: Node = null
+var _cached_cam: Node = null
+var _last_arc_slot: int = -1
+var _last_phase_is_n: int = -1
+var _last_solar_int: int = -999
+var _last_zoom_str: String = ""
+var eco_btn: Button
 
 func _process(_delta: float) -> void:
-	var tm: Node = get_tree().get_first_node_in_group("time_manager")
-	if tm != null:
+	if _cached_tm == null or not is_instance_valid(_cached_tm):
+		_cached_tm = get_tree().get_first_node_in_group("time_manager")
+
+	if _cached_tm != null:
 		if not _tm_connected:
 			_tm_connected = true
-			if tm.has_signal("sunset_warning") and not tm.sunset_warning.is_connected(_on_sunset_warning):
-				tm.sunset_warning.connect(_on_sunset_warning)
-			if tm.has_signal("phase_changed") and not tm.phase_changed.is_connected(_on_phase_changed):
-				tm.phase_changed.connect(_on_phase_changed)
-			if tm.has_signal("solar_changed") and not tm.solar_changed.is_connected(_on_solar_changed):
-				tm.solar_changed.connect(_on_solar_changed)
+			if _cached_tm.has_signal("sunset_warning") and not _cached_tm.sunset_warning.is_connected(_on_sunset_warning):
+				_cached_tm.sunset_warning.connect(_on_sunset_warning)
+			if _cached_tm.has_signal("phase_changed") and not _cached_tm.phase_changed.is_connected(_on_phase_changed):
+				_cached_tm.phase_changed.connect(_on_phase_changed)
+			if _cached_tm.has_signal("solar_changed") and not _cached_tm.solar_changed.is_connected(_on_solar_changed):
+				_cached_tm.solar_changed.connect(_on_solar_changed)
 
-		var time_elapsed: float = float(tm.get("time_elapsed"))
-		var is_n: bool = bool(tm.get("is_night"))
-		var dur: float = float(tm.get("night_duration_seconds") if is_n else tm.get("day_duration_seconds"))
+		var time_elapsed: float = float(_cached_tm.get("time_elapsed"))
+		var is_n: bool = bool(_cached_tm.get("is_night"))
+		var dur: float = float(_cached_tm.get("night_duration_seconds") if is_n else _cached_tm.get("day_duration_seconds"))
 		var r: float = clampf(time_elapsed / maxf(dur, 1.0), 0.0, 1.0)
+		var current_slot: int = int(r * 7.0)
+		var phase_val: int = 1 if is_n else 0
 		
-		# Update Lofi Sun/Moon Arc Display
-		if time_arc_label != null:
+		# Update Lofi Sun/Moon Arc Display ONLY when slot or phase changes
+		if time_arc_label != null and (current_slot != _last_arc_slot or phase_val != _last_phase_is_n):
+			_last_arc_slot = current_slot
+			_last_phase_is_n = phase_val
 			var phase_icon: String = "🌙 Đêm" if is_n else "☀️ Ngày"
 			var arc_bar: String = _make_arc_bar(r)
 			time_arc_label.text = phase_icon + "  " + arc_bar
 			
-		# Update Solar battery
-		var sol: float = float(tm.get("current_solar_energy"))
-		if solar_bar != null:
-			solar_bar.value = sol
-		if solar_text != null:
-			solar_text.text = "⚡ Solar: " + str(int(sol)) + "%"
+		# Update Solar battery ONLY when integer percentage changes
+		var sol: float = float(_cached_tm.get("current_solar_energy"))
+		var sol_int: int = int(sol)
+		if sol_int != _last_solar_int:
+			_last_solar_int = sol_int
+			if solar_bar != null:
+				solar_bar.value = sol
+			if solar_text != null:
+				solar_text.text = "⚡ Solar: " + str(sol_int) + "%"
 
-	# Update Zoom level indicator
+	# Update Zoom level indicator ONLY when value changes
 	if zoom_lbl != null:
-		var cam: Node = get_tree().get_first_node_in_group("main_camera")
-		if cam != null and cam.has_method("get_zoom_level"):
-			var z_val: float = float(cam.call("get_zoom_level"))
-			zoom_lbl.text = str(snappedf(z_val, 0.1)) + "x"
+		if _cached_cam == null or not is_instance_valid(_cached_cam):
+			_cached_cam = get_tree().get_first_node_in_group("main_camera")
+		if _cached_cam != null and _cached_cam.has_method("get_zoom_level"):
+			var z_val: float = float(_cached_cam.call("get_zoom_level"))
+			var z_str: String = str(snappedf(z_val, 0.1)) + "x"
+			if z_str != _last_zoom_str:
+				_last_zoom_str = z_str
+				zoom_lbl.text = z_str
+
+
+func _setup_eco_toggle_button() -> void:
+	eco_btn = Button.new()
+	eco_btn.anchor_left = 1.0
+	eco_btn.anchor_top = 0.0
+	eco_btn.anchor_right = 1.0
+	eco_btn.anchor_bottom = 0.0
+	eco_btn.offset_left = -140.0
+	eco_btn.offset_top = 48.0
+	eco_btn.offset_right = -14.0
+	eco_btn.offset_bottom = 76.0
+	eco_btn.add_theme_font_size_override("font_size", 11)
+
+	var b_sb: StyleBoxFlat = StyleBoxFlat.new()
+	b_sb.bg_color = Color(0.16, 0.12, 0.09, 0.90)
+	b_sb.border_color = Color(0.48, 0.36, 0.24, 1.0)
+	b_sb.set_border_width_all(1)
+	b_sb.set_corner_radius_all(8)
+	eco_btn.add_theme_stylebox_override("normal", b_sb)
+
+	_update_eco_btn_ui()
+	eco_btn.pressed.connect(func() -> void:
+		GameState.set_eco_mode(not GameState.eco_mode)
+	)
+	add_child(eco_btn)
+
+
+func _update_eco_btn_ui() -> void:
+	if eco_btn == null:
+		return
+	if GameState.eco_mode:
+		eco_btn.text = "⚡ Eco: BẬT"
+		eco_btn.modulate = Color(0.65, 1.0, 0.65, 1.0)
+	else:
+		eco_btn.text = "⚡ Eco: TẮT"
+		eco_btn.modulate = Color(1.0, 0.92, 0.82, 0.9)
+
+
+func _on_eco_mode_changed(enabled: bool) -> void:
+	_update_eco_btn_ui()
+	_apply_eco_mode(enabled)
+	if enabled:
+		show_toast("⚡ Chế độ Tiết kiệm: BẬT (Đã tắt hậu kỳ & giảm tải GPU)", 3.2, false)
+	else:
+		show_toast("✨ Chế độ Tiết kiệm: TẮT (Đã bật đầy đủ hiệu ứng)", 3.2, false)
+
+
+func _apply_eco_mode(enabled: bool) -> void:
+	var post_layer: Node = get_tree().root.find_child("LofiPostProcessLayer", true, false)
+	if post_layer != null and "visible" in post_layer:
+		post_layer.set("visible", not enabled)
+
 
 
 func _setup_zoom_controls() -> void:
@@ -630,8 +706,39 @@ func _setup_mailbox_modal() -> void:
 	mailbox_modal = Panel.new()
 	mailbox_modal.set_script(script)
 	add_child(mailbox_modal)
+	_setup_merchant_modal()
+
+
+var merchant_modal: Control = null
+
+
+func _setup_merchant_modal() -> void:
+	var scene: PackedScene = preload("res://scenes/merchant_modal.tscn")
+	merchant_modal = scene.instantiate() as Control
+	add_child(merchant_modal)
 
 
 func open_mailbox_ui() -> void:
 	if mailbox_modal != null and mailbox_modal.has_method("open_mailbox"):
 		mailbox_modal.call("open_mailbox")
+
+
+func open_merchant_modal() -> void:
+	if merchant_modal != null and merchant_modal.has_method("open_shop"):
+		merchant_modal.call("open_shop")
+
+
+var cooking_modal: Control = null
+
+
+func _setup_cooking_modal() -> void:
+	var scene: PackedScene = preload("res://scenes/cooking_modal.tscn")
+	cooking_modal = scene.instantiate() as Control
+	add_child(cooking_modal)
+
+
+func open_cooking_modal() -> void:
+	if cooking_modal == null:
+		_setup_cooking_modal()
+	if cooking_modal != null and cooking_modal.has_method("open_menu"):
+		cooking_modal.call("open_menu")

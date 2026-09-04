@@ -125,18 +125,49 @@ func _check_milestone_surprise(sender: String, aff: int) -> void:
 	if aff >= 60 and not bool(SaveManager.has_unlocked("surprise_60_" + sender) if SaveManager else false):
 		if SaveManager:
 			SaveManager.unlock("surprise_60_" + sender)
+
+		var title: String = "🎁 [TRI KỶ] Gói Tiếp Tế Bí Mật Từ " + sender
+		var content: String = "Chú em/Đồng chí thân mến! Hiếm có người nào ở vùng hoang mạc này lại tâm đầu ý hợp và đáng tin như cậu. Tôi gửi tặng cậu toàn bộ thùng đồ sinh tồn cao cấp nhất!"
+		var gifts: Dictionary = {"scrap": 40, "seeds": 12, "water": 5}
+		var relic_name: String = ""
+
+		if sender.begins_with("Bác Sáu"):
+			title = "🎁 [MINI-ENDING: BÁC SÁU] Trao Tặng Cần Câu Vàng Gia Truyền!"
+			content = "Chào chú mày! Lão Sáu chèo thuyền qua bão cát ghé thăm chú đây! Nhìn căn cabin ấm áp thế này lão ưng cái bụng quá. Lão trao cho chú bảo vật gia truyền: CẦN CÂU VÀNG CỦA LÃO SÁU. Cứ mỗi sáng bình minh, cần câu sẽ tự động vớt tặng chú 1 Phế Liệu & 1 Bình Nước ngọt vĩnh viễn!"
+			gifts = {"scrap": 25, "water": 5}
+			relic_name = "golden_fishing_rod"
+			GameState.add_relic("golden_fishing_rod")
+		elif sender.begins_with("Bóng Đêm 404"):
+			title = "🎁 [MINI-ENDING: ĐIỆP VỤ 404] Ống Kính Nhìn Đêm AK-47!"
+			content = "Tín hiệu đã thông suốt toàn bộ hoang mạc. Drone tiếp tế thả thẳng xuống mái nhà cậu: ỐNG KÍNH NHÌN ĐÊM QUÂN SỰ. Gắn trực tiếp vào AK-47, tăng 25% tầm bắn và độ chính xác trong đêm tối!"
+			gifts = {"scrap": 30}
+			relic_name = "night_vision_relic"
+			GameState.add_relic("night_vision_relic")
+		elif sender.begins_with("Cô Bé Hoa Cúc"):
+			title = "🎁 [MINI-ENDING: VƯỜN THẢO DƯỢC] Bình Tưới Thần Kỳ!"
+			content = "Anh ơi! Khu bảo tồn hoa cúc đã phủ xanh ngọn đồi rồi! Em tặng anh BÌNH TƯỚI THẦN KỲ làm từ vỏ hợp kim máy bay. Cây hoa và thảo dược của anh giờ đây sẽ lớn nhanh hơn gấp rưỡi (x1.5)!"
+			gifts = {"seeds": 15, "water": 4}
+			relic_name = "miracle_watering_can"
+			GameState.add_relic("miracle_watering_can")
+		elif sender.begins_with("Thợ Máy Râu Kẽm"):
+			title = "🎁 [MINI-ENDING: VUA CÔNG SỰ] Bộ Nòng AK Mạ Crom!"
+			content = "Ha ha! Công sự kiên cố của chú mày làm lão nể phục rồi đấy! Lão gửi tặng món quà vô giá: BỘ NÒNG AK MẠ CROM rèn từ thép thiên thạch, tăng 25% tốc độ xả đạn của súng trên mái!"
+			gifts = {"scrap": 35}
+			relic_name = "chromium_ak_barrel"
+			GameState.add_relic("chromium_ak_barrel")
+
 		var s_pkg: Dictionary = {
 			"id": "surprise_60_" + str(Time.get_ticks_msec()),
 			"sender": sender,
-			"title": "🎁 [TRI KỶ] Gói Tiếp Tế Bí Mật Từ " + sender,
-			"content": "Chú em/Đồng chí thân mến! Hiếm có người nào ở vùng hoang mạc này lại tâm đầu ý hợp và đáng tin như cậu. Tôi vừa mở hầm dự trữ bí mật, gửi tặng cậu toàn bộ thùng đồ sinh tồn cao cấp nhất. Hãy sống sót đến ngày hòa bình nhé!",
-			"gift": {"scrap": 40, "seeds": 12, "water": 5},
+			"title": title,
+			"content": content,
+			"gift": gifts,
 			"replies": [
-				{"text": "Vô cùng cảm kích tấm lòng của bạn! Hẹn ngày gặp mặt.", "affinity": 10, "reaction": "Tình bạn vượt qua mọi giông bão tận thế!"}
+				{"text": "Vô cùng cảm kích tấm lòng của bạn! Hẹn ngày gặp lại.", "affinity": 10, "reaction": "Tình bạn vượt qua mọi giông bão tận thế!"}
 			]
 		}
 		receive_letter(s_pkg)
-		surprise_gift_unlocked.emit(sender, "Thùng Đồ Tri Kỷ", "+40 🔩 Phế liệu, +12 🌱 Hạt giống, +5 💧 Nước")
+		surprise_gift_unlocked.emit(sender, title, "Kích hoạt bảo vật vĩnh viễn: " + relic_name)
 	elif aff >= 30 and not bool(SaveManager.has_unlocked("surprise_30_" + sender) if SaveManager else false):
 		if SaveManager:
 			SaveManager.unlock("surprise_30_" + sender)

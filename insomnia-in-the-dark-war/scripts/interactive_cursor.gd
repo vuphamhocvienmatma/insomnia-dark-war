@@ -67,6 +67,16 @@ func _detect_hover_action() -> void:
 				current_hover_target = m_node
 				return
 
+	# 3b. Check Merchant Dog at x = -265
+	for dog in get_tree().get_nodes_in_group("merchant_dog"):
+		if is_instance_valid(dog) and dog is Node2D:
+			var d_node: Node2D = dog as Node2D
+			if d_node.global_position.distance_to(w_pos) < 36.0:
+				current_action_type = "merchant"
+				current_action_title = "🤖 [Click] Cửa Hàng Chó Robot"
+				current_hover_target = d_node
+				return
+
 	# 4. Check Build Sockets (via BuildingManager)
 	var bm: Node = get_tree().root.find_child("BuildingManager", true, false)
 	if bm != null and bm.get("active_socket") != null:
@@ -124,6 +134,11 @@ func _unhandled_input(event: InputEvent) -> void:
 				var hud: Node = get_tree().get_first_node_in_group("hud")
 				if hud != null and hud.has_method("open_mailbox_ui"):
 					hud.call("open_mailbox_ui")
+					get_viewport().set_input_as_handled()
+			elif current_action_type == "merchant":
+				var hud: Node = get_tree().get_first_node_in_group("hud")
+				if hud != null and hud.has_method("open_merchant_modal"):
+					hud.call("open_merchant_modal")
 					get_viewport().set_input_as_handled()
 			elif current_action_type == "stove" and is_instance_valid(current_hover_target):
 				if current_hover_target.has_method("interact"):

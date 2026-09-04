@@ -5,6 +5,7 @@ signal seeds_changed(new_amount: int)
 signal water_changed(new_amount: int)
 signal tired_changed(is_tired: bool)
 signal relic_collected(type: String)
+signal eco_mode_changed(enabled: bool)
 
 var scrap_count: int = 0
 var seeds_count: int = 0
@@ -12,6 +13,16 @@ var water_count: int = 0
 var breach_last_night: bool = false
 var is_tired: bool = false
 var relics_found: Array[String] = []
+var eco_mode: bool = false
+
+func _ready() -> void:
+	# Default eco_mode to true on Web export for maximum smoothness on low-end browsers
+	if OS.has_feature("web"):
+		eco_mode = true
+
+func set_eco_mode(enabled: bool) -> void:
+	eco_mode = enabled
+	eco_mode_changed.emit(eco_mode)
 
 var turret_damage_multiplier: float = 1.0
 var plant_harvest_bonus: int = 0
@@ -64,6 +75,14 @@ func start_new_day() -> void:
 		print("Đêm qua mất ngủ... hôm nay đi chậm hơn một chút.")
 	elif saved_breach and saved_meal:
 		print("Bữa ăn ấm bụng đã giúp bạn ngủ ngon dù hàng rào bị hở!")
+
+	# Permanent Relic: Golden Fishing Rod bonus each morning
+	if relics_found.has("golden_fishing_rod"):
+		add_scrap(1)
+		add_water(1)
+		var hud: Node = get_tree().get_first_node_in_group("hud")
+		if hud != null and hud.has_method("show_toast"):
+			hud.call("show_toast", "🎣 Cần Câu Vàng Bác Sáu vớt được: +1 Phế liệu, +1 Nước!", 4.0, false)
 
 func track_stat(name: String) -> void:
 	stats[name] += 1

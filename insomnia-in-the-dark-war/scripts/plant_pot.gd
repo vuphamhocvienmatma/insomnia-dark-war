@@ -7,6 +7,7 @@ enum PotState { EMPTY, PLANTED, BLOOMED }
 var current_state: PotState = PotState.EMPTY
 var growth_timer: float = 0.0
 var growth_progress: float = 0.0
+var _pot_redraw_accum: float = 0.0
 
 @onready var art_node: Node2D = $Art
 
@@ -16,9 +17,18 @@ func _ready() -> void:
 
 func _process(delta: float) -> void:
 	if current_state == PotState.PLANTED:
-		growth_timer += delta
+		var growth_speed: float = 1.0
+		var ls: Node = get_tree().root.find_child("LevelSetup", true, false)
+		if ls != null and str(ls.get("current_weather")) == "acid_rain":
+			growth_speed = 2.0
+		if GameState != null and GameState.relics_found.has("miracle_watering_can"):
+			growth_speed *= 1.5
+		growth_timer += delta * growth_speed
 		growth_progress = growth_timer / growth_time
-		art_node.queue_redraw()
+		_pot_redraw_accum += delta
+		if _pot_redraw_accum >= 0.2: # 5 times a second
+			_pot_redraw_accum = 0.0
+			art_node.queue_redraw()
 		if growth_timer >= growth_time:
 			current_state = PotState.BLOOMED
 			growth_progress = 1.0

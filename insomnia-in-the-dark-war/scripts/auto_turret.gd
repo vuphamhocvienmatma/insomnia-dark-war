@@ -31,8 +31,10 @@ func _on_fire_rate_timer_timeout() -> void:
 	if current_target != null and is_instance_valid(current_target):
 		if tm.spend_solar(solar_cost_per_shot):
 			var final_damage: float = attack_damage * (GameState.turret_damage_multiplier if GameState else 1.0)
+			if GameState != null and GameState.relics_found.has("night_vision_relic"):
+				final_damage *= 1.25
 			current_target.call("take_damage", final_damage)
-			print("Turret phun lửa! Tiêu tốn ", solar_cost_per_shot, " Solar.")
+			print("Turret AK-47 khai hỏa! Sát thương: ", final_damage)
 			var line := Line2D.new()
 			line.add_point(Vector2.ZERO)
 			line.add_point(current_target.global_position - global_position)

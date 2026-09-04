@@ -11,15 +11,26 @@ const FLOWER_CORE := Color(1.0, 0.85, 0.30, 1.0)
 
 var _state: String = "empty"
 var _time: float = 0.0
+var _redraw_timer: float = 0.0
 
 
 func _ready() -> void:
 	_time = randf() * TAU
+	queue_redraw()
 
 
 func _process(delta: float) -> void:
+	var p: Node = get_parent()
+	var progress: float = 0.0
+	if p != null and "growth_progress" in p:
+		progress = float(p.get("growth_progress"))
+	if _state == "empty" and progress <= 0.0:
+		return
 	_time += delta * 2.0
-	queue_redraw()
+	_redraw_timer += delta
+	if _redraw_timer >= 0.08:
+		_redraw_timer = 0.0
+		queue_redraw()
 
 
 func set_state(s: String) -> void:

@@ -16,9 +16,9 @@ const FLOWER_YELLOW: Color = Color(0.95, 0.82, 0.32, 1.0)
 const FLOWER_WHITE: Color = Color(0.92, 0.92, 0.88, 1.0)
 const SHADOW_TINT: Color = Color(0.0, 0.0, 0.0, 0.3)
 
-var _items: Array[Dictionary] = []
+var _pebbles: Array[Dictionary] = []
 var _sub_rocks: Array[Dictionary] = []
-var _time: float = 0.0
+var _flora_node: Node2D = null
 
 
 func _ready() -> void:
@@ -26,19 +26,25 @@ func _ready() -> void:
 	var rng: RandomNumberGenerator = RandomNumberGenerator.new()
 	rng.seed = 99
 	
+	var flora_items: Array[Dictionary] = []
+
 	# Scatter 2.5D surface items across the walkable depth plane [y: -6 to 16]
 	for i in 45:
 		var side: float = -1.0 if (i % 2 == 0) else 1.0
 		var x: float = side * rng.randf_range(230.0, 1180.0)
 		var y: float = rng.randf_range(-4.0, 14.0)
 		var item_type: int = rng.randi() % 3
-		_items.append({
+		var dict: Dictionary = {
 			"x": x,
 			"y": y,
 			"type": item_type,
 			"size": rng.randf_range(3.0, 5.5),
 			"phase": rng.randf_range(0.0, TAU)
-		})
+		}
+		if item_type == 0:
+			_pebbles.append(dict)
+		else:
+			flora_items.append(dict)
 
 	# Subterranean organic rock strata & buried relics
 	for i in 22:
@@ -51,16 +57,17 @@ func _ready() -> void:
 			"rot": rot
 		})
 
+	_flora_node = FloraAmbient.new()
+	_flora_node.set("flora_items", flora_items)
+	add_child(_flora_node)
 
-func _process(delta: float) -> void:
-	_time += delta * 2.2
 	queue_redraw()
 
 
 func _draw() -> void:
 	_draw_25d_ground_plane()
 	_draw_cutaway_cliff_face()
-	_draw_surface_props()
+	_draw_static_pebbles()
 
 
 func _draw_25d_ground_plane() -> void:
@@ -118,31 +125,53 @@ func _draw_cutaway_cliff_face() -> void:
 		draw_line(Vector2(root_x + 8.0, 45.0), Vector2(root_x - 12.0, 75.0), ROOT_COL, 1.4)
 
 
-func _draw_surface_props() -> void:
-	for item in _items:
+func _draw_static_pebbles() -> void:
+	for item in _pebbles:
 		var x: float = float(item["x"])
 		var y: float = float(item["y"])
 		var sz: float = float(item["size"])
-		var ph: float = float(item["phase"])
-		var t: int = int(item["type"])
-		
-		# 2.5D perspective oval contact shadow on ground
 		draw_circle(Vector2(x + 1.0, y + 2.0), sz * 0.7, SHADOW_TINT)
+		draw_circle(Vector2(x, y), sz * 0.6, PEBBLE_A)
+		draw_circle(Vector2(x - 0.6, y - 0.6), sz * 0.35, PEBBLE_B)
 
-		if t == 0:
-			# 2.5D Pebble (highlight top, shadow bottom)
-			draw_circle(Vector2(x, y), sz * 0.6, PEBBLE_A)
-			draw_circle(Vector2(x - 0.6, y - 0.6), sz * 0.35, PEBBLE_B)
-		elif t == 1:
-			# 2.5D Swaying grass tuft rooted in perspective
-			var sway: float = sin(_time + ph) * 2.0
-			draw_line(Vector2(x - 2.0, y), Vector2(x - 4.0 + sway, y - sz * 1.5), GRASS_A, 1.3)
-			draw_line(Vector2(x, y), Vector2(x + sway, y - sz * 1.8), GRASS_B, 1.5)
-			draw_line(Vector2(x + 2.0, y), Vector2(x + 4.0 + sway, y - sz * 1.3), GRASS_A, 1.3)
-		else:
-			# 2.5D Tiny wildflower
-			var sway: float = sin(_time + ph) * 1.5
-			draw_line(Vector2(x, y), Vector2(x + sway, y - sz * 1.5), GRASS_A, 1.2)
-			var flower_col: Color = FLOWER_YELLOW if (int(ph * 10.0) % 2 == 0) else FLOWER_WHITE
-			draw_circle(Vector2(x + sway, y - sz * 1.5), 2.2, flower_col)
-			draw_circle(Vector2(x + sway, y - sz * 1.5), 0.9, Color(0.9, 0.5, 0.2, 1.0))
+
+class FloraAmbient extends Node2D:
+	const GRASS_A: Color = Color(0.38, 0.48, 0.26, 0.85)
+	const GRASS_B: Color = Color(0.48, 0.58, 0.32, 0.90)
+	const FLOWER_YELLOW: Color = Color(0.95, 0.82, 0.32, 1.0)
+	const FLOWER_WHITE: Color = Color(0.92, 0.92, 0.88, 1.0)
+	const SHADOW_TINT: Color = Color(0.0, 0.0, 0.0, 0.3)
+
+	var flora_items: Array[Dictionary] = []
+	var _time: float = 0.0
+	var _redraw_timer: float = 0.0
+
+	func _process(delta: float) -> void:
+		_time += delta * 2.2
+		_redraw_timer += delta
+		if _redraw_timer >= 0.066: # Throttled to 15 fps
+			_redraw_timer = 0.0
+			queue_redraw()
+
+	func _draw() -> void:
+		for item in flora_items:
+			var x: float = float(item["x"])
+			var y: float = float(item["y"])
+			var sz: float = float(item["size"])
+			var ph: float = float(item["phase"])
+			var t: int = int(item["type"])
+			
+			draw_circle(Vector2(x + 1.0, y + 2.0), sz * 0.7, SHADOW_TINT)
+
+			if t == 1:
+				var sway: float = sin(_time + ph) * 2.0
+				draw_line(Vector2(x - 2.0, y), Vector2(x - 4.0 + sway, y - sz * 1.5), GRASS_A, 1.3)
+				draw_line(Vector2(x, y), Vector2(x + sway, y - sz * 1.8), GRASS_B, 1.5)
+				draw_line(Vector2(x + 2.0, y), Vector2(x + 4.0 + sway, y - sz * 1.3), GRASS_A, 1.3)
+			else:
+				var sway: float = sin(_time + ph) * 1.5
+				draw_line(Vector2(x, y), Vector2(x + sway, y - sz * 1.5), GRASS_A, 1.2)
+				var flower_col: Color = FLOWER_YELLOW if (int(ph * 10.0) % 2 == 0) else FLOWER_WHITE
+				draw_circle(Vector2(x + sway, y - sz * 1.5), 2.2, flower_col)
+				draw_circle(Vector2(x + sway, y - sz * 1.5), 0.9, Color(0.9, 0.5, 0.2, 1.0))
+

@@ -9,7 +9,7 @@ const BRASS: Color = Color(0.88, 0.72, 0.30, 1.0)
 const RIVET: Color = Color(0.85, 0.85, 0.88, 1.0)
 
 
-func _process(_delta: float) -> void:
+func _ready() -> void:
 	queue_redraw()
 
 

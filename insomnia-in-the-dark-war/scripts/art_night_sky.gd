@@ -23,7 +23,12 @@ func _ready() -> void:
 		})
 
 
+var _redraw_timer: float = 0.0
+
 func _process(delta: float) -> void:
+	if not is_visible_in_tree():
+		return
+
 	_time += delta
 	# Occasional shooting star
 	if randf() < 0.008 and _shooting_stars.size() < 2:
@@ -41,8 +46,11 @@ func _process(delta: float) -> void:
 		if float(s["progress"]) >= 1.0:
 			_shooting_stars.remove_at(i)
 		i -= 1
-		
-	queue_redraw()
+
+	_redraw_timer += delta
+	if _redraw_timer >= 0.05:
+		_redraw_timer = 0.0
+		queue_redraw()
 
 
 func _draw() -> void:

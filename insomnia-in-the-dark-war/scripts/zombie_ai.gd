@@ -7,11 +7,13 @@ const SAFE_RADIUS: float = 125.0
 @export var attack_damage: float = 10.0
 @export var attack_cooldown: float = 1.5
 @export var max_health: float = 30.0
+@export var zombie_type: String = "normal"
 
 var current_health: float = 0.0
 var spawn_position: Vector2 = Vector2.ZERO
 var state: String = "approach"
 var has_looted: bool = false
+var stolen_scrap: int = 0
 
 @onready var attack_area: Area2D = $AttackArea
 @onready var attack_timer: Timer = $AttackTimer
@@ -21,10 +23,48 @@ var current_target_fence: Node2D = null
 var safe_zone: Area2D = null
 var _art_node: Node2D = null
 
+
+func setup_type(type_name: String) -> void:
+	zombie_type = type_name
+	if zombie_type == "runner":
+		speed = 68.0
+		max_health = 16.0
+		current_health = 16.0
+		attack_damage = 8.0
+		attack_cooldown = 1.0
+	elif zombie_type == "brute":
+		speed = 18.0
+		max_health = 80.0
+		current_health = 80.0
+		attack_damage = 30.0
+		attack_cooldown = 2.0
+		scale = Vector2(1.35, 1.35)
+	elif zombie_type == "thief":
+		speed = 48.0
+		max_health = 22.0
+		current_health = 22.0
+		attack_damage = 6.0
+		attack_cooldown = 1.2
+	else:
+		zombie_type = "normal"
+		speed = 30.0
+		max_health = 30.0
+		current_health = 30.0
+		attack_damage = 10.0
+
+	if attack_timer != null:
+		attack_timer.wait_time = attack_cooldown
+	if _art_node != null and "zombie_type" in _art_node:
+		_art_node.set("zombie_type", zombie_type)
+
+
 func _ready() -> void:
 	current_health = max_health
 	add_to_group("zombie")
 	_art_node = get_node_or_null("Art") as Node2D
+	if _art_node != null and "zombie_type" in _art_node:
+		_art_node.set("zombie_type", zombie_type)
+
 	var sz := get_tree().get_first_node_in_group("safe_zone")
 	if sz != null:
 		safe_zone = sz as Area2D
@@ -34,6 +74,7 @@ func _ready() -> void:
 	attack_area.body_entered.connect(_on_attack_area_body_entered)
 	attack_area.body_exited.connect(_on_attack_area_body_exited)
 	attack_timer.timeout.connect(_on_attack_timer_timeout)
+
 
 func _physics_process(_delta: float) -> void:
 	position.y = GROUND_Y
@@ -89,10 +130,20 @@ func _physics_process(_delta: float) -> void:
 		elif abs(global_position.x) < 200.0 and not _has_wall_in_front():
 			if not has_looted:
 				has_looted = true
-				if GameState.spend_scrap(1):
-					print("Zombie lục lọi! Mất 1 phế liệu.")
+				if zombie_type == "thief":
+					if GameState.spend_scrap(2):
+						stolen_scrap = 2
+					elif GameState.spend_scrap(1):
+						stolen_scrap = 1
+					if stolen_scrap > 0:
+						var hud: Node = get_tree().get_first_node_in_group("hud")
+						if hud != null and hud.has_method("show_toast"):
+							hud.call("show_toast", "⚠️ Tên trộm Thief đã cuỗm " + str(stolen_scrap) + " phế liệu!", 3.0, true)
 				else:
-					print("Zombie lục lội nhưng bạn sạch túi... chúng chán nản bỏ đi.")
+					if GameState.spend_scrap(1):
+						print("Zombie lục lọi! Mất 1 phế liệu.")
+					else:
+						print("Zombie lục lội nhưng bạn sạch túi... chúng chán nản bỏ đi.")
 				state = "leave"
 		else:
 			velocity = Vector2.ZERO
@@ -128,39 +179,51 @@ func _on_attack_area_body_exited(body: Node2D) -> void:
 func _on_attack_timer_timeout() -> void:
 	if current_target_fence and is_instance_valid(current_target_fence):
 		current_target_fence.call("take_damage", attack_damage)
-		var cam := get_tree().get_first_node_in_group("main_camera")
-		if cam and cam.has_method("trigger_shake"):
-			cam.call("trigger_shake", 8.0)
+		var cam: Node = get_tree().get_first_node_in_group("main_camera")
+		if cam != null and cam.has_method("trigger_shake"):
+			var shake_pwr: float = 14.0 if zombie_type == "brute" else 6.0
+			cam.call("trigger_shake", shake_pwr)
 	else:
 		is_attacking = false
 		attack_timer.stop()
 
 func take_damage(amount: float) -> void:
 	current_health -= amount
-	print("Zombie chịu ", amount, " sát thương! Còn lại: ", current_health)
 	if current_health <= 0.0:
 		_spawn_death_fx()
-		print("Zombie gục ngã và tan biến...")
+		if stolen_scrap > 0:
+			GameState.add_scrap(stolen_scrap)
+			var hud: Node = get_tree().get_first_node_in_group("hud")
+			if hud != null and hud.has_method("show_toast"):
+				hud.call("show_toast", "🎉 Đã hạ gục tên trộm! Thu hồi +" + str(stolen_scrap) + " phế liệu!", 3.0, false)
+
+		var ls: Node = get_tree().root.find_child("LevelSetup", true, false)
+		if ls != null and str(ls.get("current_night_mutation")) == "scrap_jackpot":
+			GameState.add_scrap(1) # Extra jackpot drop
+
 		JournalManager.track_progress("zombie_kill")
 		queue_free()
 
 
 func _spawn_death_fx() -> void:
-	var particles := GPUParticles2D.new()
+	var particles := CPUParticles2D.new()
 	var parent := get_parent()
 	if parent != null:
 		parent.add_child(particles)
 	else:
-		add_child(particles)
+		get_tree().current_scene.add_child(particles)
 	particles.global_position = global_position
-	particles.amount = 15
-	particles.lifetime = 0.5
+	particles.amount = 10
+	particles.lifetime = 0.4
 	particles.one_shot = true
-	var mat := ParticleProcessMaterial.new()
-	mat.color = Color(0.5, 0.7, 0.5)
-	mat.gravity = Vector3(0.0, 100.0, 0.0)
-	mat.scale_min = 0.0
-	mat.scale_max = 0.3
-	particles.process_material = mat
+	particles.explosiveness = 0.9
+	particles.direction = Vector2(0, -1)
+	particles.spread = 60.0
+	particles.gravity = Vector2(0.0, 160.0)
+	particles.initial_velocity_min = 25.0
+	particles.initial_velocity_max = 60.0
+	particles.scale_amount_min = 2.0
+	particles.scale_amount_max = 3.5
+	particles.color = Color(0.45, 0.65, 0.42, 0.8)
 	particles.emitting = true
-	get_tree().create_timer(0.6).timeout.connect(particles.queue_free)
+	get_tree().create_timer(0.45).timeout.connect(particles.queue_free)

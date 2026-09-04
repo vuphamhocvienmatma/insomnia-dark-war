@@ -35,8 +35,11 @@ func _ready() -> void:
 		tm.phase_changed.connect(_on_phase_changed)
 
 
+var _weather_redraw_accum: float = 0.0
+
+
 func _process(delta: float) -> void:
-	if not visible:
+	if not visible or not is_visible_in_tree():
 		return
 		
 	_time += delta
@@ -75,7 +78,17 @@ func _process(delta: float) -> void:
 		if float(f["x"]) > 1300.0:
 			f["x"] = -1300.0
 			
-	queue_redraw()
+	_weather_redraw_accum += delta
+	if _weather_redraw_accum >= 0.033: # 30 fps
+		_weather_redraw_accum = 0.0
+		queue_redraw()
+
+
+var weather_type: String = "sunny"
+
+
+func set_weather(w_type: String) -> void:
+	weather_type = w_type
 
 
 func _draw() -> void:
@@ -89,28 +102,65 @@ func _draw() -> void:
 		var fw: float = float(f["w"])
 		var fh: float = float(f["h"])
 		draw_set_transform(Vector2(fx, fy), 0.0, Vector2(1.0, fh / fw))
-		draw_circle(Vector2.ZERO, fw * 0.5, Color(0.65, 0.75, 0.88, 0.06))
+		var fog_col: Color = Color(0.85, 0.65, 0.35, 0.09) if weather_type == "sandstorm" else Color(0.65, 0.75, 0.88, 0.06)
+		draw_circle(Vector2.ZERO, fw * 0.5, fog_col)
 		draw_set_transform(Vector2.ZERO, 0.0, Vector2.ONE)
 
-	# Draw diagonal rain streaks
-	for d in _raindrops:
-		var x: float = float(d["x"])
-		var y: float = float(d["y"])
-		var len_drop: float = float(d["length"])
-		var alpha: float = float(d["alpha"])
-		var start: Vector2 = Vector2(x, y)
-		var end: Vector2 = Vector2(x - len_drop * 0.25, y + len_drop)
-		draw_line(start, end, Color(0.72, 0.85, 0.98, alpha), 1.2)
-		
+	# Draw weather particles based on weather_type
+	if weather_type == "sandstorm":
+		# Amber swirling sand dust streaks
+		for d in _raindrops:
+			var x: float = float(d["x"])
+			var y: float = float(d["y"])
+			var len_drop: float = float(d["length"]) * 1.5
+			var alpha: float = float(d["alpha"]) * 0.7
+			var start: Vector2 = Vector2(x, y)
+			var end: Vector2 = Vector2(x + len_drop * 1.8, y + len_drop * 0.3)
+			draw_line(start, end, Color(0.88, 0.70, 0.38, alpha), 1.6)
+
+	elif weather_type == "acid_rain":
+		# Toxic lime rain streaks
+		for d in _raindrops:
+			var x: float = float(d["x"])
+			var y: float = float(d["y"])
+			var len_drop: float = float(d["length"])
+			var alpha: float = float(d["alpha"])
+			var start: Vector2 = Vector2(x, y)
+			var end: Vector2 = Vector2(x - len_drop * 0.25, y + len_drop)
+			draw_line(start, end, Color(0.45, 0.92, 0.38, alpha), 1.3)
+
+	elif weather_type == "meteor_shower":
+		# Glowing shooting meteors
+		for d in _raindrops:
+			var x: float = float(d["x"])
+			var y: float = float(d["y"])
+			var len_drop: float = float(d["length"]) * 2.2
+			var start: Vector2 = Vector2(x, y)
+			var end: Vector2 = Vector2(x - len_drop * 1.2, y + len_drop)
+			draw_line(start, end, Color(1.0, 0.92, 0.55, 0.6), 2.2)
+			draw_circle(end, 2.5, Color(1.0, 1.0, 0.85, 0.9))
+
+	else:
+		# Standard rain streaks
+		for d in _raindrops:
+			var x: float = float(d["x"])
+			var y: float = float(d["y"])
+			var len_drop: float = float(d["length"])
+			var alpha: float = float(d["alpha"])
+			var start: Vector2 = Vector2(x, y)
+			var end: Vector2 = Vector2(x - len_drop * 0.25, y + len_drop)
+			draw_line(start, end, Color(0.72, 0.85, 0.98, alpha), 1.2)
+
 	# Draw ground splash ripples
 	for sp in _splashes:
 		var sx: float = float(sp["x"])
 		var sy: float = float(sp["y"])
 		var r: float = float(sp["rad"])
 		var a: float = float(sp["alpha"])
-		draw_arc(Vector2(sx, sy), r, 0.0, TAU, 10, Color(0.80, 0.90, 1.0, a), 1.0)
+		var sp_col: Color = Color(0.88, 0.70, 0.38, a) if weather_type == "sandstorm" else Color(0.80, 0.90, 1.0, a)
+		draw_arc(Vector2(sx, sy), r, 0.0, TAU, 10, sp_col, 1.0)
 
 
 func _on_phase_changed(is_night: bool) -> void:
-	visible = is_night
+	visible = is_night or weather_type != "sunny"
 

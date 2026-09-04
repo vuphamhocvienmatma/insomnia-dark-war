@@ -8,8 +8,26 @@ const TOOLTIP_BG: Color = Color(0.14, 0.10, 0.07, 0.92)
 const TOOLTIP_BORDER: Color = Color(0.72, 0.55, 0.32, 1.0)
 
 
-func _process(_delta: float) -> void:
-	queue_redraw()
+var _last_pos: Vector2 = Vector2(-999, -999)
+var _pulse_timer: float = 0.0
+
+
+func _process(delta: float) -> void:
+	var m_pos: Vector2 = get_viewport().get_mouse_position()
+	var parent: CanvasLayer = get_parent() as CanvasLayer
+	var has_dynamic_target: bool = parent != null and (
+		str(parent.get("current_action_type")) != "" or 
+		parent.get("current_hover_target") != null
+	)
+
+	if has_dynamic_target:
+		_pulse_timer += delta
+		if _pulse_timer >= 0.033:
+			_pulse_timer = 0.0
+			queue_redraw()
+	elif m_pos != _last_pos:
+		_last_pos = m_pos
+		queue_redraw()
 
 
 func _draw() -> void:

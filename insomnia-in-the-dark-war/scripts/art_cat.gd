@@ -12,9 +12,15 @@ const WHITE := Color(1.0, 1.0, 1.0, 1.0)
 var _anim_time: float = 0.0
 
 
+var _redraw_accum: float = 0.0
+
+
 func _process(delta: float) -> void:
 	_anim_time += delta * 3.0
-	queue_redraw()
+	_redraw_accum += delta
+	if _redraw_accum >= 0.066: # 15 fps smooth breathing/tail
+		_redraw_accum = 0.0
+		queue_redraw()
 
 
 func _draw() -> void:

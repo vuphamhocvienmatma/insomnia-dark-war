@@ -15,6 +15,7 @@ var _time: float = 0.0
 
 func _ready() -> void:
 	_time = randf() * TAU
+	queue_redraw()
 
 
 func set_type(t: String) -> void:
@@ -24,12 +25,10 @@ func set_type(t: String) -> void:
 
 func _process(delta: float) -> void:
 	_time += delta * 3.0
-	queue_redraw()
+	position.y = sin(_time) * 2.0
 
 
 func _draw() -> void:
-	var bob_y: float = sin(_time) * 2.0
-	
 	# Small drop shadow on ground
 	draw_colored_polygon(
 		PackedVector2Array([
@@ -40,8 +39,6 @@ func _draw() -> void:
 		]),
 		Color(0.0, 0.0, 0.0, 0.22)
 	)
-	
-	draw_set_transform(Vector2(0.0, bob_y), 0.0, Vector2.ONE)
 
 	if _type == "seed":
 		# Seed bag / sprout

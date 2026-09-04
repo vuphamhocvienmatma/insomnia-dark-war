@@ -9,11 +9,15 @@ const KETTLE := Color(0.55, 0.60, 0.65, 1.0)
 const BRASS := Color(0.85, 0.68, 0.25, 1.0)
 
 var _fire_time: float = 0.0
+var _redraw_timer: float = 0.0
 
 
 func _process(delta: float) -> void:
 	_fire_time += delta * 7.0
-	queue_redraw()
+	_redraw_timer += delta
+	if _redraw_timer >= 0.08:
+		_redraw_timer = 0.0
+		queue_redraw()
 
 
 func _draw() -> void:

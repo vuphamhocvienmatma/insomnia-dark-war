@@ -17,14 +17,22 @@ func _ready() -> void:
 	z_index = -3
 
 
+var _cabin_redraw_accum: float = 0.0
+
+
 func _process(delta: float) -> void:
 	_time += delta * 2.5
-	queue_redraw()
+	_cabin_redraw_accum += delta
+	if _cabin_redraw_accum >= 0.066: # 15 fps smooth fairy lights & steam
+		_cabin_redraw_accum = 0.0
+		queue_redraw()
 
 
 func _draw() -> void:
 	_draw_ground_window_light_shaft()
 	_draw_wall_planks()
+	_draw_wooden_badge_wall()
+	_draw_custom_decorations()
 	_draw_mezzanine_bedding()
 	_draw_mezzanine_railing()
 	_draw_shelves_and_supplies()
@@ -767,4 +775,109 @@ func _draw_guitar() -> void:
 	# Neck and headstock
 	draw_line(Vector2(gx + 2.0, gy - 16.0), Vector2(gx + 7.0, gy - 32.0), WOOD_BEAM, 2.5)
 	draw_rect(Rect2(gx + 6.0, gy - 36.0, 4.0, 5.0), WOOD_BEAM)
+
+
+func _draw_wooden_badge_wall() -> void:
+	# Wooden Medal Badges Wall mounted on 2nd floor loft wall
+	var board_rect := Rect2(-75.0, -188.0, 102.0, 24.0)
+	draw_rect(board_rect, Color(0.24, 0.15, 0.10, 1.0))
+	_draw_rect_outline(board_rect, OUTLINE)
+
+	# Brass corner screws
+	draw_circle(Vector2(-72.0, -185.0), 1.2, Color(0.88, 0.72, 0.30))
+	draw_circle(Vector2(24.0, -185.0), 1.2, Color(0.88, 0.72, 0.30))
+	draw_circle(Vector2(-72.0, -167.0), 1.2, Color(0.88, 0.72, 0.30))
+	draw_circle(Vector2(24.0, -167.0), 1.2, Color(0.88, 0.72, 0.30))
+
+	# 7 Badges definition
+	var badges_unlocked: Array[bool] = [
+		GameState != null and int(GameState.stats.get("days_survived", 0)) >= 7,
+		GameState != null and int(GameState.stats.get("zombies_killed", 0)) >= 50,
+		MailboxManager != null and int(MailboxManager.sender_affinity.get("Bác Sáu (Câu Cá Sa Mạc)", 0)) >= 60,
+		GameState != null and int(GameState.stats.get("plants_harvested", 0)) >= 15,
+		GameState != null and int(GameState.stats.get("walls_built", 0)) >= 10,
+		GameState != null and bool(GameState.meal_buff),
+		CabinDecorationManager != null and CabinDecorationManager.cozy_score >= 80
+	]
+
+	var start_x: float = -66.0
+	for i in 7:
+		var bx: float = start_x + float(i) * 14.5
+		var by: float = -176.0
+		var is_unlocked: bool = badges_unlocked[i]
+
+		if is_unlocked:
+			# Unlocked Medal: Shining brass & silk ribbon
+			draw_line(Vector2(bx - 2.5, by - 7.0), Vector2(bx, by - 3.0), Color(0.85, 0.25, 0.25), 2.0)
+			draw_line(Vector2(bx + 2.5, by - 7.0), Vector2(bx, by - 3.0), Color(0.25, 0.45, 0.85), 2.0)
+			draw_circle(Vector2(bx, by), 4.2, Color(1.0, 0.85, 0.35, 1.0))
+			_draw_circle_outline(Vector2(bx, by), 4.2, OUTLINE)
+			draw_circle(Vector2(bx, by), 1.8, Color(1.0, 0.95, 0.75, 1.0))
+		else:
+			# Locked Badge: Dark engraved wood silhouette
+			draw_circle(Vector2(bx, by), 3.5, Color(0.18, 0.12, 0.08, 0.8))
+			_draw_circle_outline(Vector2(bx, by), 3.5, Color(0.35, 0.25, 0.18, 0.8))
+
+
+func _draw_custom_decorations() -> void:
+	if CabinDecorationManager == null:
+		return
+
+	# 1. Cozy Bohemian Woven Rug (Ground floor living room)
+	if CabinDecorationManager.unlocked_decorations.get("cozy_rug", false):
+		var rug_rect := Rect2(-42.0, -3.5, 78.0, 4.5)
+		draw_rect(rug_rect, Color(0.72, 0.32, 0.26, 1.0))
+		_draw_rect_outline(rug_rect, OUTLINE)
+		# Fringe tassels
+		for fx in [-42.0, 36.0]:
+			for fy in [-3.0, -1.0, 1.0]:
+				draw_line(Vector2(fx, fy), Vector2(fx + (1.5 if fx > 0 else -1.5), fy), Color(0.92, 0.85, 0.70), 1.0)
+		# Geometric diamond patterns
+		for dx in [-28.0, -14.0, 0.0, 14.0, 28.0]:
+			draw_circle(Vector2(dx, -1.5), 1.6, Color(0.28, 0.65, 0.65, 1.0))
+			draw_circle(Vector2(dx, -1.5), 0.8, Color(0.95, 0.88, 0.60, 1.0))
+
+	# 2. Disco Ball (Loft ceiling with orbiting sparkles)
+	if CabinDecorationManager.unlocked_decorations.get("disco_ball", false):
+		draw_line(Vector2(0.0, -215.0), Vector2(0.0, -196.0), Color(0.4, 0.45, 0.5), 1.2)
+		var db_pos := Vector2(0.0, -196.0)
+		draw_circle(db_pos, 6.5, Color(0.85, 0.88, 0.95, 1.0))
+		_draw_circle_outline(db_pos, 6.5, OUTLINE)
+		# Rotating facet sparkles
+		for a in 4:
+			var ang: float = _time * 2.0 + float(a) * (PI * 0.5)
+			var sp_pos := db_pos + Vector2(cos(ang) * 4.5, sin(ang) * 2.5)
+			draw_circle(sp_pos, 1.2, Color(1.0, 1.0, 1.0, 0.9))
+
+	# 3. Retro Anime Poster (Ground floor wall)
+	if CabinDecorationManager.unlocked_decorations.get("retro_poster", false):
+		var p_rect := Rect2(10.0, -84.0, 22.0, 30.0)
+		draw_rect(p_rect, Color(0.20, 0.14, 0.10, 1.0))
+		_draw_rect_outline(p_rect, OUTLINE)
+		# Poster artwork: retro sun and turquoise waves
+		draw_rect(Rect2(12.0, -82.0, 18.0, 26.0), Color(0.96, 0.88, 0.70, 1.0))
+		draw_circle(Vector2(21.0, -72.0), 6.0, Color(0.95, 0.45, 0.35, 1.0))
+		draw_rect(Rect2(12.0, -66.0, 18.0, 10.0), Color(0.25, 0.60, 0.70, 1.0))
+
+	# 4. Super Stove Pipes & Gauge
+	if CabinDecorationManager.has_super_stove():
+		# Brass copper boiler pipes over stove
+		draw_line(Vector2(-72.0, -32.0), Vector2(-72.0, -50.0), Color(0.85, 0.60, 0.30), 3.0)
+		draw_line(Vector2(-72.0, -50.0), Vector2(-60.0, -50.0), Color(0.85, 0.60, 0.30), 3.0)
+		# Pressure gauge
+		draw_circle(Vector2(-60.0, -50.0), 3.5, Color(0.85, 0.85, 0.90))
+		_draw_circle_outline(Vector2(-60.0, -50.0), 3.5, OUTLINE)
+		draw_line(Vector2(-60.0, -50.0), Vector2(-59.0, -52.0), Color(0.9, 0.2, 0.2), 1.2)
+
+	# 5. Radio on Workbench
+	if CabinDecorationManager.has_radio():
+		var r_rect := Rect2(82.0, -43.0, 16.0, 11.0)
+		draw_rect(r_rect, Color(0.35, 0.24, 0.16, 1.0))
+		_draw_rect_outline(r_rect, OUTLINE)
+		# Tuning dial & vacuum tube
+		draw_circle(Vector2(86.0, -38.0), 2.2, Color(0.85, 0.80, 0.60))
+		draw_rect(Rect2(91.0, -41.0, 4.0, 6.0), Color(0.95, 0.55, 0.20, 0.85)) # glowing tube
+		# Antenna
+		draw_line(Vector2(95.0, -43.0), Vector2(98.0, -56.0), Color(0.65, 0.68, 0.72), 1.2)
+
 

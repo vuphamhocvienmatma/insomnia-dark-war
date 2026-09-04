@@ -13,6 +13,7 @@ const WEATHER_SCRIPT := preload("res://scripts/art_weather.gd")
 const GROUND_PROPS_SCRIPT := preload("res://scripts/art_ground_props.gd")
 const MAILBOX_SCENE := preload("res://scenes/mailbox.tscn")
 const CABIN_DOOR_SCENE := preload("res://scenes/cabin_door.tscn")
+const MERCHANT_DOG_SCENE := preload("res://scenes/merchant_dog.tscn")
 const CURSOR_SCRIPT := preload("res://scripts/interactive_cursor.gd")
 
 const GROUND_Y: float = 0.0
@@ -38,6 +39,7 @@ func _ready() -> void:
 
 	_spawn_cabin_door()
 	_spawn_mailbox()
+	_spawn_merchant_dog()
 	_spawn_sockets()
 	_spawn_turrets()
 	_spawn_scrap_field()
@@ -123,15 +125,28 @@ func _create_night_sky() -> void:
 	_night_sky.set_script(NIGHT_SKY_SCRIPT)
 	add_child(_night_sky)
 
+var current_night_mutation: String = ""
+var current_weather: String = "sunny"
+
+
 func _on_phase_changed(is_night: bool) -> void:
 	if not is_night:
 		day_count += 1
+		_roll_daily_weather()
+		_check_nightmare_night_announcement()
+
 	if _night_sky != null:
 		_night_sky.visible = is_night
 	if _weather != null:
-		_weather.visible = is_night
+		_weather.visible = is_night or current_weather != "sunny"
+		if _weather.has_method("set_weather"):
+			_weather.call("set_weather", current_weather)
 
 	if is_night:
+		if current_night_mutation == "solar_eclipse":
+			var tm: Node = get_tree().get_first_node_in_group("time_manager")
+			if tm != null and "current_solar_energy" in tm:
+				tm.set("current_solar_energy", float(tm.get("current_solar_energy")) * 0.5)
 		_respawn_zombie_wave()
 	else:
 		for zombie in get_tree().get_nodes_in_group("zombie"):
@@ -139,18 +154,97 @@ func _on_phase_changed(is_night: bool) -> void:
 				zombie.queue_free()
 		_spawned_zombies.clear()
 
+
+func _roll_daily_weather() -> void:
+	var roll: float = randf()
+	var hud: Node = get_tree().get_first_node_in_group("hud")
+	if roll < 0.20:
+		current_weather = "sandstorm"
+		if hud != null and hud.has_method("show_toast"):
+			hud.call("show_toast", "🌪️ BÃO CÁT SA MẠC: Gió cuốn phế liệu về sân (+4 Scrap), mèo ở nhà sưởi ấm!", 5.0, false)
+		# Sandstorm drops 4 scrap near cabin
+		for s in 4:
+			var sc := SCRAP_SCENE.instantiate() as Node2D
+			sc.position = Vector2(randf_range(-400.0, 400.0), GROUND_Y)
+			add_child(sc)
+	elif roll < 0.35:
+		current_weather = "acid_rain"
+		if hud != null and hud.has_method("show_toast"):
+			hud.call("show_toast", "🌧️ MƯA AXIT: Cây trồng lớn nhanh x2, nhưng sụt 50% Solar!", 5.0, false)
+		if GameState != null:
+			GameState.solar_charge_multiplier = 0.5
+	elif roll < 0.42:
+		current_weather = "meteor_shower"
+		if hud != null and hud.has_method("show_toast"):
+			hud.call("show_toast", "🌠 MƯA SAO BĂNG: Thiên thạch phế liệu quý hiếm rơi (+12 Scrap)!", 5.0, false)
+		if GameState != null:
+			GameState.add_scrap(12)
+	else:
+		current_weather = "sunny"
+		if GameState != null:
+			GameState.solar_charge_multiplier = 1.0
+
+
+func _check_nightmare_night_announcement() -> void:
+	if day_count % 5 == 0:
+		var mutations: Array[String] = ["zombie_speed_boost", "scrap_jackpot", "solar_eclipse", "dense_fog"]
+		current_night_mutation = mutations[randi() % mutations.size()]
+		var hud: Node = get_tree().get_first_node_in_group("hud")
+		var m_desc: String = ""
+		if current_night_mutation == "zombie_speed_boost":
+			m_desc = "Zombie cuồng nộ tăng 30% tốc độ chạy!"
+		elif current_night_mutation == "scrap_jackpot":
+			m_desc = "Đàn zombie đông x1.5 nhưng rơi gấp đôi phế liệu!"
+		elif current_night_mutation == "solar_eclipse":
+			m_desc = "Bão từ làm sụt giảm 50% pin Solar!"
+		elif current_night_mutation == "dense_fog":
+			m_desc = "Sương mù dày đặc che khuất bầy zombie!"
+
+		if hud != null and hud.has_method("show_toast"):
+			hud.call("show_toast", "📻 [RADIO CẢNH BÁO] ĐÊM ÁC MỘNG NGÀY " + str(day_count) + ": " + m_desc, 6.0, true)
+	else:
+		current_night_mutation = ""
+
+
 func _respawn_zombie_wave() -> void:
 	var speed_multiplier: float = 1.0 + (float(day_count) * 0.05) if day_count <= 10 else 1.5
 	var wave_size: int = 10 + int(GameState.scrap_count / 5.0) + (day_count * 2)
+	if current_night_mutation == "scrap_jackpot":
+		wave_size = int(float(wave_size) * 1.5)
+	wave_size = mini(wave_size, 18)
+
 	for i in wave_size:
 		var side: float = -1.0 if (i % 2 == 0) else 1.0
-		var x: float = side * 1200.0
+		var x: float = side * randf_range(1100.0, 1350.0)
 		var pos := Vector2(x, GROUND_Y)
 		var zombie := ZOMBIE_SCENE.instantiate() as Node2D
 		zombie.position = pos
-		zombie.set("speed", 30.0 * speed_multiplier)
+
+		# Variety rolls
+		var roll: float = randf()
+		var z_type: String = "normal"
+		if roll < 0.25:
+			z_type = "runner"
+		elif roll < 0.45:
+			z_type = "thief"
+		elif roll < 0.65 and day_count >= 2:
+			z_type = "brute"
+		else:
+			z_type = "normal"
+
 		add_child(zombie)
-		_spawned_zombies.append(zombie)
+		if zombie.has_method("setup_type"):
+			zombie.call("setup_type", z_type)
+
+		if current_night_mutation == "zombie_speed_boost":
+			zombie.set("speed", float(zombie.get("speed")) * 1.30)
+		else:
+			zombie.set("speed", float(zombie.get("speed")) * speed_multiplier)
+
+		_spawn_zombies.append(zombie)
+
+
+var _spawn_zombies: Array[Node2D] = []
 
 
 func _spawn_mailbox() -> void:
@@ -163,3 +257,9 @@ func _spawn_cabin_door() -> void:
 	var door := CABIN_DOOR_SCENE.instantiate() as Node2D
 	door.position = Vector2(-195.0, 0.0)
 	add_child(door)
+
+
+func _spawn_merchant_dog() -> void:
+	var dog := MERCHANT_DOG_SCENE.instantiate() as Node2D
+	dog.position = Vector2(-265.0, 0.0)
+	add_child(dog)

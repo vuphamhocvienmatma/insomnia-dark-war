@@ -22,6 +22,9 @@ var _far_clouds: Array[Vector2] = [
 ]
 
 
+var _redraw_timer: float = 0.0
+
+
 func _process(delta: float) -> void:
 	for i in _near_clouds.size():
 		_near_clouds[i].x += SPEED_NEAR * delta
@@ -33,7 +36,10 @@ func _process(delta: float) -> void:
 		if _far_clouds[i].x > SCROLL_LIMIT:
 			_far_clouds[i].x = SCROLL_RESET
 
-	queue_redraw()
+	_redraw_timer += delta
+	if _redraw_timer >= 0.04:
+		_redraw_timer = 0.0
+		queue_redraw()
 
 
 func _draw() -> void:
