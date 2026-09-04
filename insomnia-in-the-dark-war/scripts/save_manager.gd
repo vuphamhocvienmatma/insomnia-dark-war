@@ -2,6 +2,17 @@ extends Node
 
 const SAVE_PATH: String = "user://insomnia_save.json"
 
+var _unlocked_ids: Array[String] = []
+
+
+func unlock(id: String) -> void:
+	if not _unlocked_ids.has(id):
+		_unlocked_ids.append(id)
+
+
+func has_unlocked(id: String) -> bool:
+	return _unlocked_ids.has(id)
+
 func save_game() -> void:
 	var save_data: Dictionary = {}
 
@@ -38,6 +49,8 @@ func save_game() -> void:
 
 	var built_walls: Array = []
 	for wall in get_tree().get_nodes_in_group("defensive_wall"):
+		if wall.is_in_group("cabin_door"):
+			continue
 		if is_instance_valid(wall):
 			built_walls.append({
 				"pos_x": wall.global_position.x,
@@ -46,6 +59,26 @@ func save_game() -> void:
 				"health": wall.current_health
 			})
 	save_data["built_walls"] = built_walls
+
+	# Cabin door state
+	var doors: Array = []
+	for door in get_tree().get_nodes_in_group("cabin_door"):
+		if is_instance_valid(door):
+			doors.append({
+				"is_open": door.get("is_open"),
+				"reinforce_level": door.get("reinforce_level"),
+				"hp": door.get("hp"),
+				"max_hp": door.get("max_hp")
+			})
+	if not doors.is_empty():
+		save_data["door_state"] = doors[0]
+
+	# Mailbox sender affinity
+	if MailboxManager != null and "sender_affinity" in MailboxManager:
+		save_data["sender_affinity"] = MailboxManager.sender_affinity
+
+	# Unlocked IDs
+	save_data["unlocked_ids"] = _unlocked_ids.duplicate()
 
 	if JournalManager != null:
 		save_data["daily_tasks"] = JournalManager.daily_tasks
@@ -111,6 +144,12 @@ func load_game() -> bool:
 		GameState.meal_buff = bool(save_data["meal_buff"])
 	if save_data.has("active_cooking_buff"):
 		GameState.active_cooking_buff = str(save_data["active_cooking_buff"])
+
+	# Load unlocked IDs
+	if save_data.has("unlocked_ids"):
+		_unlocked_ids.clear()
+		for uid in save_data["unlocked_ids"]:
+			_unlocked_ids.append(str(uid))
 	if GameState.meal_buff and GameState.active_cooking_buff != "":
 		if GameState.active_cooking_buff == "solar":
 			GameState.solar_charge_multiplier = 1.15
@@ -132,6 +171,24 @@ func load_game() -> bool:
 			cdm.set("light_color_theme", save_data["light_color_theme"])
 		if cdm.has_method("calculate_cozy_score"):
 			cdm.call("calculate_cozy_score")
+
+	# Restore cabin door state
+	if save_data.has("door_state"):
+		var ds: Dictionary = save_data["door_state"]
+		var doors: Array = get_tree().get_nodes_in_group("cabin_door")
+		if not doors.is_empty():
+			var door: Node = doors[0]
+			if is_instance_valid(door):
+				door.set("is_open", bool(ds.get("is_open", false)))
+				door.set("reinforce_level", int(ds.get("reinforce_level", 1)))
+				door.set("hp", float(ds.get("hp", 100.0)))
+				door.set("max_hp", float(ds.get("max_hp", 100.0)))
+
+	# Restore mailbox sender affinity
+	if save_data.has("sender_affinity") and MailboxManager != null:
+		var loaded_aff: Dictionary = save_data["sender_affinity"]
+		for sender in loaded_aff:
+			MailboxManager.sender_affinity[str(sender)] = int(loaded_aff[sender])
 
 	# Restore level data (day count, weather)
 	if save_data.has("level_data"):
@@ -176,6 +233,7 @@ func load_game() -> bool:
 				task["target"] = int(task_data.get("target", 0))
 				task["desc"] = str(task_data.get("desc", ""))
 				task["type"] = str(task_data.get("type", ""))
+				task["completed"] = bool(task_data.get("completed", false))
 				tasks.append(task)
 		JournalManager.daily_tasks = tasks
 		JournalManager.tasks_updated.emit()

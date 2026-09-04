@@ -132,7 +132,7 @@ func _ready() -> void:
 		show_toast("🎯 Chuột trái: Bắn súng phòng thủ bảo vệ căn cứ", 3.8)
 	)
 	get_tree().create_timer(11.5).timeout.connect(func() -> void:
-		show_toast("🔨 Phím [B] hoặc [Tab]: Chế tạo rào chắn & công sự", 3.8)
+		show_toast("🔨 Phím [C]: Chế tạo rào chắn & công sự", 3.8)
 	)
 
 	_refresh_stats()
@@ -255,7 +255,7 @@ func _setup_journal_dropdown() -> void:
 		"• [W] hoặc [↑] : Leo thang gác xép & lên mái nhà",
 		"• [E] : Tương tác (Hái quả, nhặt phế liệu, vào hầm)",
 		"• [Chuột trái] : Bắn súng phòng thủ",
-		"• [B] hoặc [Tab] : Mở Menu Chế Tạo công trình",
+		"• [C] : Mở Menu Chế Tạo công trình",
 		"• [T] : Mở Túi Đồ Sinh Tồn",
 		"💡 Ban ngày tìm đồ & sửa rào; ban đêm cố thủ trên mái súng AK!"
 	]
@@ -494,7 +494,7 @@ func _apply_eco_mode(enabled: bool) -> void:
 	if get_tree().current_scene != null:
 		for light in get_tree().current_scene.find_children("", "PointLight2D", true, false):
 			if light is PointLight2D:
-				light.shadow_enabled = false
+				light.shadow_enabled = not enabled
 
 
 
