@@ -134,6 +134,7 @@ func _on_phase_changed(is_night: bool) -> void:
 		day_count += 1
 		_roll_daily_weather()
 		_check_nightmare_night_announcement()
+		update_merchant_dog_visibility()
 
 	if _night_sky != null:
 		_night_sky.visible = is_night
@@ -263,3 +264,31 @@ func _spawn_merchant_dog() -> void:
 	var dog := MERCHANT_DOG_SCENE.instantiate() as Node2D
 	dog.position = Vector2(-265.0, 0.0)
 	add_child(dog)
+	update_merchant_dog_visibility()
+
+
+func update_merchant_dog_visibility() -> void:
+	var dog: Node2D = get_tree().get_first_node_in_group("merchant_dog") as Node2D
+	if dog != null:
+		var is_visiting: bool = (day_count == 1 or day_count % 3 == 0)
+		dog.visible = is_visiting
+		dog.set_process(is_visiting)
+		dog.set_physics_process(is_visiting)
+
+
+func get_save_data() -> Dictionary:
+	return {
+		"day_count": day_count,
+		"current_weather": current_weather,
+		"current_night_mutation": current_night_mutation
+	}
+
+
+func load_save_data(data: Dictionary) -> void:
+	if data.has("day_count"):
+		day_count = int(data["day_count"])
+	if data.has("current_weather"):
+		current_weather = str(data["current_weather"])
+	if data.has("current_night_mutation"):
+		current_night_mutation = str(data["current_night_mutation"])
+	update_merchant_dog_visibility()

@@ -28,6 +28,7 @@ var turret_damage_multiplier: float = 1.0
 var plant_harvest_bonus: int = 0
 var solar_charge_multiplier: float = 1.0
 var meal_buff: bool = false
+var active_cooking_buff: String = ""
 var stats: Dictionary = {"zombies_killed": 0, "days_survived": 0, "walls_built": 0, "plants_harvested": 0}
 
 func add_scrap(amount: int = 1) -> void:

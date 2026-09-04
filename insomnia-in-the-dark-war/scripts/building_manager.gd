@@ -4,21 +4,23 @@ var holding_part_type: String = "Wall"
 var active_socket: BuildSocket2D = null
 var ghost_preview: Node2D = null
 
+var _player: Node2D = null
+
 func _ready() -> void:
 	ghost_preview = Node2D.new()
 	ghost_preview.set_script(preload("res://scripts/art_wall.gd"))
 	ghost_preview.modulate = Color(1, 1, 1, 0.4)
 	ghost_preview.visible = false
 	add_child(ghost_preview)
+	_player = get_tree().get_first_node_in_group("player") as Node2D
 
 func _process(_delta: float) -> void:
 	var mouse_pos := get_global_mouse_position()
 	var socket: BuildSocket2D = _find_closest_valid_socket(mouse_pos)
-	var player := get_tree().get_first_node_in_group("player") as Node2D
 
 	var player_near := false
-	if player != null and socket != null:
-		player_near = player.global_position.distance_to(socket.global_position) < 180.0
+	if _player != null and socket != null:
+		player_near = _player.global_position.distance_to(socket.global_position) < 180.0
 
 	if socket != null and player_near:
 		active_socket = socket
@@ -33,8 +35,7 @@ func _process(_delta: float) -> void:
 
 func _unhandled_input(event: InputEvent) -> void:
 	if event.is_action_pressed("click_build") and active_socket != null and ghost_preview.visible:
-		var player := get_tree().get_first_node_in_group("player") as Node2D
-		if player and player.global_position.distance_to(active_socket.global_position) < 180.0:
+		if _player and _player.global_position.distance_to(active_socket.global_position) < 180.0:
 			if GameState and GameState.spend_scrap(1) == true:
 				place_build_piece(active_socket)
 				if JournalManager:

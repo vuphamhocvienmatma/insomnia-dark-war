@@ -11,10 +11,12 @@ const WARM_GLOW: Color = Color(1.0, 0.88, 0.55, 0.9)
 const FAIRY_WIRE: Color = Color(0.15, 0.15, 0.15, 0.7)
 
 var _time: float = 0.0
+var _tm: Node = null
 
 
 func _ready() -> void:
 	z_index = -3
+	_tm = get_tree().get_first_node_in_group("time_manager")
 
 
 var _cabin_redraw_accum: float = 0.0
@@ -348,8 +350,7 @@ func _draw_mezzanine_railing() -> void:
 
 
 func _draw_ground_window_light_shaft() -> void:
-	var tm: Node = get_tree().get_first_node_in_group("time_manager")
-	if tm == null or not bool(tm.get("is_night")):
+	if _tm == null or not bool(_tm.get("is_night")):
 		return
 	# Warm light shaft shining outside on the left ground
 	var shaft_poly: PackedVector2Array = PackedVector2Array([
@@ -363,8 +364,7 @@ func _draw_ground_window_light_shaft() -> void:
 
 func _draw_fairy_lights() -> void:
 	# String of cozy fairy lights hanging under the ceiling
-	var tm: Node = get_tree().get_first_node_in_group("time_manager")
-	var is_night: bool = tm != null and bool(tm.get("is_night"))
+	var is_night: bool = _tm != null and bool(_tm.get("is_night"))
 	var wire_pts: PackedVector2Array = PackedVector2Array()
 	var bulb_count: int = 12
 	var bulb_colors: Array[Color] = [
@@ -460,8 +460,7 @@ func _draw_pitched_roof_and_rooftop_stations() -> void:
 	_draw_rect_outline(cap, OUTLINE)
 
 	# Smooth, dense connected stream of overlapping smoke puffs
-	var tm_n: Node = get_tree().get_first_node_in_group("time_manager")
-	var is_night_smoke: bool = tm_n != null and bool(tm_n.get("is_night"))
+	var is_night_smoke: bool = _tm != null and bool(_tm.get("is_night"))
 	var puff_count: int = 12
 	for s_idx in puff_count:
 		var p: float = fmod(_time * 0.35 + float(s_idx) / float(puff_count), 1.0)

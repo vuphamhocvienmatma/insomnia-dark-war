@@ -114,3 +114,15 @@ func _buy_item(itm: Dictionary) -> void:
 
 	item_purchased.emit(itm["id"])
 	_refresh_shop()
+
+
+func get_save_data() -> Dictionary:
+	return {
+		"purchased_unique": purchased_unique
+	}
+
+
+func load_save_data(data: Dictionary) -> void:
+	if data.has("purchased_unique") and data["purchased_unique"] is Dictionary:
+		purchased_unique = data["purchased_unique"].duplicate()
+	_refresh_shop()

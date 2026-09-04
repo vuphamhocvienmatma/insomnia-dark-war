@@ -10,22 +10,35 @@ const EYE_PUPIL := Color(0.12, 0.10, 0.10, 1.0)
 const WHITE := Color(1.0, 1.0, 1.0, 1.0)
 
 var _anim_time: float = 0.0
-
-
 var _redraw_accum: float = 0.0
+var _last_moving: bool = false
+var _is_moving: bool = false
 
 
 func _process(delta: float) -> void:
-	_anim_time += delta * 3.0
-	_redraw_accum += delta
-	if _redraw_accum >= 0.066: # 15 fps smooth breathing/tail
-		_redraw_accum = 0.0
+	var p: Node = get_parent()
+	var vx: float = 0.0
+	if p != null and "velocity" in p:
+		var v: Vector2 = p.get("velocity")
+		vx = v.x
+	_is_moving = absf(vx) > 2.0
+	var state_changed: bool = (_is_moving != _last_moving)
+	_last_moving = _is_moving
+
+	# When velocity == 0 and state has not changed: queue_redraw is NEVER called!
+	if state_changed:
 		queue_redraw()
+	elif _is_moving:
+		_anim_time += delta * 3.0
+		_redraw_accum += delta
+		if _redraw_accum >= 0.066: # 15 fps
+			_redraw_accum = 0.0
+			queue_redraw()
 
 
 func _draw() -> void:
-	var breath_y: float = sin(_anim_time * 0.8) * 0.5
-	var tail_wag: float = sin(_anim_time * 1.5) * 3.0
+	var breath_y: float = sin(_anim_time * 0.8) * 0.5 if _is_moving else 0.0
+	var tail_wag: float = sin(_anim_time * 1.5) * 3.0 if _is_moving else 0.0
 	
 	# Shadow
 	draw_colored_polygon(

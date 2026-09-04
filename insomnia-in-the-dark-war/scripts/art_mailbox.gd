@@ -9,13 +9,17 @@ const BRASS: Color = Color(0.88, 0.72, 0.30, 1.0)
 
 var has_unread_mail: bool = false
 var _anim_time: float = 0.0
+var _mm: Node = null
+
+
+func _ready() -> void:
+	_mm = get_tree().get_first_node_in_group("mailbox_manager")
 
 
 func _process(delta: float) -> void:
 	_anim_time += delta * 3.0
-	var mm: Node = get_tree().get_first_node_in_group("mailbox_manager")
-	if mm != null and mm.has_method("has_unread"):
-		var unread: bool = bool(mm.call("has_unread"))
+	if _mm != null and _mm.has_method("has_unread"):
+		var unread: bool = bool(_mm.call("has_unread"))
 		if unread != has_unread_mail:
 			has_unread_mail = unread
 			queue_redraw()

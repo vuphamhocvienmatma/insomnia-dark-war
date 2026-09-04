@@ -97,6 +97,17 @@ func _ready() -> void:
 	_setup_eco_toggle_button()
 	_setup_mailbox_modal()
 
+	_cached_tm = get_tree().get_first_node_in_group("time_manager")
+	_cached_cam = get_tree().get_first_node_in_group("main_camera")
+	if _cached_tm != null:
+		_tm_connected = true
+		if _cached_tm.has_signal("sunset_warning"):
+			_cached_tm.sunset_warning.connect(_on_sunset_warning)
+		if _cached_tm.has_signal("phase_changed"):
+			_cached_tm.phase_changed.connect(_on_phase_changed)
+		if _cached_tm.has_signal("solar_changed"):
+			_cached_tm.solar_changed.connect(_on_solar_changed)
+
 	GameState.scrap_changed.connect(_on_scrap_changed)
 	GameState.seeds_changed.connect(_on_seeds_changed)
 	GameState.water_changed.connect(_on_water_changed)
@@ -291,6 +302,10 @@ func _refresh_journal_btn_text() -> void:
 func _unhandled_input(event: InputEvent) -> void:
 	if event.is_action_pressed("toggle_stats"):
 		_set_stats_visible(not stats_visible)
+	elif event is InputEventKey and event.is_pressed() and not event.is_echo():
+		if event.keycode == KEY_P or event.keycode == KEY_F4:
+			GameState.set_eco_mode(not GameState.eco_mode)
+			get_viewport().set_input_as_handled()
 
 
 func _set_stats_visible(v: bool) -> void:
@@ -377,24 +392,14 @@ var _cached_tm: Node = null
 var _cached_cam: Node = null
 var _last_arc_slot: int = -1
 var _last_phase_is_n: int = -1
+var _last_arc_text: String = ""
 var _last_solar_int: int = -999
+var _last_solar_text: String = ""
 var _last_zoom_str: String = ""
 var eco_btn: Button
 
 func _process(_delta: float) -> void:
-	if _cached_tm == null or not is_instance_valid(_cached_tm):
-		_cached_tm = get_tree().get_first_node_in_group("time_manager")
-
 	if _cached_tm != null:
-		if not _tm_connected:
-			_tm_connected = true
-			if _cached_tm.has_signal("sunset_warning") and not _cached_tm.sunset_warning.is_connected(_on_sunset_warning):
-				_cached_tm.sunset_warning.connect(_on_sunset_warning)
-			if _cached_tm.has_signal("phase_changed") and not _cached_tm.phase_changed.is_connected(_on_phase_changed):
-				_cached_tm.phase_changed.connect(_on_phase_changed)
-			if _cached_tm.has_signal("solar_changed") and not _cached_tm.solar_changed.is_connected(_on_solar_changed):
-				_cached_tm.solar_changed.connect(_on_solar_changed)
-
 		var time_elapsed: float = float(_cached_tm.get("time_elapsed"))
 		var is_n: bool = bool(_cached_tm.get("is_night"))
 		var dur: float = float(_cached_tm.get("night_duration_seconds") if is_n else _cached_tm.get("day_duration_seconds"))
@@ -408,7 +413,10 @@ func _process(_delta: float) -> void:
 			_last_phase_is_n = phase_val
 			var phase_icon: String = "🌙 Đêm" if is_n else "☀️ Ngày"
 			var arc_bar: String = _make_arc_bar(r)
-			time_arc_label.text = phase_icon + "  " + arc_bar
+			var new_arc_text: String = phase_icon + "  " + arc_bar
+			if new_arc_text != _last_arc_text:
+				_last_arc_text = new_arc_text
+				time_arc_label.text = new_arc_text
 			
 		# Update Solar battery ONLY when integer percentage changes
 		var sol: float = float(_cached_tm.get("current_solar_energy"))
@@ -417,19 +425,18 @@ func _process(_delta: float) -> void:
 			_last_solar_int = sol_int
 			if solar_bar != null:
 				solar_bar.value = sol
-			if solar_text != null:
-				solar_text.text = "⚡ Solar: " + str(sol_int) + "%"
+			var new_solar_text: String = "⚡ Solar: " + str(sol_int) + "%"
+			if new_solar_text != _last_solar_text and solar_text != null:
+				_last_solar_text = new_solar_text
+				solar_text.text = new_solar_text
 
 	# Update Zoom level indicator ONLY when value changes
-	if zoom_lbl != null:
-		if _cached_cam == null or not is_instance_valid(_cached_cam):
-			_cached_cam = get_tree().get_first_node_in_group("main_camera")
-		if _cached_cam != null and _cached_cam.has_method("get_zoom_level"):
-			var z_val: float = float(_cached_cam.call("get_zoom_level"))
-			var z_str: String = str(snappedf(z_val, 0.1)) + "x"
-			if z_str != _last_zoom_str:
-				_last_zoom_str = z_str
-				zoom_lbl.text = z_str
+	if zoom_lbl != null and _cached_cam != null and _cached_cam.has_method("get_zoom_level"):
+		var z_val: float = float(_cached_cam.call("get_zoom_level"))
+		var z_str: String = str(snappedf(z_val, 0.1)) + "x"
+		if z_str != _last_zoom_str:
+			_last_zoom_str = z_str
+			zoom_lbl.text = z_str
 
 
 func _setup_eco_toggle_button() -> void:
@@ -472,8 +479,10 @@ func _update_eco_btn_ui() -> void:
 func _on_eco_mode_changed(enabled: bool) -> void:
 	_update_eco_btn_ui()
 	_apply_eco_mode(enabled)
+	if SaveManager != null:
+		SaveManager.save_game()
 	if enabled:
-		show_toast("⚡ Chế độ Tiết kiệm: BẬT (Đã tắt hậu kỳ & giảm tải GPU)", 3.2, false)
+		show_toast("⚡ Chế độ Tiết kiệm: BẬT (Đã tắt hậu kỳ & tắt bóng đèn PointLight2D)", 3.2, false)
 	else:
 		show_toast("✨ Chế độ Tiết kiệm: TẮT (Đã bật đầy đủ hiệu ứng)", 3.2, false)
 
@@ -482,6 +491,10 @@ func _apply_eco_mode(enabled: bool) -> void:
 	var post_layer: Node = get_tree().root.find_child("LofiPostProcessLayer", true, false)
 	if post_layer != null and "visible" in post_layer:
 		post_layer.set("visible", not enabled)
+	if get_tree().current_scene != null:
+		for light in get_tree().current_scene.find_children("", "PointLight2D", true, false):
+			if light is PointLight2D:
+				light.shadow_enabled = false
 
 
 
@@ -515,9 +528,8 @@ func _setup_zoom_controls() -> void:
 	btn_out.text = "－"
 	btn_out.custom_minimum_size = Vector2(24, 22)
 	btn_out.pressed.connect(func() -> void:
-		var cam: Node = get_tree().get_first_node_in_group("main_camera")
-		if cam != null and cam.has_method("zoom_out"):
-			cam.call("zoom_out")
+		if _cached_cam != null and _cached_cam.has_method("zoom_out"):
+			_cached_cam.call("zoom_out")
 	)
 	hbox.add_child(btn_out)
 
@@ -531,9 +543,8 @@ func _setup_zoom_controls() -> void:
 	btn_in.text = "＋"
 	btn_in.custom_minimum_size = Vector2(24, 22)
 	btn_in.pressed.connect(func() -> void:
-		var cam: Node = get_tree().get_first_node_in_group("main_camera")
-		if cam != null and cam.has_method("zoom_in"):
-			cam.call("zoom_in")
+		if _cached_cam != null and _cached_cam.has_method("zoom_in"):
+			_cached_cam.call("zoom_in")
 	)
 	hbox.add_child(btn_in)
 

@@ -45,20 +45,25 @@ func _ready() -> void:
 
 	bgm_day.volume_db = -6.0
 	bgm_night.volume_db = -80.0
+	call_deferred("_connect_tm")
 
 
 var _connected_tm: Node = null
 
+
+func _connect_tm() -> void:
+	if _connected_tm != null:
+		return
+	var tm: Node = get_tree().get_first_node_in_group("time_manager")
+	if tm != null:
+		_connected_tm = tm
+		if not tm.phase_changed.is_connected(crossfade_bgm):
+			tm.phase_changed.connect(crossfade_bgm)
+		var is_night: bool = bool(tm.get("is_night"))
+		crossfade_bgm(is_night)
+
+
 func _process(_delta: float) -> void:
-	if _connected_tm == null:
-		var tm: Node = get_tree().get_first_node_in_group("time_manager")
-		if tm != null:
-			_connected_tm = tm
-			if not tm.phase_changed.is_connected(crossfade_bgm):
-				tm.phase_changed.connect(crossfade_bgm)
-			var is_night: bool = bool(tm.get("is_night"))
-			crossfade_bgm(is_night)
-	
 	# Ensure music keeps playing
 	if bgm_day.stream != null and not bgm_day.playing and bgm_day.volume_db > -40.0:
 		bgm_day.play()

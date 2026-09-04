@@ -29,6 +29,11 @@ func set_climbing(c: bool) -> void:
 	queue_redraw()
 
 
+var _anim_accum: float = 0.0
+var _last_moving: bool = false
+var _last_climbing: bool = false
+
+
 func _process(delta: float) -> void:
 	var vx: float = 0.0
 	var p: Node = get_parent()
@@ -37,40 +42,29 @@ func _process(delta: float) -> void:
 		vx = v.x
 	
 	_is_moving = absf(vx) > 5.0
+	var state_changed: bool = (_is_moving != _last_moving or is_climbing != _last_climbing)
+	_last_moving = _is_moving
+	_last_climbing = is_climbing
+
 	if is_climbing:
 		_climb_bob += delta * 12.0
 	elif _is_moving:
 		_walk_bob += delta * 9.0
 	else:
 		_walk_bob = 0.0
-		_idle_time += delta * 2.5
-	
-	_blink_timer += delta
-	if _blink_timer > 4.0:
-		_blink_timer = 0.0
 
-	var need_redraw: bool = false
-	if _is_moving or is_climbing:
-		_anim_accum += delta
-		if _anim_accum >= 0.033: # 30 fps walk/climb
-			_anim_accum = 0.0
-			need_redraw = true
-	else:
-		_idle_accum += delta
-		if _idle_accum >= 0.1: # 10 fps idle
-			_idle_accum = 0.0
-			need_redraw = true
-
-	if need_redraw:
+	# When velocity == 0 and state has not changed: queue_redraw is NEVER called!
+	if state_changed:
 		queue_redraw()
-
-
-var _anim_accum: float = 0.0
-var _idle_accum: float = 0.0
+	elif _is_moving or is_climbing:
+		_anim_accum += delta
+		if _anim_accum >= 0.033: # 30 fps
+			_anim_accum = 0.0
+			queue_redraw()
 
 
 func _draw() -> void:
-	var bob_y: float = sin(_walk_bob) * 2.5 if _is_moving else sin(_idle_time) * 0.8
+	var bob_y: float = sin(_walk_bob) * 2.5 if _is_moving else 0.0
 	draw_set_transform(Vector2(0.0, bob_y), 0.0, Vector2.ONE)
 	
 	_draw_shadow()

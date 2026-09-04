@@ -14,6 +14,27 @@ func save_game() -> void:
 	save_data["turret_damage_multiplier"] = GameState.turret_damage_multiplier
 	save_data["plant_harvest_bonus"] = GameState.plant_harvest_bonus
 	save_data["solar_charge_multiplier"] = GameState.solar_charge_multiplier
+	save_data["eco_mode"] = GameState.eco_mode
+	save_data["meal_buff"] = GameState.meal_buff
+	save_data["active_cooking_buff"] = GameState.active_cooking_buff
+
+	# Cabin decorations
+	var cdm: Node = get_tree().root.find_child("CabinDecorationManager", true, false)
+	if cdm != null:
+		save_data["unlocked_decorations"] = cdm.get("unlocked_decorations")
+		save_data["light_color_theme"] = cdm.get("light_color_theme")
+
+	# Merchant store and dog visit state
+	var hud: Node = get_tree().get_first_node_in_group("hud")
+	if hud != null and "merchant_modal" in hud and hud.get("merchant_modal") != null:
+		var mm_node = hud.get("merchant_modal")
+		if mm_node.has_method("get_save_data"):
+			save_data["merchant_data"] = mm_node.call("get_save_data")
+
+	# Level day count and weather
+	var ls: Node = get_tree().root.find_child("LevelSetup", true, false)
+	if ls != null and ls.has_method("get_save_data"):
+		save_data["level_data"] = ls.call("get_save_data")
 
 	var built_walls: Array = []
 	for wall in get_tree().get_nodes_in_group("defensive_wall"):
@@ -82,6 +103,49 @@ func load_game() -> bool:
 	GameState.seeds_changed.emit(GameState.seeds_count)
 	GameState.water_changed.emit(GameState.water_count)
 	GameState.tired_changed.emit(GameState.is_tired)
+
+	if save_data.has("eco_mode"):
+		GameState.set_eco_mode(bool(save_data["eco_mode"]))
+
+	if save_data.has("meal_buff"):
+		GameState.meal_buff = bool(save_data["meal_buff"])
+	if save_data.has("active_cooking_buff"):
+		GameState.active_cooking_buff = str(save_data["active_cooking_buff"])
+	if GameState.meal_buff and GameState.active_cooking_buff != "":
+		if GameState.active_cooking_buff == "solar":
+			GameState.solar_charge_multiplier = 1.15
+		elif GameState.active_cooking_buff == "speed":
+			var p: Node2D = get_tree().get_first_node_in_group("player") as Node2D
+			if p != null:
+				p.set("speed", 135.0)
+		elif GameState.active_cooking_buff == "lucky_cat":
+			var c: Node = get_tree().get_first_node_in_group("companion_cat")
+			if c != null:
+				c.set("lucky_loot", true)
+
+	# Restore cabin decorations
+	var cdm: Node = get_tree().root.find_child("CabinDecorationManager", true, false)
+	if cdm != null:
+		if save_data.has("unlocked_decorations") and save_data["unlocked_decorations"] is Dictionary:
+			cdm.set("unlocked_decorations", save_data["unlocked_decorations"])
+		if save_data.has("light_color_theme"):
+			cdm.set("light_color_theme", save_data["light_color_theme"])
+		if cdm.has_method("calculate_cozy_score"):
+			cdm.call("calculate_cozy_score")
+
+	# Restore level data (day count, weather)
+	if save_data.has("level_data"):
+		var ls: Node = get_tree().root.find_child("LevelSetup", true, false)
+		if ls != null and ls.has_method("load_save_data"):
+			ls.call("load_save_data", save_data["level_data"])
+
+	# Restore merchant data
+	if save_data.has("merchant_data"):
+		var hud: Node = get_tree().get_first_node_in_group("hud")
+		if hud != null and "merchant_modal" in hud and hud.get("merchant_modal") != null:
+			var mm_node = hud.get("merchant_modal")
+			if mm_node.has_method("load_save_data"):
+				mm_node.call("load_save_data", save_data["merchant_data"])
 
 	var wall_scene := preload("res://scenes/wall_piece.tscn")
 	var walls_data: Array = save_data.get("built_walls", [])

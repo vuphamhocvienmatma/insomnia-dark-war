@@ -77,16 +77,19 @@ func water_plant() -> bool:
 			return true
 	return false
 
+func interact() -> void:
+	if current_state == PotState.BLOOMED:
+		harvest()
+	elif current_state == PotState.EMPTY:
+		plant_seed()
+	elif current_state == PotState.PLANTED:
+		water_plant()
+
 func _unhandled_input(event: InputEvent) -> void:
 	if event.is_action_pressed("interact"):
 		var player := get_tree().get_first_node_in_group("player") as Node2D
 		if player and global_position.distance_to(player.global_position) < 60.0:
-			if current_state == PotState.BLOOMED:
-				harvest()
-			elif current_state == PotState.EMPTY:
-				plant_seed()
-			elif current_state == PotState.PLANTED:
-				water_plant()
+			interact()
 
 func _spawn_burst(count: int, col: Color) -> void:
 	var particles := GPUParticles2D.new()

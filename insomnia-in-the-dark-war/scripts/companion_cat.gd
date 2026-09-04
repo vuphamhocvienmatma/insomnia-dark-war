@@ -24,6 +24,7 @@ func _ready() -> void:
 	position.y = GROUND_Y
 	if cabin == null:
 		cabin = get_node_or_null("../CabinStructure") as Node2D
+	target_player = get_tree().get_first_node_in_group("player")
 
 func _physics_process(_delta: float) -> void:
 	if cabin != null and not _cat_climbing:
@@ -32,8 +33,6 @@ func _physics_process(_delta: float) -> void:
 		position.y = GROUND_Y
 
 	if target_player == null or not is_instance_valid(target_player):
-		target_player = get_tree().get_first_node_in_group("player")
-	if target_player == null:
 		return
 
 	if is_being_pet:

@@ -22,6 +22,7 @@ var is_attacking: bool = false
 var current_target_fence: Node2D = null
 var safe_zone: Area2D = null
 var _art_node: Node2D = null
+var _hud: Node = null
 
 
 func setup_type(type_name: String) -> void:
@@ -65,6 +66,7 @@ func _ready() -> void:
 	if _art_node != null and "zombie_type" in _art_node:
 		_art_node.set("zombie_type", zombie_type)
 
+	_hud = get_tree().get_first_node_in_group("hud")
 	var sz := get_tree().get_first_node_in_group("safe_zone")
 	if sz != null:
 		safe_zone = sz as Area2D
@@ -78,11 +80,6 @@ func _ready() -> void:
 
 func _physics_process(_delta: float) -> void:
 	position.y = GROUND_Y
-
-	if safe_zone == null:
-		var sz := get_tree().get_first_node_in_group("safe_zone")
-		if sz != null:
-			safe_zone = sz as Area2D
 
 	if safe_zone != null and is_instance_valid(safe_zone):
 		var dist_to_safe: float = global_position.distance_to(safe_zone.global_position)
@@ -136,9 +133,8 @@ func _physics_process(_delta: float) -> void:
 					elif GameState.spend_scrap(1):
 						stolen_scrap = 1
 					if stolen_scrap > 0:
-						var hud: Node = get_tree().get_first_node_in_group("hud")
-						if hud != null and hud.has_method("show_toast"):
-							hud.call("show_toast", "⚠️ Tên trộm Thief đã cuỗm " + str(stolen_scrap) + " phế liệu!", 3.0, true)
+						if _hud != null and _hud.has_method("show_toast"):
+							_hud.call("show_toast", "⚠️ Tên trộm Thief đã cuỗm " + str(stolen_scrap) + " phế liệu!", 3.0, true)
 				else:
 					if GameState.spend_scrap(1):
 						print("Zombie lục lọi! Mất 1 phế liệu.")
@@ -193,9 +189,8 @@ func take_damage(amount: float) -> void:
 		_spawn_death_fx()
 		if stolen_scrap > 0:
 			GameState.add_scrap(stolen_scrap)
-			var hud: Node = get_tree().get_first_node_in_group("hud")
-			if hud != null and hud.has_method("show_toast"):
-				hud.call("show_toast", "🎉 Đã hạ gục tên trộm! Thu hồi +" + str(stolen_scrap) + " phế liệu!", 3.0, false)
+			if _hud != null and _hud.has_method("show_toast"):
+				_hud.call("show_toast", "🎉 Đã hạ gục tên trộm! Thu hồi +" + str(stolen_scrap) + " phế liệu!", 3.0, false)
 
 		var ls: Node = get_tree().root.find_child("LevelSetup", true, false)
 		if ls != null and str(ls.get("current_night_mutation")) == "scrap_jackpot":

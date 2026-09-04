@@ -8,21 +8,24 @@ var shake_decay: float = 5.0
 var _sway_time: float = 0.0
 
 
+var _player: Node2D = null
+
+
 func _ready() -> void:
 	add_to_group("main_camera")
 	top_level = true
 	position = Vector2(0.0, CAM_Y)
 	zoom = Vector2(1.05, 1.05)
+	_player = get_tree().get_first_node_in_group("player") as Node2D
 
 
 func _process(delta: float) -> void:
-	var player: Node2D = get_tree().get_first_node_in_group("player") as Node2D
 	var is_in_cabin: bool = false
 	
-	if player != null:
-		global_position.x = lerpf(global_position.x, player.global_position.x, 3.5 * delta)
+	if _player != null:
+		global_position.x = lerpf(global_position.x, _player.global_position.x, 3.5 * delta)
 		global_position.x = clampf(global_position.x, -1100.0, 1100.0)
-		is_in_cabin = absf(player.global_position.x) < CABIN_HALF_WIDTH
+		is_in_cabin = absf(_player.global_position.x) < CABIN_HALF_WIDTH
 		
 	# Solid steady camera height
 	global_position.y = CAM_Y

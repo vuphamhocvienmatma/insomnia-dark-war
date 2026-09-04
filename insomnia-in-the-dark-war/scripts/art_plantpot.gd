@@ -19,6 +19,9 @@ func _ready() -> void:
 	queue_redraw()
 
 
+var _last_drawn_progress: float = -1.0
+
+
 func _process(delta: float) -> void:
 	var p: Node = get_parent()
 	var progress: float = 0.0
@@ -28,8 +31,10 @@ func _process(delta: float) -> void:
 		return
 	_time += delta * 2.0
 	_redraw_timer += delta
-	if _redraw_timer >= 0.08:
+	# Throttle <= 10 lần/giây (>= 0.1s) và chỉ gọi khi progress đổi >= 1% (0.01) hoặc khi nở hoa đầy đủ
+	if _redraw_timer >= 0.1 and (absf(progress - _last_drawn_progress) >= 0.01 or progress >= 0.9):
 		_redraw_timer = 0.0
+		_last_drawn_progress = progress
 		queue_redraw()
 
 
