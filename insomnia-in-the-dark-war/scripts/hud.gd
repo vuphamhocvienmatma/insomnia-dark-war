@@ -34,6 +34,7 @@ var toast_label: Label
 var toast_tween: Tween
 var zoom_lbl: Label
 var mailbox_modal: Panel
+var fps_label: Label
 
 const WOOD: Color = Color(0.76, 0.62, 0.46, 0.96)
 const BORDER: Color = Color(0.34, 0.24, 0.16, 1.0)
@@ -46,6 +47,15 @@ const GUIDE_COLOR: Color = Color(0.85, 0.80, 0.74, 1.0)
 
 func _ready() -> void:
 	add_to_group("hud")
+	fps_label = Label.new()
+	fps_label.add_theme_font_size_override("font_size", 11)
+	fps_label.add_theme_color_override("font_color", Color(1.0, 1.0, 1.0, 0.5))
+	fps_label.set_anchors_and_offsets_preset(Control.PRESET_TOP_RIGHT)
+	fps_label.offset_left = -60.0
+	fps_label.offset_top = 10.0
+	fps_label.offset_right = -10.0
+	fps_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
+	add_child(fps_label)
 	stats_panel = Panel.new()
 	stats_panel.position = Vector2(16, 16)
 	stats_panel.size = Vector2(230, 150)
@@ -407,6 +417,8 @@ var _last_zoom_str: String = ""
 var eco_btn: Button
 
 func _process(_delta: float) -> void:
+	if fps_label != null:
+		fps_label.text = str(Engine.get_frames_per_second()) + " FPS"
 	if _cached_tm != null:
 		var time_elapsed: float = float(_cached_tm.get("time_elapsed"))
 		var is_n: bool = bool(_cached_tm.get("is_night"))
