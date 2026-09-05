@@ -51,11 +51,10 @@ func _ready() -> void:
 	fps_label = Label.new()
 	fps_label.add_theme_font_size_override("font_size", 11)
 	fps_label.add_theme_color_override("font_color", Color(1.0, 1.0, 1.0, 0.5))
-	fps_label.set_anchors_and_offsets_preset(Control.PRESET_TOP_RIGHT)
-	fps_label.offset_left = -60.0
-	fps_label.offset_top = 10.0
-	fps_label.offset_right = -10.0
-	fps_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
+	fps_label.set_anchors_and_offsets_preset(Control.PRESET_BOTTOM_LEFT)
+	fps_label.offset_left = 16.0
+	fps_label.offset_top = -26.0
+	fps_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_LEFT
 	add_child(fps_label)
 	stats_panel = Panel.new()
 	stats_panel.position = Vector2(16, 16)

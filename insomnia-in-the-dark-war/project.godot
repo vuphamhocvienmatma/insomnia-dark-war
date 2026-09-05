@@ -1,4 +1,4 @@
-﻿; Engine configuration file.
+; Engine configuration file.
 ; It's best edited using the editor UI and not directly,
 ; since the parameters that go here are not all obvious.
 ;
@@ -7,6 +7,8 @@
 ;   param=value ; assign values to parameters
 
 config_version=5
+
+"ï»¿config_version"=5
 
 [application]
 
@@ -29,6 +31,10 @@ ChillManager="*res://scripts/chill_manager.gd"
 
 window/stretch/mode="canvas_items"
 window/stretch/aspect="expand"
+
+[gui]
+
+theme/custom="res://assets/theme.tres"
 
 [input]
 
@@ -78,7 +84,3 @@ toggle_stats={
 
 rendering_device/driver.windows="d3d12"
 renderer/rendering_method="mobile"
-
-[gui]
-
-theme/custom="res://assets/theme.tres"
