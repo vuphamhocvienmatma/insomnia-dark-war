@@ -45,9 +45,9 @@ void fragment() {
 		vec2 ca_offset = diff * dist_sq * aberration_amount * 6.0;
 		// Audio-Visual Sync Wobble
 		if (wobble_intensity > 0.0) {
-			uv.x += sin(TIME * 6.0 + uv.y * 10.0) * wobble_intensity * 0.005;
-			uv.y += cos(TIME * 4.0 + uv.x * 12.0) * wobble_intensity * 0.005;
-			ca_offset = diff * dist_sq * aberration_amount * (6.0 + wobble_intensity * 10.0);
+			uv.x += sin(TIME * 6.0 + uv.y * 10.0) * wobble_intensity * 0.001;
+			uv.y += cos(TIME * 4.0 + uv.x * 12.0) * wobble_intensity * 0.001;
+			ca_offset = diff * dist_sq * aberration_amount * (2.0 + wobble_intensity * 2.0);
 		}
 		
 		float r = texture(screen_texture, uv - ca_offset).r;
@@ -57,7 +57,7 @@ void fragment() {
 
 		// Insomnia Shift
 		if (insomnia_level > 0.0) {
-			vec2 insom_shift = vec2(sin(TIME * 5.0) * 0.005, cos(TIME * 3.0) * 0.005) * insomnia_level;
+			vec2 insom_shift = vec2(sin(TIME * 2.5) * 0.0008, cos(TIME * 1.5) * 0.0008) * insomnia_level;
 			col.r = texture(screen_texture, uv + insom_shift).r;
 			col.b = texture(screen_texture, uv - insom_shift).b;
 		}

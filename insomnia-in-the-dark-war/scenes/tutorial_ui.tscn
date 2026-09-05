@@ -3,6 +3,7 @@
 [ext_resource type="Script" path="res://scripts/tutorial_ui.gd" id="1_tut"]
 
 [node name="TutorialUI" type="CanvasLayer"]
+layer = 100
 script = ExtResource("1_tut")
 
 [node name="Panel" type="Panel" parent="."]
