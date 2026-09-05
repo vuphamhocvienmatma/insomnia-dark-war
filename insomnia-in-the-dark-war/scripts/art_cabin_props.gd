@@ -63,7 +63,6 @@ func _draw() -> void:
 	_draw_wooden_badge_wall()
 	_draw_custom_decorations()
 	_draw_mezzanine_bedding()
-	_draw_mezzanine_railing()
 	_draw_shelves_and_supplies()
 	_draw_steaming_mug()
 	_draw_guitar()

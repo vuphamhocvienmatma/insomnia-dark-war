@@ -9,6 +9,7 @@ const RELIC_SCENE := preload("res://scenes/relic_item.tscn")
 const NIGHT_SKY_SCRIPT := preload("res://scripts/art_night_sky.gd")
 const SKYLINE_SCRIPT := preload("res://scripts/art_skyline.gd")
 const CABIN_PROPS_SCRIPT := preload("res://scripts/art_cabin_props.gd")
+const CABIN_FRONT_SCRIPT := preload("res://scripts/art_cabin_front.gd")
 const WEATHER_SCRIPT := preload("res://scripts/art_weather.gd")
 const GROUND_PROPS_SCRIPT := preload("res://scripts/art_ground_props.gd")
 const MAILBOX_SCENE := preload("res://scenes/mailbox.tscn")
@@ -36,6 +37,10 @@ func _ready() -> void:
 	var cabin_props := Node2D.new()
 	cabin_props.set_script(CABIN_PROPS_SCRIPT)
 	add_child(cabin_props)
+
+	var cabin_front := Node2D.new()
+	cabin_front.set_script(CABIN_FRONT_SCRIPT)
+	add_child(cabin_front)
 
 	_spawn_cabin_door()
 	_spawn_mailbox()

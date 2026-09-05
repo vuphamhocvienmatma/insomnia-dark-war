@@ -24,7 +24,7 @@ func _process(delta: float) -> void:
 	
 	if _player != null:
 		global_position.x = lerpf(global_position.x, _player.global_position.x, 3.5 * delta)
-		global_position.x = clampf(global_position.x, -1100.0, 1100.0)
+		global_position.x = clampf(global_position.x, -2800.0, 2800.0)
 		is_in_cabin = absf(_player.global_position.x) < CABIN_HALF_WIDTH
 		
 	# Solid steady camera height

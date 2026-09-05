@@ -69,6 +69,7 @@ func _physics_process(_delta: float) -> void:
 	if art and direction.x != 0.0:
 		art.scale.x = -1.0 if direction.x < 0.0 else 1.0
 
+	position.x = clampf(position.x, -3150.0, 3150.0)
 	move_and_slide()
 	
 	_handle_footsteps(direction.x, _delta)
