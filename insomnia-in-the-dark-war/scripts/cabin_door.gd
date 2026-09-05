@@ -1,10 +1,10 @@
-extends StaticBody2D
+﻿extends StaticBody2D
 
 signal door_state_changed(is_open: bool)
 signal door_reinforced(level: int)
 
 @export var is_open: bool = false
-@export var reinforce_level: int = 1 # 1: Cửa gỗ, 2: Nẹp sắt, 3: Bọc thép
+@export var reinforce_level: int = 1
 @export var hp: float = 100.0
 @export var max_hp: float = 100.0
 
@@ -13,11 +13,14 @@ signal door_reinforced(level: int)
 @onready var art: Node2D = $Art
 
 var is_player_near: bool = false
-
+var _swing_angle: float = 0.0
 
 func _ready() -> void:
 	add_to_group("cabin_door")
 	add_to_group("defensive_wall")
+	_swing_angle = 1.0 if is_open else 0.0
+	if art != null and art.has_method("set_swing"):
+		art.call("set_swing", _swing_angle)
 	_update_collision()
 	_update_prompt()
 
@@ -46,11 +49,17 @@ func toggle_door() -> void:
 	door_state_changed.emit(is_open)
 
 	if art != null:
-		art.queue_redraw()
+		var tw = create_tween()
+		tw.tween_method(func(val: float) -> void:
+			_swing_angle = val
+			if art.has_method("set_swing"):
+				art.call("set_swing", val)
+			art.queue_redraw()
+		, _swing_angle, 1.0 if is_open else 0.0, 0.4).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN_OUT)
 
 	var am: Node = get_tree().get_first_node_in_group("audio_manager")
 	if am != null and am.has_method("play_sfx"):
-		am.call("play_sfx", "item_pickup")
+		am.call("play_sfx", "wood_creak")
 
 	var hud: Node = get_tree().get_first_node_in_group("hud")
 	if hud != null and hud.has_method("show_toast"):
@@ -89,7 +98,6 @@ func reinforce_door() -> void:
 			hud.call("show_toast", "🛡️ Đã gia cố Cấp 3: Cửa Thiết Giáp Tận Thế (500 HP)!", 3.5, false)
 
 	else:
-		# Already max level -> Repair if damaged
 		if hp < max_hp:
 			if GameState.scrap_count < 5:
 				if hud != null and hud.has_method("show_toast"):
@@ -101,7 +109,7 @@ func reinforce_door() -> void:
 				hud.call("show_toast", "🔧 Đã sửa chữa cửa phục hồi 100% HP!", 2.5, false)
 		else:
 			if hud != null and hud.has_method("show_toast"):
-				hud.call("show_toast", "✨ Cửa đã đạt cấp độ gia cố tối đa!", 2.5, false)
+				hud.call("show_toast", "✨ Cửa đã đạt cấp độ tối đa!", 2.5, false)
 
 	_update_prompt()
 	if art != null:
@@ -110,7 +118,7 @@ func reinforce_door() -> void:
 
 func take_damage(amount: float) -> void:
 	if is_open:
-		return # Damage passes through if door is wide open
+		return
 
 	hp = maxf(hp - amount, 0.0)
 	var cam: Node = get_tree().get_first_node_in_group("main_camera")
@@ -120,9 +128,24 @@ func take_damage(amount: float) -> void:
 	if hp <= 0.0:
 		is_open = true
 		_update_collision()
+		
+		if art != null:
+			var tw = create_tween()
+			tw.tween_method(func(val: float) -> void:
+				_swing_angle = val
+				if art.has_method("set_swing"):
+					art.call("set_swing", val)
+				art.queue_redraw()
+			, _swing_angle, 1.0, 0.2).set_trans(Tween.TRANS_BOUNCE).set_ease(Tween.EASE_OUT)
+			
+		var am: Node = get_tree().get_first_node_in_group("audio_manager")
+		if am != null and am.has_method("play_sfx"):
+			am.call("play_sfx", "wall_break")
+
 		var hud: Node = get_tree().get_first_node_in_group("hud")
 		if hud != null and hud.has_method("show_toast"):
 			hud.call("show_toast", "⚠️ CỬA CHÍNH ĐÃ BỊ ZOMBIE PHÁ THỦNG!", 4.0, true)
+			
 	_update_prompt()
 	if art != null:
 		art.queue_redraw()
@@ -130,8 +153,6 @@ func take_damage(amount: float) -> void:
 
 func _update_collision() -> void:
 	if collision_shape != null:
-		# When open, collision layer is 0 so player and zombies pass through
-		# When closed, collision layer is 1 so it blocks movement
 		collision_shape.set_deferred("disabled", is_open)
 
 

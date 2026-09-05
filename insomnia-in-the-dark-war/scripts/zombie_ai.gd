@@ -1,4 +1,4 @@
-extends CharacterBody2D
+﻿extends CharacterBody2D
 
 const GROUND_Y: float = 0.0
 const SAFE_RADIUS: float = 125.0
@@ -14,6 +14,7 @@ var spawn_position: Vector2 = Vector2.ZERO
 var state: String = "approach"
 var has_looted: bool = false
 var stolen_scrap: int = 0
+var is_dead: bool = false
 
 @onready var attack_area: Area2D = $AttackArea
 @onready var attack_timer: Timer = $AttackTimer
@@ -79,6 +80,8 @@ func _ready() -> void:
 
 
 func _physics_process(_delta: float) -> void:
+	if is_dead: return
+	
 	position.y = GROUND_Y
 
 	if safe_zone != null and is_instance_valid(safe_zone):
@@ -137,9 +140,7 @@ func _physics_process(_delta: float) -> void:
 							_hud.call("show_toast", "⚠️ Tên trộm Thief đã cuỗm " + str(stolen_scrap) + " phế liệu!", 3.0, true)
 				else:
 					if GameState.spend_scrap(1):
-						print("Zombie lục lọi! Mất 1 phế liệu.")
-					else:
-						print("Zombie lục lội nhưng bạn sạch túi... chúng chán nản bỏ đi.")
+						pass
 				state = "leave"
 		else:
 			velocity = Vector2.ZERO
@@ -161,6 +162,7 @@ func _do_leave() -> void:
 		queue_free()
 
 func _on_attack_area_body_entered(body: Node2D) -> void:
+	if is_dead: return
 	if body.is_in_group("defensive_wall"):
 		is_attacking = true
 		current_target_fence = body
@@ -173,6 +175,7 @@ func _on_attack_area_body_exited(body: Node2D) -> void:
 		current_target_fence = null
 
 func _on_attack_timer_timeout() -> void:
+	if is_dead: return
 	if current_target_fence and is_instance_valid(current_target_fence):
 		current_target_fence.call("take_damage", attack_damage)
 		var cam: Node = get_tree().get_first_node_in_group("main_camera")
@@ -184,8 +187,13 @@ func _on_attack_timer_timeout() -> void:
 		attack_timer.stop()
 
 func take_damage(amount: float) -> void:
+	if is_dead: return
 	current_health -= amount
 	if current_health <= 0.0:
+		is_dead = true
+		set_physics_process(false)
+		attack_area.set_deferred("monitoring", false)
+		
 		_spawn_death_fx()
 		if stolen_scrap > 0:
 			GameState.add_scrap(stolen_scrap)
@@ -194,7 +202,7 @@ func take_damage(amount: float) -> void:
 
 		var ls: Node = get_tree().root.find_child("LevelSetup", true, false)
 		if ls != null and str(ls.get("current_night_mutation")) == "scrap_jackpot":
-			GameState.add_scrap(1) # Extra jackpot drop
+			GameState.add_scrap(1) 
 
 		JournalManager.track_progress("zombie_kill")
 		queue_free()

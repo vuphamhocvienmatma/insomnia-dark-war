@@ -32,6 +32,7 @@ var vignette_rect: ColorRect
 var toast_panel: Panel
 var toast_label: Label
 var toast_tween: Tween
+var vignette_tween: Tween
 var zoom_lbl: Label
 var mailbox_modal: Panel
 var fps_label: Label
@@ -640,9 +641,11 @@ func show_toast(msg: String, duration: float = 3.8, is_warning: bool = false) ->
 		toast_label.add_theme_color_override("font_color", Color(1.0, 0.45, 0.35, 1.0))
 		if vignette_rect != null:
 			vignette_rect.modulate.a = 0.0
-			var vtw: Tween = create_tween()
-			vtw.tween_property(vignette_rect, "modulate:a", 0.35, 0.3)
-			vtw.tween_property(vignette_rect, "modulate:a", 0.0, 1.7)
+			if vignette_tween != null and vignette_tween.is_valid():
+				vignette_tween.kill()
+			vignette_tween = create_tween()
+			vignette_tween.tween_property(vignette_rect, "modulate:a", 0.35, 0.3)
+			vignette_tween.tween_property(vignette_rect, "modulate:a", 0.0, 1.7)
 	else:
 		toast_label.add_theme_color_override("font_color", HEADER_COLOR)
 

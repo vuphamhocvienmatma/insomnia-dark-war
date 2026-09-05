@@ -1,6 +1,7 @@
 extends Panel
 
 var current_letter: Dictionary = {}
+var _typewriter_tween: Tween
 
 var header_lbl: Label
 var sender_lbl: Label
@@ -215,8 +216,10 @@ func display_letter(letter: Dictionary) -> void:
 	content_lbl.visible_characters = 0
 
 	# Typewriter Effect
-	var tw = create_tween()
-	tw.tween_method(func(val): _typewriter_step(val), 0, content_lbl.text.length(), content_lbl.text.length() * 0.05)
+	if _typewriter_tween != null and _typewriter_tween.is_valid():
+		_typewriter_tween.kill()
+	_typewriter_tween = create_tween()
+	_typewriter_tween.tween_method(func(val): _typewriter_step(val), 0, content_lbl.text.length(), content_lbl.text.length() * 0.05)
 
 	var mm: Node = get_tree().get_first_node_in_group("mailbox_manager")
 	var aff_val: int = 0

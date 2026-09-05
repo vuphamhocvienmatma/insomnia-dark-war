@@ -107,7 +107,11 @@ func load_game() -> bool:
 		print("Lỗi parse JSON!")
 		return false
 
-	var save_data: Dictionary = json.get_data()
+	var raw_data = json.get_data()
+	if typeof(raw_data) != TYPE_DICTIONARY:
+		print("Lỗi: Dữ liệu save không phải là Dictionary!")
+		return false
+	var save_data: Dictionary = raw_data as Dictionary
 
 	GameState.scrap_count = int(save_data.get("scrap", 0))
 	GameState.seeds_count = int(save_data.get("seeds", 0))

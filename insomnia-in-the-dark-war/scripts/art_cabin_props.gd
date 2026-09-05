@@ -14,7 +14,7 @@ var _time: float = 0.0
 var _clock_str_cache: String = "06:00"
 var _solar_pct_cache: float = 0.0
 var _clock_timer: float = 0.0
-var _badge_cache: Array[bool] = [false, false, false, false, false, false]
+var _badge_cache: Array[bool] = [false, false, false, false, false, false, false]
 var _badge_timer: float = 0.0
 var _tm: Node = null
 var dust_particles: Array[Dictionary] = []
@@ -835,12 +835,13 @@ func _draw_guitar() -> void:
 
 
 func _update_badge_cache() -> void:
-	_badge_cache[0] = GameState.stats.get("zombies_killed", 0) >= 10
-	_badge_cache[1] = GameState.stats.get("days_survived", 0) >= 5
-	_badge_cache[2] = GameState.stats.get("days_survived", 0) >= 15
-	_badge_cache[3] = GameState.relics_found.size() > 0
-	_badge_cache[4] = true
-	_badge_cache[5] = true
+	_badge_cache[0] = GameState != null and int(GameState.stats.get("days_survived", 0)) >= 7
+	_badge_cache[1] = GameState != null and int(GameState.stats.get("zombies_killed", 0)) >= 50
+	_badge_cache[2] = MailboxManager != null and int(MailboxManager.sender_affinity.get("Bác Sáu (Câu Cá Sa Mạc)", 0)) >= 60
+	_badge_cache[3] = GameState != null and int(GameState.stats.get("plants_harvested", 0)) >= 15
+	_badge_cache[4] = GameState != null and int(GameState.stats.get("walls_built", 0)) >= 10
+	_badge_cache[5] = GameState != null and bool(GameState.meal_buff)
+	_badge_cache[6] = CabinDecorationManager != null and CabinDecorationManager.cozy_score >= 80
 
 func _draw_wooden_badge_wall() -> void:
 	# Wooden Medal Badges Wall mounted on 2nd floor loft wall
@@ -855,15 +856,7 @@ func _draw_wooden_badge_wall() -> void:
 	draw_circle(Vector2(24.0, -167.0), 1.2, Color(0.88, 0.72, 0.30))
 
 	# 7 Badges definition
-	var badges_unlocked: Array[bool] = [
-		GameState != null and int(GameState.stats.get("days_survived", 0)) >= 7,
-		GameState != null and int(GameState.stats.get("zombies_killed", 0)) >= 50,
-		MailboxManager != null and int(MailboxManager.sender_affinity.get("Bác Sáu (Câu Cá Sa Mạc)", 0)) >= 60,
-		GameState != null and int(GameState.stats.get("plants_harvested", 0)) >= 15,
-		GameState != null and int(GameState.stats.get("walls_built", 0)) >= 10,
-		GameState != null and bool(GameState.meal_buff),
-		CabinDecorationManager != null and CabinDecorationManager.cozy_score >= 80
-	]
+	var badges_unlocked: Array[bool] = _badge_cache
 
 	var start_x: float = -66.0
 	for i in 7:
