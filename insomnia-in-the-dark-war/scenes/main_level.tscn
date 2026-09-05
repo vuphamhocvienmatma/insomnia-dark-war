@@ -38,7 +38,7 @@ shader_parameter/grain_intensity = 0.02
 shader_parameter/warm_tint = Color(1.05, 0.98, 0.91, 1)
 shader_parameter/aberration_amount = 0.0012
 
-[node name="MainLevel" type="Node2D" unique_id=129172497]
+[node name="LevelSetup" type="Node2D" unique_id=129172497]
 script = ExtResource("1_level")
 
 [node name="SkyBackground" type="ColorRect" parent="." unique_id=1609654701]

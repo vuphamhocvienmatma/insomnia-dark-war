@@ -239,9 +239,7 @@ func _draw() -> void:
 		for sp in _splashes:
 			draw_arc(Vector2(sp.x, sp.y), sp.rad, 0.0, TAU, 8, Color(0.8, 0.9, 1.0, sp.alpha), 1.0)
 		if _lightning_flash > 0:
-			var c = CanvasLayer.new()
-			# Simulating flash via direct color rect drawing on screen would be easier, but we use post-process tint or just draw large rect
-			draw_rect(Rect2(-2000, -1000, 4000, 2000), Color(1,1,1, _lightning_flash * 0.5))
+			draw_rect(Rect2(-2000, -1000, 4000, 2000), Color(1, 1, 1, _lightning_flash * 0.75))
 	elif weather_type == "thick_fog":
 		for f in _fog_layers:
 			# draw huge soft circles for fog

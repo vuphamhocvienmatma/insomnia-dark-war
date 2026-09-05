@@ -18,7 +18,33 @@ Mục tiêu: Sống sót qua các chu kỳ ngày-đêm, gắn kết tình bạn 
 
 ---
 
-## 2. Tính Năng Chính Mới Nhất
+## 2. Trải Nghiệm Thị Giác & Bầu Không Khí Lofi (Visual Showcase)
+
+Bộ 7 bức ảnh chụp trực tiếp từ engine **Godot 4.7** thể hiện trọn vẹn sự kết hợp giữa sinh tồn kịch tính và không gian lofi ấm áp:
+
+| ☀️ 1. Nắng Động & Hạt Bụi (Dynamic Sunlight) | ⛈️ 2. Bão Lớn & Đèn Bão Đung Đưa (Heavy Storm) |
+| :---: | :---: |
+| ![Dynamic Sunlight](assets/screenshots/01_dynamic_sunlight.png) | ![Heavy Storm](assets/screenshots/02_heavy_storm.png) |
+| *Vạt nắng sớm xiên qua ô cửa cabin, bụi lơ lửng trong nhà và mèo cuộn tròn sưởi nắng.* | *Sấm chớp lóe sáng rực rỡ, mưa rơi nghiêng, đèn bão đung đưa dữ dội và mèo trốn dưới gầm bàn.* |
+
+| 📸 3. Khoảnh Khắc Ảnh Polaroid (Polaroid Moment) | 🎸 4. Gảy Đàn Lofi Bên Cửa Sổ (Lofi Guitar) |
+| :---: | :---: |
+| ![Polaroid Moment](assets/screenshots/03_polaroid_moment.png) | ![Lofi Guitar](assets/screenshots/04_lofi_guitar.png) |
+| *Tấm ảnh kỷ niệm vintage trượt từ từ xuống kèm thông báo nhật ký trên HUD.* | *Minigame gảy đàn 4 dây bắt nốt nhạc vàng ấm cúng đón hoàng hôn buông xuống sa mạc.* |
+
+| 🐰 5. Động Vật Hoang Dã Ghé Thăm (Wild Animals) | 🔭 6. Đêm Ngắm Sao & Vệt Sao Băng (Stargazing) |
+| :---: | :---: |
+| ![Wild Animals](assets/screenshots/05_wild_animals.png) | ![Stargazing](assets/screenshots/06_stargazing.png) |
+| *Thỏ cát hoang dã nhảy nhót, chim sẻ đậu trên hàng rào trong ánh mắt ngắm nhìn của mèo.* | *Cú zoom điện ảnh 0.5x bao quát màn đêm huyền ảo, ngàn sao lấp lánh và sao băng rực sáng trên nóc cabin.* |
+
+| ☕ 7. Nghi Thức Cà Phê Sáng (Coffee Ritual) |
+| :---: |
+| ![Coffee Ritual](assets/screenshots/07_coffee_ritual.png) |
+| *Pha cà phê nóng từng bước bên lò sưởi ấm cúng, khởi đầu ngày mới an yên giữa vùng đất chết.* |
+
+---
+
+## 3. Tính Năng Chính Mới Nhất
 
 | Hệ thống | Mô tả chi tiết |
 |----------|----------------|
@@ -36,7 +62,7 @@ Mục tiêu: Sống sót qua các chu kỳ ngày-đêm, gắn kết tình bạn 
 
 ---
 
-## 3. Cấu Trúc Dự Án
+## 4. Cấu Trúc Dự Án
 
 ```
 insomnia-in-the-dark-war/
@@ -71,7 +97,7 @@ insomnia-in-the-dark-war/
     └── lofi_post_process.gdshader # Shader phim nhựa, hạt nhiễu (film grain), vignette ấm
 ```
 
-### 3.1 Autoloads Toàn Cục (`project.godot`)
+### 4.1 Autoloads Toàn Cục (`project.godot`)
 
 | Tên Singleton | Script | Trách nhiệm |
 |---------------|--------|-------------|
@@ -83,7 +109,7 @@ insomnia-in-the-dark-war/
 
 ---
 
-## 4. Hệ Thống Hòm Thư & Bằng Hữu Phương Xa (Wasteland Postal Mailbox)
+## 5. Hệ Thống Hòm Thư & Bằng Hữu Phương Xa (Wasteland Postal Mailbox)
 
 Hòm thư đặt trước hiên cabin (`x = -225`). Khi có thư mới, **lá cờ đỏ 🚩 sẽ bật đứng dậy** kèm phong thư nhấp nháy:
 
@@ -100,7 +126,7 @@ Hòm thư đặt trước hiên cabin (`x = -225`). Khi có thư mới, **lá c�
 
 ---
 
-## 5. Hướng Dẫn Điều Khiển & Phím Tắt
+## 6. Hướng Dẫn Điều Khiển & Phím Tắt
 
 - **Di chuyển**: Phím mũi tên hoặc `A` / `D` (Trái / Phải).
 - **Leo thang**: Đứng tại vị trí thang trong nhà (`x = 150`), nhấn `W` / `Mũi tên Lên` để trèo lên gác xép, `S` / `Mũi tên Xuống` để trèo xuống.
@@ -113,7 +139,7 @@ Hòm thư đặt trước hiên cabin (`x = -225`). Khi có thư mới, **lá c�
 
 ---
 
-## 6. Cách Chạy Game
+## 7. Cách Chạy Game
 
 1. Khởi chạy **Godot 4.7** (hoặc bản 4.x tương thích).
 2. Chọn `Import` trỏ đến thư mục `insomnia-in-the-dark-war/project.godot`.
@@ -121,7 +147,7 @@ Hòm thư đặt trước hiên cabin (`x = -225`). Khi có thư mới, **lá c�
 
 ---
 
-## 7. Tối Ưu Hóa HTML5 / WebGL & Chế Độ Tiết Kiệm (Eco Mode)
+## 8. Tối Ưu Hóa HTML5 / WebGL & Chế Độ Tiết Kiệm (Eco Mode)
 
 Dự án được tối ưu sâu cho xuất bản Web (HTML5 / WASM) và phần cứng yếu:
 

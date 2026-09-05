@@ -59,6 +59,10 @@ func _ready() -> void:
 	if tm != null:
 		tm.phase_changed.connect(_on_phase_changed)
 
+	if OS.get_cmdline_args().has("--take-screenshots"):
+		var auto = preload("res://scripts/screenshot_automator.gd").new()
+		add_child(auto)
+
 func _spawn_sockets() -> void:
 	var socket_x: Array[float] = [-232.0, 232.0]
 	var socket_y: Array[float] = [-40.0, -100.0, -160.0]

@@ -18,7 +18,33 @@ Mục tiêu: Sống sót qua các chu kỳ ngày-đêm, gắn kết tình bạn 
 
 ---
 
-## 2. Tính Năng Chính Mới Nhất
+## 2. Trải Nghiệm Thị Giác & Bầu Không Khí Lofi (Visual Showcase)
+
+Bộ 7 bức ảnh chụp trực tiếp từ engine **Godot 4.7** thể hiện trọn vẹn sự kết hợp giữa sinh tồn kịch tính và không gian lofi ấm áp:
+
+| ☀️ 1. Nắng Động & Hạt Bụi (Dynamic Sunlight) | ⛈️ 2. Bão Lớn & Đèn Bão Đung Đưa (Heavy Storm) |
+| :---: | :---: |
+| ![Dynamic Sunlight](assets/screenshots/01_dynamic_sunlight.png) | ![Heavy Storm](assets/screenshots/02_heavy_storm.png) |
+| *Vạt nắng sớm xiên qua ô cửa cabin, bụi lơ lửng trong nhà và mèo cuộn tròn sưởi nắng.* | *Sấm chớp lóe sáng rực rỡ, mưa rơi nghiêng, đèn bão đung đưa dữ dội và mèo trốn dưới gầm bàn.* |
+
+| 📸 3. Khoảnh Khắc Ảnh Polaroid (Polaroid Moment) | 🎸 4. Gảy Đàn Lofi Bên Cửa Sổ (Lofi Guitar) |
+| :---: | :---: |
+| ![Polaroid Moment](assets/screenshots/03_polaroid_moment.png) | ![Lofi Guitar](assets/screenshots/04_lofi_guitar.png) |
+| *Tấm ảnh kỷ niệm vintage trượt từ từ xuống kèm thông báo nhật ký trên HUD.* | *Minigame gảy đàn 4 dây bắt nốt nhạc vàng ấm cúng đón hoàng hôn buông xuống sa mạc.* |
+
+| 🐰 5. Động Vật Hoang Dã Ghé Thăm (Wild Animals) | 🔭 6. Đêm Ngắm Sao & Vệt Sao Băng (Stargazing) |
+| :---: | :---: |
+| ![Wild Animals](assets/screenshots/05_wild_animals.png) | ![Stargazing](assets/screenshots/06_stargazing.png) |
+| *Thỏ cát hoang dã nhảy nhót, chim sẻ đậu trên hàng rào trong ánh mắt ngắm nhìn của mèo.* | *Cú zoom điện ảnh 0.5x bao quát màn đêm huyền ảo, ngàn sao lấp lánh và sao băng rực sáng trên nóc cabin.* |
+
+| ☕ 7. Nghi Thức Cà Phê Sáng (Coffee Ritual) |
+| :---: |
+| ![Coffee Ritual](assets/screenshots/07_coffee_ritual.png) |
+| *Pha cà phê nóng từng bước bên lò sưởi ấm cúng, khởi đầu ngày mới an yên giữa vùng đất chết.* |
+
+---
+
+## 3. Tính Năng Chính Mới Nhất
 
 | Hệ thống | Mô tả chi tiết |
 |----------|----------------|
@@ -38,7 +64,7 @@ Mục tiêu: Sống sót qua các chu kỳ ngày-đêm, gắn kết tình bạn 
 
 ---
 
-## 3. 8 Cơ Chế "Chill Lofi" Đặc Biệt (Chill Manager)
+## 4. 8 Cơ Chế "Chill Lofi" Đặc Biệt (Chill Manager)
 
 Trái tim của trải nghiệm lofi nằm ở **Chill Manager**, một hệ thống tự động mang lại sức sống êm ả cho tựa game:
 
@@ -53,7 +79,7 @@ Trái tim của trải nghiệm lofi nằm ở **Chill Manager**, một hệ th�
 
 ---
 
-## 4. Hệ Thống Thời Tiết & Ánh Sáng Động (Weather & Sunlight)
+## 5. Hệ Thống Thời Tiết & Ánh Sáng Động (Weather & Sunlight)
 
 - **Post-Processing Shader:** Tích hợp bộ lọc màu thời gian thực bóp méo thị giác nhẹ (Aberration), nhiễu hạt (Grain), tối viền (Vignette).
   - **Nắng ấm:** Bầu trời ngả cam vàng, hạt bụi bay trong vệt nắng chiếu vào cabin, vệt nắng dịch chuyển chậm từ trái qua phải.
@@ -63,7 +89,7 @@ Trái tim của trải nghiệm lofi nằm ở **Chill Manager**, một hệ th�
 
 ---
 
-## 5. Cấu Trúc Dự Án
+## 6. Cấu Trúc Dự Án
 
 ```
 insomnia-in-the-dark-war/
@@ -101,7 +127,7 @@ insomnia-in-the-dark-war/
     └── weather_post_process.gdshader # Shader blend màu theo 6 thời tiết
 ```
 
-### 5.1 Autoloads Toàn Cục (`project.godot`)
+### 6.1 Autoloads Toàn Cục (`project.godot`)
 
 | Tên Singleton | Script | Trách nhiệm |
 |---------------|--------|-------------|
@@ -114,7 +140,7 @@ insomnia-in-the-dark-war/
 
 ---
 
-## 6. Bằng Hữu Phương Xa & Hòm Thư Dã Chiến (Wasteland Postal)
+## 7. Bằng Hữu Phương Xa & Hòm Thư Dã Chiến (Wasteland Postal)
 
 Hòm thư đặt trước hiên cabin (`x = -225`). Khi có thư mới, **lá cờ đỏ 🚩 sẽ bật đứng dậy** kèm phong thư nhấp nháy:
 
@@ -128,7 +154,7 @@ Hòm thư đặt trước hiên cabin (`x = -225`). Khi có thư mới, **lá c�
 
 ---
 
-## 7. Hướng Dẫn Điều Khiển & Phím Tắt
+## 8. Hướng Dẫn Điều Khiển & Phím Tắt
 
 - **Di chuyển**: Phím mũi tên hoặc `A` / `D` (Trái / Phải).
 - **Leo thang**: Đứng tại vị trí thang trong nhà (`x = 150`), nhấn `W` / `Mũi tên Lên` để trèo lên gác xép, `S` / `Mũi tên Xuống` để trèo xuống.
@@ -141,7 +167,7 @@ Hòm thư đặt trước hiên cabin (`x = -225`). Khi có thư mới, **lá c�
 
 ---
 
-## 8. Cách Chạy Game
+## 9. Cách Chạy Game
 
 1. Khởi chạy **Godot 4.7** (hoặc bản 4.x tương thích).
 2. Chọn `Import` trỏ đến thư mục `insomnia-in-the-dark-war/project.godot`.

@@ -9,7 +9,7 @@ var weather_timer: float = 0.0
 # 2. Fireflies
 var fireflies_caught: int = 0
 var max_fireflies: int = 12
-var fireflies_list: Array[Node2D] = []
+var fireflies_list: Array[Control] = []
 
 # 3. Coffee
 var coffee_ui: Panel = null
@@ -46,7 +46,7 @@ var guitar_active: bool = false
 var guitar_timer: float = 0.0
 
 # Wild Animals
-var animals_list: Array[Node2D] = []
+var animals_list: Array[Control] = []
 
 func _ready() -> void:
 	layer = 100
@@ -238,17 +238,17 @@ func _draw_guitar_notes() -> void:
 
 func _create_guitar_ui() -> void:
 	guitar_ui = Panel.new()
-	guitar_ui.set_anchors_preset(Control.PRESET_CENTER)
-	guitar_ui.size = Vector2(250, 200)
-	guitar_ui.position = Vector2(515, 260)
+	guitar_ui.size = Vector2(260, 210)
+	guitar_ui.position = Vector2(446, 219)
 	guitar_ui.hide()
 	guitar_ui.draw.connect(_draw_guitar_notes)
 	add_child(guitar_ui)
 	
 	var lbl = Label.new()
-	lbl.text = "Gảy Đàn (Bấm phím di chuyển)\nChờ 20 giây để hoàn thành!"
+	lbl.text = "🎸 GẢY ĐÀN LOFI (Phím A-S-D-F)\nThư giãn đón hoàng hôn..."
 	lbl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	lbl.position = Vector2(0, -40)
+	lbl.position = Vector2(0, -45)
+	lbl.size = Vector2(260, 40)
 	guitar_ui.add_child(lbl)
 
 # Wild Animals
@@ -304,24 +304,33 @@ func _take_polaroid(id: String, desc: String) -> void:
 	polaroids_taken.append(id)
 	
 	var p = ColorRect.new()
-	p.color = Color(0.95, 0.92, 0.85) # vintage paper
-	p.size = Vector2(150, 180)
-	p.position = Vector2(100, -200) # slide from top
-	p.rotation = randf_range(-0.1, 0.1)
+	p.name = "Polaroid_Frame"
+	p.color = Color(0.96, 0.94, 0.88) # vintage paper
+	p.size = Vector2(160, 190)
+	p.position = Vector2(100, -220) # slide from top
+	p.rotation = randf_range(-0.06, 0.06)
 	
 	var p_img = ColorRect.new()
-	p_img.color = Color(0.2, 0.2, 0.25)
-	p_img.size = Vector2(130, 130)
+	p_img.color = Color(0.22, 0.25, 0.32)
+	p_img.size = Vector2(140, 125)
 	p_img.position = Vector2(10, 10)
 	p.add_child(p_img)
+
+	var p_scene = Label.new()
+	p_scene.text = "☀️ 🐱 🌿"
+	p_scene.add_theme_font_size_override("font_size", 26)
+	p_scene.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	p_scene.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+	p_scene.size = Vector2(140, 125)
+	p_img.add_child(p_scene)
 	
 	var lbl = Label.new()
 	lbl.text = desc
-	lbl.add_theme_color_override("font_color", Color(0,0,0,0.8))
+	lbl.add_theme_color_override("font_color", Color(0.15, 0.15, 0.15, 0.9))
 	lbl.add_theme_font_size_override("font_size", 10)
 	lbl.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	lbl.size = Vector2(130, 30)
-	lbl.position = Vector2(10, 145)
+	lbl.size = Vector2(140, 42)
+	lbl.position = Vector2(10, 140)
 	p.add_child(lbl)
 	
 	add_child(p)
@@ -413,20 +422,23 @@ func _update_cat_forecast() -> void:
 
 func _create_coffee_ui() -> void:
 	coffee_ui = Panel.new()
-	coffee_ui.set_anchors_preset(Control.PRESET_CENTER)
-	coffee_ui.size = Vector2(400, 200)
-	coffee_ui.position = Vector2(440, 260)
+	coffee_ui.size = Vector2(380, 160)
+	coffee_ui.position = Vector2(386, 244)
 	coffee_ui.hide()
 	add_child(coffee_ui)
 	var vbox = VBoxContainer.new()
-	vbox.set_anchors_preset(Control.PRESET_FULL_RECT)
+	vbox.position = Vector2(20, 20)
+	vbox.size = Vector2(340, 120)
+	vbox.add_theme_constant_override("separation", 15)
 	coffee_ui.add_child(vbox)
 	var lbl = Label.new()
-	lbl.text = "☕ NGHI THỨC CÀ PHÊ SÁNG"
+	lbl.text = "☕ NGHI THỨC CÀ PHÊ SÁNG ♨️"
 	lbl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	lbl.add_theme_font_size_override("font_size", 16)
 	vbox.add_child(lbl)
 	var btn = Button.new()
-	btn.text = "Bước 1: Xay hạt"
+	btn.text = "Bước 1: Xay hạt cà phê thơm lừng"
+	btn.custom_minimum_size = Vector2(300, 42)
 	btn.pressed.connect(_on_coffee_btn_pressed.bind(btn))
 	vbox.add_child(btn)
 

@@ -54,6 +54,7 @@ func _process(delta: float) -> void:
 
 
 func _draw() -> void:
+	draw_rect(Rect2(-3200.0, -1200.0, 6400.0, 1400.0), Color(0.04, 0.04, 0.09, 0.92))
 	_draw_moon()
 	_draw_stars()
 	_draw_shooting_stars()

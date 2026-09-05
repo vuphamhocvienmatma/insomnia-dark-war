@@ -80,17 +80,22 @@ func _draw() -> void:
 
 	else:
 		# Default Sleek Lofi Brass Arrow Cursor
-		var arrow_pts: PackedVector2Array = PackedVector2Array([
+		var head_pts: PackedVector2Array = PackedVector2Array([
 			m_pos,
-			m_pos + Vector2(0.0, 17.0),
-			m_pos + Vector2(4.5, 13.5),
-			m_pos + Vector2(8.5, 21.0),
-			m_pos + Vector2(11.5, 19.5),
-			m_pos + Vector2(7.5, 12.0),
-			m_pos + Vector2(13.5, 12.0)
+			m_pos + Vector2(0.0, 16.0),
+			m_pos + Vector2(4.5, 12.5),
+			m_pos + Vector2(12.0, 12.0)
 		])
-		draw_colored_polygon(arrow_pts, ARROW_COL)
-		draw_polyline(arrow_pts, OUTLINE, 1.3)
+		var stem_pts: PackedVector2Array = PackedVector2Array([
+			m_pos + Vector2(3.5, 11.5),
+			m_pos + Vector2(7.5, 19.5),
+			m_pos + Vector2(10.5, 18.0),
+			m_pos + Vector2(6.5, 10.5)
+		])
+		draw_colored_polygon(stem_pts, ARROW_COL)
+		draw_polyline(stem_pts, OUTLINE, 1.3)
+		draw_colored_polygon(head_pts, ARROW_COL)
+		draw_polyline(head_pts, OUTLINE, 1.3)
 		# Inner bevel highlight
 		draw_line(m_pos + Vector2(1.0, 2.0), m_pos + Vector2(1.0, 14.0), Color(1.0, 1.0, 1.0, 0.6), 1.0)
 
