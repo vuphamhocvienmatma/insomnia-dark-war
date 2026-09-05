@@ -13,23 +13,32 @@ const FAIRY_WIRE: Color = Color(0.15, 0.15, 0.15, 0.7)
 var _time: float = 0.0
 var _tm: Node = null
 var dust_particles: Array[Dictionary] = []
-var _font: Font = null
+@onready var _font: Font = ThemeDB.fallback_font
 
 
 func _ready() -> void:
 	z_index = -3
+	for i in 50:
+		dust_particles.append({
+			"pos": _get_random_sunray_pos(),
+			"speed": randf_range(5.0, 15.0),
+			"alpha": randf_range(0.1, 0.4)
+		})
 	_tm = get_tree().get_first_node_in_group("time_manager")
 
-
-var _cabin_redraw_accum: float = 0.0
+func _get_random_sunray_pos() -> Vector2:
+	return Vector2(randf_range(-150.0, 150.0), randf_range(-190.0, 0.0))
 
 
 func _process(delta: float) -> void:
 	_time += delta * 2.5
-	_cabin_redraw_accum += delta
-	if _cabin_redraw_accum >= 0.066: # 15 fps smooth fairy lights & steam
-		_cabin_redraw_accum = 0.0
-		queue_redraw()
+	for d in dust_particles:
+		d["pos"].y -= d["speed"] * delta
+		d["pos"].x += sin(_time + d["speed"]) * 0.2
+		if d["pos"].y < -190.0 or randf() < 0.001:
+			d["pos"] = _get_random_sunray_pos()
+			d["pos"].y = 0.0
+	queue_redraw()
 
 
 func _draw() -> void:
@@ -855,6 +864,19 @@ func _draw_wooden_badge_wall() -> void:
 
 
 func _draw_custom_decorations() -> void:
+	# 6. Mementos from friends
+	if GameState.relics_found.has("golden_fishing_rod"):
+		# Dried fish on the wall
+		var fish_rect = Rect2(120.0, -110.0, 10.0, 24.0)
+		draw_rect(fish_rect, Color(0.6, 0.5, 0.4))
+		_draw_rect_outline(fish_rect, OUTLINE)
+		draw_line(Vector2(125.0, -110.0), Vector2(125.0, -115.0), Color(0.9, 0.9, 0.9), 1.0)
+	if GameState.relics_found.has("chromium_ak_barrel"):
+		# Shiny AK barrel on the wall
+		var barrel_rect = Rect2(140.0, -110.0, 4.0, 30.0)
+		draw_rect(barrel_rect, Color(0.9, 0.9, 0.95))
+		_draw_rect_outline(barrel_rect, OUTLINE)
+
 	if CabinDecorationManager == null:
 		return
 

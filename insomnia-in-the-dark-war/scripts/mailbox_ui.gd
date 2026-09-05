@@ -202,6 +202,11 @@ func display_letter(letter: Dictionary) -> void:
 	sender_lbl.text = "Người gửi: " + sender
 	title_lbl.text = str(letter.get("title", ""))
 	content_lbl.text = str(letter.get("content", ""))
+	content_lbl.visible_characters = 0
+
+	# Typewriter Effect
+	var tw = create_tween()
+	tw.tween_method(func(val): _typewriter_step(val), 0, content_lbl.text.length(), content_lbl.text.length() * 0.05)
 
 	var mm: Node = get_tree().get_first_node_in_group("mailbox_manager")
 	var aff_val: int = 0
@@ -244,6 +249,14 @@ func display_letter(letter: Dictionary) -> void:
 		btn.pressed.connect(func() -> void: _on_reply_chosen(c_idx))
 		reply_vbox.add_child(btn)
 
+
+func _typewriter_step(val: int) -> void:
+	var prev = content_lbl.visible_characters
+	content_lbl.visible_characters = val
+	if val > prev:
+		# Play sound
+		var am: Node = get_tree().get_first_node_in_group("audio_manager")
+		if am and am.has_method("play_sfx"): am.call("play_sfx", "typewriter_tick")
 
 func _on_claim_gift_pressed() -> void:
 	var mm: Node = get_tree().get_first_node_in_group("mailbox_manager")

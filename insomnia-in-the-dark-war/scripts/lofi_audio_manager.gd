@@ -5,6 +5,16 @@ extends Node
 @onready var day_lofi_player: AudioStreamPlayer = $DayLofiPlayer
 @onready var night_ambient_player: AudioStreamPlayer = $NightAmbientPlayer
 
+func play_sfx(sfx_name: String) -> void:
+	print("[SFX_PLAYED] ", sfx_name) # Stub for physical sounds like typewriter_tick, build_wall, coffee_boil
+
+func _update_audio_zone(in_cabin: bool) -> void:
+	var tw = create_tween().set_parallel(true)
+	if in_cabin:
+		tw.tween_property(day_lofi_player, "pitch_scale", 0.9, 1.0) # Muffled/Cozy
+	else:
+		tw.tween_property(day_lofi_player, "pitch_scale", 1.0, 1.0) # Clear
+
 func _ready() -> void:
 	day_lofi_player.play()
 	night_ambient_player.play()
@@ -18,6 +28,11 @@ func _on_phase_changed(is_night: bool) -> void:
 		fade_to_night()
 	else:
 		fade_to_day()
+
+func fade_to_sunset() -> void:
+	# Dynamic Music System: Sunset brings slight urgency
+	var tween := create_tween().set_parallel(true)
+	tween.tween_property(day_lofi_player, "pitch_scale", 1.05, 4.0)
 
 func fade_to_night() -> void:
 	var tween := create_tween().set_parallel(true)

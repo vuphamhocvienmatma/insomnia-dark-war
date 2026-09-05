@@ -347,6 +347,14 @@ func _on_tired_changed(is_tired: bool) -> void:
 	_refresh_stats()
 	_pulse(tired_line)
 
+	var root = get_tree().root
+	var post_layer = root.find_child("LofiPostProcessLayer", true, false)
+	if post_layer and post_layer.get_child_count() > 0:
+		var crect = post_layer.get_child(0) as ColorRect
+		if crect and crect.material is ShaderMaterial:
+			var tw = create_tween()
+			tw.tween_method(func(val): crect.material.set_shader_parameter("insomnia_level", val), 0.0 if not is_tired else 0.8, 0.8 if is_tired else 0.0, 3.0)
+
 
 func _pulse(ln: Label) -> void:
 	if not stats_panel.visible:

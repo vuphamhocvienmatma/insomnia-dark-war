@@ -66,7 +66,20 @@ func harvest() -> bool:
 	if am != null:
 		am.call("play_sfx", "harvest")
 	_spawn_burst(10, Color(1.0, 0.85, 0.2, 1.0))
-	print("Thu hoạch hoa, nhận ", reward, " phế liệu! Thật chill...")
+
+	# Bezier Curve Juice (Fake carrot flying)
+	var carrot = Label.new()
+	carrot.text = "??"
+	carrot.global_position = global_position
+	get_tree().root.add_child(carrot)
+	var player = get_tree().get_first_node_in_group("player")
+	var target = player.global_position if player else global_position + Vector2(0, -50)
+	var tw = create_tween().set_parallel(true)
+	tw.tween_property(carrot, "global_position:x", target.x, 0.5).set_ease(Tween.EASE_OUT).set_trans(Tween.TRANS_QUAD)
+	tw.tween_property(carrot, "global_position:y", target.y - 40.0, 0.5).set_ease(Tween.EASE_OUT).set_trans(Tween.TRANS_BACK)
+	tw.chain().tween_callback(func(): carrot.queue_free())
+
+	print("Thu ho?ch hoa, nh?n ", reward, " ph? li?u! Th?t chill...")
 	return true
 
 func water_plant() -> bool:

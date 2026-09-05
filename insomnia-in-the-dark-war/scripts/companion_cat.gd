@@ -43,9 +43,14 @@ func _physics_process(_delta: float) -> void:
 	var now := Time.get_ticks_msec() / 1000.0
 
 	var ls: Node = get_tree().root.find_child("LevelSetup", true, false)
+	var is_sunny = (ls and str(ls.get("current_weather")) == "sunny")
 	if ls != null and str(ls.get("current_weather")) == "sandstorm":
 		# Stay inside cabin near stove keeping warm during sandstorm
 		_seek_x(-60.0, 15.0)
+		return
+	elif is_sunny:
+		# Seek the god rays in the cabin (x: 120)
+		_seek_x(120.0, 10.0)
 		return
 
 	if is_carrying_item:

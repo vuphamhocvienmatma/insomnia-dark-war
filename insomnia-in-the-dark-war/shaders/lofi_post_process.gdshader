@@ -10,6 +10,7 @@ uniform vec3 warm_tint : source_color = vec3(0.98, 0.94, 0.90);
 uniform float aberration_amount : hint_range(0.0, 0.01) = 0.0010;
 uniform bool eco_mode = false;
 uniform float wobble_intensity = 0.0; // Audio-Visual Sync Wobble
+uniform float insomnia_level : hint_range(0.0, 1.0) = 0.0;
 
 float random(vec2 uv) {
 	return fract(sin(dot(uv.xy, vec2(12.9898, 78.233))) * 43758.5453123);
@@ -51,6 +52,13 @@ void fragment() {
 		float g = texture(screen_texture, uv).g;
 		float b = texture(screen_texture, uv + ca_offset).b;
 		vec3 col = vec3(r, g, b);
+
+		// Insomnia Shift
+		if (insomnia_level > 0.0) {
+			vec2 insom_shift = vec2(sin(TIME * 5.0) * 0.005, cos(TIME * 3.0) * 0.005) * insomnia_level;
+			col.r = texture(screen_texture, uv + insom_shift).r;
+			col.b = texture(screen_texture, uv - insom_shift).b;
+		}
 		
 		// Apply exposure factor
 		col *= exposure;
