@@ -62,6 +62,7 @@ func _physics_process(_delta: float) -> void:
 			else:
 				cabin.climb_down()
 
+	# Climb logic here
 	var effective_speed: float = speed * (0.85 if (GameState and GameState.is_tired) else 1.0)
 	velocity = Vector2(direction.x * effective_speed, 0.0)
 
@@ -69,6 +70,9 @@ func _physics_process(_delta: float) -> void:
 		art.scale.x = -1.0 if direction.x < 0.0 else 1.0
 
 	move_and_slide()
+	
+	_handle_footsteps(direction.x, _delta)
+	_handle_cold_breath(_delta)
 
 	# Clamp movement bounds: On mezzanine cannot walk into air; on ground cannot leave map
 	if cabin != null and cabin.current_floor == "mezzanine":
@@ -78,6 +82,72 @@ func _physics_process(_delta: float) -> void:
 
 	if not _climbing:
 		position.y = cabin.get_current_floor_y() if cabin != null else GROUND_Y
+
+var _step_timer: float = 0.0
+var _breath_timer: float = 0.0
+
+func _handle_footsteps(dir_x: float, delta: float) -> void:
+	if dir_x == 0.0 or _climbing:
+		_step_timer = 0.0
+		return
+	
+	_step_timer += delta
+	if _step_timer >= 0.4:
+		_step_timer = 0.0
+		var sound_text = "sột soạt"
+		var w = "sunny"
+		if get_node_or_null("/root/LevelSetup"):
+			w = get_node("/root/LevelSetup").get("current_weather")
+		
+		# In cabin
+		if position.x > -180.0 and position.x < 180.0:
+			sound_text = "cộp cộp"
+		elif w == "snowstorm":
+			sound_text = "xộp xộp"
+		elif w == "heavy_rain" or w == "drizzle":
+			sound_text = "lép nhép"
+			
+		_spawn_floating_text(sound_text, Color(0.8, 0.8, 0.8, 0.6))
+
+func _handle_cold_breath(delta: float) -> void:
+	var w = "sunny"
+	if get_node_or_null("/root/LevelSetup"):
+		w = get_node("/root/LevelSetup").get("current_weather")
+		
+	if w == "snowstorm" or w == "thick_fog":
+		_breath_timer += delta
+		if _breath_timer >= 2.5:
+			_breath_timer = 0.0
+			_spawn_cold_breath()
+
+func _spawn_cold_breath() -> void:
+	var puff = Label.new()
+	puff.text = "☁️"
+	puff.add_theme_font_size_override("font_size", 10)
+	puff.modulate = Color(1,1,1,0.5)
+	var offset_x = 20.0 * (1.0 if (art and art.scale.x > 0) else -1.0)
+	puff.position = Vector2(offset_x, -30)
+	add_child(puff)
+	
+	var tw = create_tween()
+	tw.tween_property(puff, "position:y", -50.0, 1.5)
+	tw.parallel().tween_property(puff, "modulate:a", 0.0, 1.5)
+	tw.tween_callback(puff.queue_free)
+
+func _spawn_floating_text(txt: String, col: Color) -> void:
+	var lbl = Label.new()
+	lbl.text = txt
+	lbl.add_theme_color_override("font_color", col)
+	lbl.add_theme_font_size_override("font_size", 10)
+	lbl.position = Vector2(-20, 0)
+	add_child(lbl)
+	
+	var tw = create_tween()
+	tw.tween_property(lbl, "position:y", -20.0, 0.5)
+	tw.parallel().tween_property(lbl, "modulate:a", 0.0, 0.5)
+	tw.tween_callback(lbl.queue_free)
+
+
 
 
 func _on_floor_changed(_floor_name: String) -> void:

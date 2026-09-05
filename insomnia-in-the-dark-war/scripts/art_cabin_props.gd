@@ -49,6 +49,7 @@ func _draw() -> void:
 	_draw_fairy_lights()
 	_draw_pitched_roof_and_rooftop_stations()
 	_draw_ladder()
+	_draw_lantern()
 
 
 func _draw_wall_planks() -> void:
@@ -350,16 +351,47 @@ func _draw_mezzanine_railing() -> void:
 
 
 func _draw_ground_window_light_shaft() -> void:
-	if _tm == null or not bool(_tm.get("is_night")):
+	if _tm == null: return
+	var is_night = bool(_tm.get("is_night"))
+	if is_night:
+		# Moonlight shaft
+		var shaft_poly: PackedVector2Array = PackedVector2Array([
+			Vector2(-232.0, -70.0),
+			Vector2(-232.0, 0.0),
+			Vector2(-310.0, 16.0),
+			Vector2(-340.0, -10.0)
+		])
+		draw_colored_polygon(shaft_poly, Color(0.6, 0.7, 0.9, 0.08))
 		return
-	# Warm light shaft shining outside on the left ground
-	var shaft_poly: PackedVector2Array = PackedVector2Array([
-		Vector2(-232.0, -70.0),
-		Vector2(-232.0, 0.0),
-		Vector2(-310.0, 16.0),
-		Vector2(-340.0, -10.0)
+		
+	var w = "sunny"
+	if get_node_or_null("/root/LevelSetup"): w = get_node("/root/LevelSetup").get("current_weather")
+	if w != "sunny": return # Only draw strong sun shafts if sunny
+		
+	var ratio = _tm.get("time_elapsed") / max(float(_tm.get("day_duration_seconds")), 1.0)
+	
+	# Light sweeps from left (morning) to right (evening)
+	var sweep = lerp(-150.0, 150.0, ratio)
+	var color_a = Color(1.0, 0.9, 0.7, 0.15) # Morning warm
+	var color_b = Color(1.0, 0.7, 0.4, 0.15) # Evening orange
+	var sun_col = color_a.lerp(color_b, ratio)
+	
+	var shaft: PackedVector2Array = PackedVector2Array([
+		Vector2(sweep - 100.0, -400.0), # Top left of window
+		Vector2(sweep + 50.0, -400.0), # Top right
+		Vector2(sweep + 250.0, 100.0), # Bottom right on floor
+		Vector2(sweep - 200.0, 100.0)  # Bottom left on floor
 	])
-	draw_colored_polygon(shaft_poly, Color(0.98, 0.82, 0.40, 0.14))
+	draw_colored_polygon(shaft, sun_col)
+	
+	# Dust particles in sun beam
+	var dust_count = 15
+	for i in dust_count:
+		var dx = sweep + sin(_time + float(i)*1.5) * 100.0 + (float(i) * 10.0)
+		var dy = -200.0 + fmod((_time * -15.0 + float(i) * 30.0), 300.0)
+		var alpha = sin(_time * 2.0 + float(i)) * 0.8
+		if alpha > 0:
+			draw_circle(Vector2(dx, dy), 1.5, Color(1.0, 0.9, 0.6, alpha * 0.8))
 
 
 func _draw_fairy_lights() -> void:
@@ -878,5 +910,39 @@ func _draw_custom_decorations() -> void:
 		draw_rect(Rect2(91.0, -41.0, 4.0, 6.0), Color(0.95, 0.55, 0.20, 0.85)) # glowing tube
 		# Antenna
 		draw_line(Vector2(95.0, -43.0), Vector2(98.0, -56.0), Color(0.65, 0.68, 0.72), 1.2)
+
+
+func _draw_lantern() -> void:
+	var w = "sunny"
+	if get_node_or_null("/root/LevelSetup"):
+		w = get_node("/root/LevelSetup").get("current_weather")
+	
+	# Lantern sways more in storm or snow
+	var sway_amt = 0.05
+	if w == "heavy_rain" or w == "snowstorm" or w == "thick_fog":
+		sway_amt = 0.25
+	
+	var angle = sin(_time * 2.5) * sway_amt
+	
+	var pivot = Vector2(-20.0, -145.0) # Hung under the mezzanine
+	draw_set_transform(pivot, angle, Vector2.ONE)
+	
+	# Chain
+	draw_line(Vector2.ZERO, Vector2(0, 15.0), OUTLINE, 1.5)
+	
+	# Lantern Body
+	var body = Rect2(-6.0, 15.0, 12.0, 16.0)
+	draw_rect(body, Color(0.2, 0.2, 0.2))
+	_draw_rect_outline(body, OUTLINE)
+	
+	# Glow
+	var is_night: bool = _tm != null and bool(_tm.get("is_night"))
+	if is_night or w == "thick_fog" or w == "heavy_rain" or w == "snowstorm":
+		var flicker = 0.8 + sin(_time * 15.0) * 0.2
+		draw_rect(Rect2(-4.0, 17.0, 8.0, 12.0), Color(1.0, 0.9, 0.5, flicker))
+		draw_circle(Vector2(0, 23.0), 30.0, Color(1.0, 0.9, 0.5, 0.15 * flicker))
+		
+	draw_set_transform(Vector2.ZERO, 0.0, Vector2.ONE)
+
 
 

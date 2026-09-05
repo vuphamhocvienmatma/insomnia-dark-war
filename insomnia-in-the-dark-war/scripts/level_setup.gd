@@ -157,33 +157,26 @@ func _on_phase_changed(is_night: bool) -> void:
 
 
 func _roll_daily_weather() -> void:
-	var roll: float = randf()
+	var weathers: Array[String] = ["sunny", "drizzle", "heavy_rain", "thick_fog", "snowstorm", "meteor_shower"]
+	current_weather = weathers[randi() % weathers.size()]
+	
 	var hud: Node = get_tree().get_first_node_in_group("hud")
-	if roll < 0.20:
-		current_weather = "sandstorm"
-		if hud != null and hud.has_method("show_toast"):
-			hud.call("show_toast", "🌪️ BÃO CÁT SA MẠC: Gió cuốn phế liệu về sân (+4 Scrap), mèo ở nhà sưởi ấm!", 5.0, false)
-		# Sandstorm drops 4 scrap near cabin
-		for s in 4:
-			var sc := SCRAP_SCENE.instantiate() as Node2D
-			sc.position = Vector2(randf_range(-400.0, 400.0), GROUND_Y)
-			add_child(sc)
-	elif roll < 0.35:
-		current_weather = "acid_rain"
-		if hud != null and hud.has_method("show_toast"):
-			hud.call("show_toast", "🌧️ MƯA AXIT: Cây trồng lớn nhanh x2, nhưng sụt 50% Solar!", 5.0, false)
-		if GameState != null:
-			GameState.solar_charge_multiplier = 0.5
-	elif roll < 0.42:
-		current_weather = "meteor_shower"
-		if hud != null and hud.has_method("show_toast"):
-			hud.call("show_toast", "🌠 MƯA SAO BĂNG: Thiên thạch phế liệu quý hiếm rơi (+12 Scrap)!", 5.0, false)
-		if GameState != null:
-			GameState.add_scrap(12)
-	else:
-		current_weather = "sunny"
-		if GameState != null:
-			GameState.solar_charge_multiplier = 1.0
+	if hud and hud.has_method("show_toast"):
+		if current_weather == "drizzle":
+			hud.call("show_toast", "🌧️ Mưa phùn: Sương giăng mỏng, thời tiết êm dịu.", 5.0, false)
+		elif current_weather == "heavy_rain":
+			hud.call("show_toast", "⛈️ Mưa rào: Mưa xối xả và sấm chớp giật đùng đùng!", 5.0, true)
+		elif current_weather == "thick_fog":
+			hud.call("show_toast", "🌫️ Sương mù dày: Tầm nhìn hạn chế, âm thanh tắc nghẽn.", 5.0, false)
+		elif current_weather == "snowstorm":
+			hud.call("show_toast", "❄️ Bão tuyết: Lạnh giá bao trùm, tuyết rơi trắng xóa.", 5.0, true)
+		elif current_weather == "meteor_shower":
+			hud.call("show_toast", "🌠 Mưa sao băng: Bầu trời rực rỡ, phế liệu hiếm rơi rụng!", 5.0, false)
+		else:
+			hud.call("show_toast", "🌤️ Nắng vàng êm: Bầu trời trong xanh ấm áp.", 5.0, false)
+
+	if current_weather == "meteor_shower" and GameState != null:
+		GameState.add_scrap(12)
 
 
 func _check_nightmare_night_announcement() -> void:

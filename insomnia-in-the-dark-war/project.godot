@@ -23,6 +23,7 @@ UnlockManager="*res://scripts/unlock_manager.gd"
 SaveManager="*res://scripts/save_manager.gd"
 MailboxManager="*res://scripts/mailbox_manager.gd"
 CabinDecorationManager="*res://scripts/cabin_decoration_manager.gd"
+ChillManager="*res://scripts/chill_manager.gd"
 
 [display]
 
