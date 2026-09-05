@@ -39,14 +39,16 @@ void fragment() {
 	} else {
 		vec2 uv = SCREEN_UV;
 		
-		// Audio-Visual Sync Wobble
-		uv.x += sin(TIME * 6.0 + uv.y * 10.0) * wobble_intensity * 0.005;
-		uv.y += cos(TIME * 4.0 + uv.x * 12.0) * wobble_intensity * 0.005;
-		
-		// Chromatic aberration slightly outward from center
 		vec2 diff = uv - vec2(0.5);
 		float dist_sq = dot(diff, diff);
-		vec2 ca_offset = diff * dist_sq * aberration_amount * (6.0 + wobble_intensity * 10.0);
+
+		vec2 ca_offset = diff * dist_sq * aberration_amount * 6.0;
+		// Audio-Visual Sync Wobble
+		if (wobble_intensity > 0.0) {
+			uv.x += sin(TIME * 6.0 + uv.y * 10.0) * wobble_intensity * 0.005;
+			uv.y += cos(TIME * 4.0 + uv.x * 12.0) * wobble_intensity * 0.005;
+			ca_offset = diff * dist_sq * aberration_amount * (6.0 + wobble_intensity * 10.0);
+		}
 		
 		float r = texture(screen_texture, uv - ca_offset).r;
 		float g = texture(screen_texture, uv).g;
@@ -77,10 +79,12 @@ void fragment() {
 		col += noise * grain_intensity;
 		
 		// Retro Bayer Dithering
-		ivec2 frag_coord = ivec2(FRAGCOORD.xy) % 4;
-		int dither_idx = frag_coord.y * 4 + frag_coord.x;
-		float dither_val = (bayer[dither_idx] / 16.0) - 0.5;
-		col += dither_val * 0.05; // Light dither blend
+		if (wobble_intensity > 0.0) {
+			ivec2 frag_coord = ivec2(FRAGCOORD.xy) % 4;
+			int dither_idx = frag_coord.y * 4 + frag_coord.x;
+			float dither_val = (bayer[dither_idx] / 16.0) - 0.5;
+			col += dither_val * 0.05; // Light dither blend
+		}
 		
 		// Smooth vignette
 		float vig = smoothstep(0.08, 0.70, dist_sq);

@@ -36,10 +36,20 @@ func _ready() -> void:
 	sb.set_border_width_all(2)
 	sb.set_corner_radius_all(14)
 	sb.set_content_margin_all(14)
-	sb.shadow_color = Color(0, 0, 0, 0.5)
-	sb.shadow_size = 14
-	sb.shadow_offset = Vector2(0, 5)
+	# Optim: Remove dynamic soft shadow from tweening panel to reduce redraw cost
+	# sb.shadow_color = Color(0, 0, 0, 0.5)
+	# sb.shadow_size = 14
 	add_theme_stylebox_override("panel", sb)
+	# Add static shadow rect underneath instead
+	var shadow = ColorRect.new()
+	shadow.color = Color(0,0,0, 0.3)
+	shadow.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	shadow.offset_left = -10
+	shadow.offset_right = 10
+	shadow.offset_top = -10
+	shadow.offset_bottom = 20
+	shadow.show_behind_parent = true
+	add_child(shadow)
 
 	_build_ui()
 	visible = false

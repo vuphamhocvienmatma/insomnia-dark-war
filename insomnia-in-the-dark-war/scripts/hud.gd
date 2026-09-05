@@ -64,9 +64,9 @@ func _ready() -> void:
 	sb.border_color = BORDER
 	sb.set_corner_radius_all(18)
 	sb.set_content_margin_all(12)
-	sb.shadow_color = Color(0, 0, 0, 0.22)
-	sb.shadow_size = 8
-	sb.shadow_offset = Vector2(0, 4)
+	# Optim: static box, drop expensive dynamic shadow
+	# sb.shadow_color = Color(0, 0, 0, 0.22)
+	# sb.shadow_size = 8
 	stats_panel.add_theme_stylebox_override("panel", sb)
 	add_child(stats_panel)
 

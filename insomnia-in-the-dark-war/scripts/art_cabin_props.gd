@@ -11,6 +11,11 @@ const WARM_GLOW: Color = Color(1.0, 0.88, 0.55, 0.9)
 const FAIRY_WIRE: Color = Color(0.15, 0.15, 0.15, 0.7)
 
 var _time: float = 0.0
+var _clock_str_cache: String = "06:00"
+var _solar_pct_cache: float = 0.0
+var _clock_timer: float = 0.0
+var _badge_cache: Array[bool] = [false, false, false, false, false, false]
+var _badge_timer: float = 0.0
 var _tm: Node = null
 var dust_particles: Array[Dictionary] = []
 @onready var _font: Font = ThemeDB.fallback_font
@@ -32,6 +37,15 @@ func _get_random_sunray_pos() -> Vector2:
 
 func _process(delta: float) -> void:
 	_time += delta * 2.5
+	_clock_timer += delta
+	if _clock_timer > 1.0:
+		_clock_timer = 0.0
+		_update_clock_cache()
+
+	_badge_timer += delta
+	if _badge_timer > 2.0:
+		_badge_timer = 0.0
+		_update_badge_cache()
 	for d in dust_particles:
 		d["pos"].y -= d["speed"] * delta
 		d["pos"].x += sin(_time + d["speed"]) * 0.2
@@ -821,6 +835,14 @@ func _draw_guitar() -> void:
 	draw_rect(Rect2(gx + 6.0, gy - 36.0, 4.0, 5.0), WOOD_BEAM)
 
 
+func _update_badge_cache() -> void:
+	_badge_cache[0] = GameState.zombies_killed >= 10
+	_badge_cache[1] = GameState.days_survived >= 5
+	_badge_cache[2] = GameState.days_survived >= 15
+	_badge_cache[3] = GameState.relics_found.size() > 0
+	_badge_cache[4] = true
+	_badge_cache[5] = true
+
 func _draw_wooden_badge_wall() -> void:
 	# Wooden Medal Badges Wall mounted on 2nd floor loft wall
 	var board_rect := Rect2(-75.0, -188.0, 102.0, 24.0)
@@ -981,11 +1003,22 @@ func _draw_interior_overlay() -> void:
 	])
 	draw_colored_polygon(interior_poly, Color(0.95, 0.6, 0.2, 0.04))
 
+func _update_clock_cache() -> void:
+	if _tm == null: return
+	_solar_pct_cache = float(_tm.get("current_solar_energy")) / 100.0
+	var is_n: bool = bool(_tm.get("is_night"))
+	var time_elapsed: float = float(_tm.get("time_elapsed"))
+	var dur: float = float(_tm.get("night_duration_seconds") if is_n else _tm.get("day_duration_seconds"))
+	var ratio = time_elapsed / max(dur, 1.0)
+	var h = 0.0
+	if not is_n: h = 6.0 + ratio * 12.0
+	else: h = 18.0 + ratio * 12.0
+	if h >= 24.0: h -= 24.0
+	var mins = int(fmod(h * 60.0, 60.0))
+	_clock_str_cache = "%02d:%02d" % [int(h), mins]
+
 func _draw_diegetic_ui() -> void:
 	if _tm == null: return
-	
-	if _font == null:
-		_font = ThemeDB.fallback_font
 	var font = _font
 	
 	# 1. Analog Voltmeter (Solar Pin)
@@ -1003,7 +1036,7 @@ func _draw_diegetic_ui() -> void:
 	_draw_rect_outline(d_rect, OUTLINE)
 	
 	# Needle
-	var solar_pct: float = float(_tm.get("current_solar_energy")) / 100.0
+	var solar_pct: float = _solar_pct_cache
 	var angle = lerpf(PI * 0.8, PI * 0.2, solar_pct)
 	var needle_end = Vector2(vx, vy + 8) + Vector2(cos(angle), -sin(angle)) * 14.0
 	draw_line(Vector2(vx, vy + 8), needle_end, Color(0.8, 0.2, 0.2), 2.0)
@@ -1013,18 +1046,7 @@ func _draw_diegetic_ui() -> void:
 	draw_string(font, Vector2(vx - 16, vy - 18), "SOLAR", HORIZONTAL_ALIGNMENT_CENTER, -1, 9, Color(0.1, 0.1, 0.1, 0.5))
 	
 	# 2. Digital Clock on Radio
-	var is_n: bool = bool(_tm.get("is_night"))
-	var time_elapsed: float = float(_tm.get("time_elapsed"))
-	var dur: float = float(_tm.get("night_duration_seconds") if is_n else _tm.get("day_duration_seconds"))
-	var ratio = time_elapsed / max(dur, 1.0)
-	
-	# Map ratio to hours (Day 6:00 - 18:00, Night 18:00 - 6:00)
-	var h = 0.0
-	if not is_n: h = 6.0 + ratio * 12.0
-	else: h = 18.0 + ratio * 12.0
-	if h >= 24.0: h -= 24.0
-	var mins = int(fmod(h * 60.0, 60.0))
-	var time_str = "%02d:%02d" % [int(h), mins]
+	var time_str = _clock_str_cache
 	
 	# Draw clock on radio at x = 82, y = -43 (Workbench)
 	var rx = 85.0
