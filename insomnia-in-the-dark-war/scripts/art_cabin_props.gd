@@ -18,7 +18,7 @@ var _badge_cache: Array[bool] = [false, false, false, false, false, false, false
 var _badge_timer: float = 0.0
 var _tm: Node = null
 var dust_particles: Array[Dictionary] = []
-@onready var _font: Font = ThemeDB.fallback_font
+@onready var _font: Font = preload("res://assets/fonts/MainFont.tres")
 
 
 func _ready() -> void:

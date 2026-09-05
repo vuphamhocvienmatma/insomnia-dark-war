@@ -64,7 +64,7 @@ func _draw() -> void:
 
 		# Action Tooltip Banner
 		if action_title != "":
-			var font: Font = ThemeDB.fallback_font
+			var font: Font = preload("res://assets/fonts/MainFont.tres")
 			var text_w: float = font.get_string_size(action_title, HORIZONTAL_ALIGNMENT_LEFT, -1, 11).x
 			var tip_w: float = text_w + 16.0
 			var tip_rect: Rect2 = Rect2(m_pos.x + 16.0, m_pos.y - 12.0, tip_w, 22.0)

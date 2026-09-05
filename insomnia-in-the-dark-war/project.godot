@@ -1,4 +1,4 @@
-; Engine configuration file.
+﻿; Engine configuration file.
 ; It's best edited using the editor UI and not directly,
 ; since the parameters that go here are not all obvious.
 ;
@@ -78,3 +78,7 @@ toggle_stats={
 
 rendering_device/driver.windows="d3d12"
 renderer/rendering_method="mobile"
+
+[gui]
+
+theme/custom="res://assets/theme.tres"
