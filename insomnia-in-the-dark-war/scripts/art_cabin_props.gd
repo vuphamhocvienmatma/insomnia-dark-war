@@ -836,9 +836,9 @@ func _draw_guitar() -> void:
 
 
 func _update_badge_cache() -> void:
-	_badge_cache[0] = GameState.zombies_killed >= 10
-	_badge_cache[1] = GameState.days_survived >= 5
-	_badge_cache[2] = GameState.days_survived >= 15
+	_badge_cache[0] = GameState.stats.get("zombies_killed", 0) >= 10
+	_badge_cache[1] = GameState.stats.get("days_survived", 0) >= 5
+	_badge_cache[2] = GameState.stats.get("days_survived", 0) >= 15
 	_badge_cache[3] = GameState.relics_found.size() > 0
 	_badge_cache[4] = true
 	_badge_cache[5] = true
