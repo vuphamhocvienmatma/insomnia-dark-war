@@ -123,8 +123,8 @@ insomnia-in-the-dark-war/
 │   ├── game_state.gd          # Tài nguyên toàn cục
 │   └── level_setup.gd         # Khởi tạo màn chơi, sinh hòm thư, wave zombie
 └── shaders/
-    ├── lofi_post_process.gdshader # Shader phim nhựa cũ
-    └── weather_post_process.gdshader # Shader blend màu theo 6 thời tiết
+	├── lofi_post_process.gdshader # Shader phim nhựa cũ
+	└── weather_post_process.gdshader # Shader blend màu theo 6 thời tiết
 ```
 
 ### 6.1 Autoloads Toàn Cục (`project.godot`)
