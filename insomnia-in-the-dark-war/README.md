@@ -32,9 +32,38 @@ Mục tiêu: Sống sót qua các chu kỳ ngày-đêm, gắn kết tình bạn 
 | **Âm Nhạc Lofi & Âm Thanh Môi Trường** | Bản nhạc electric piano Rhodes lofi êm dịu ban ngày (tích hợp tiếng vinyl crackle) tự động crossfade sang ambient gió lạnh ban đêm. |
 | **Trạng Thái Tường Nứt 3 Giai Đoạn** | Hàng rào phản ánh độ bền thực tế: Nứt chân chim (>75%) → Toạc sâu đứt đai (>50%) → Thủng lỗ toang hoang rách kẽm gai (<25%). |
 
+| **Thời Tiết Đa Giác Quan (Weather System)** | 6 kiểu thời tiết (Nắng, Mưa phùn, Bão táp, Sương mù, Bão tuyết, Mưa sao băng) đi kèm Particle và hiệu ứng hình ảnh (Color Grading Shader). |
+| **8 Ý Tưởng Chill Lofi (Chill Manager)** | Hệ thống Vườn âm thanh lofi, Cà phê sáng, Câu cá cát, Đom đóm đêm, Polaroid chụp tự động, Minigame Guitar, Động vật hoang dã, và Radio phát thanh. |
+| **Ánh Sáng Động (Dynamic Sunlight)** | Ánh nắng chiếu qua cửa sổ dịch chuyển theo thời gian trong ngày, kèm các hạt bụi lơ lửng, đổi màu từ nắng sớm sang cam chiều tà. |
+
 ---
 
-## 3. Cấu Trúc Dự Án
+## 3. 8 Cơ Chế "Chill Lofi" Đặc Biệt (Chill Manager)
+
+Trái tim của trải nghiệm lofi nằm ở **Chill Manager**, một hệ thống tự động mang lại sức sống êm ả cho tựa game:
+
+1. 📸 **Ảnh Polaroid Tự Chụp:** Tự động bắt khoảnh khắc (bình minh sau bão, hoa nở đầu mùa, mèo phơi nắng). Một bức ảnh cổ điển ố vàng với dòng chữ viết tay sẽ chầm chậm lướt xuống khung hình.
+2. 🎸 **Chơi Guitar Bên Lửa Trại:** Mini-game nhịp điệu (Rhythm game) nhẹ nhàng trên gác xép. Nhấn phím đón nốt nhạc lấp lánh rơi xuống để hoàn thành bản acoustic, nhận buff tốc độ di chuyển.
+3. 🐰 **Thú Hoang Ghé Thăm:** Thỏ rừng nhảy nhót ban ngày, Chim sẻ đậu trên hàng rào, Cú mèo bồng bềnh trong đêm khuya và Rùa sa mạc lết chậm chạp sau cơn mưa. Mọi sinh vật đều di chuyển nhịp nhàng theo sóng sin tự nhiên.
+4. 📻 **Radio Phát Thanh Theo Giờ:** Một chiếc đài radio mờ ảo tự động bắt sóng theo lịch trình thực: *Chào Bình Minh (6h)*, *Giờ Ăn Trưa (12h)*, *Nhạc Jazz Chiều Tà (18h)*, *Truyện Ma Đêm Khuya (22h)* và cả *Tần Số Nhiễu (2h sáng)*.
+5. ☕ **Nghi Thức Cà Phê Sáng:** Mỗi sáng mai thức dậy, bạn có thể tự tay thực hiện 3 bước pha một tách cà phê nóng thông qua một giao diện UI mượt mà, tĩnh lặng.
+6. 🪴 **Vườn Âm Thanh (Sound Garden):** Âm thanh va đập của thiên nhiên vào cây cối (mưa rơi, gió rít) sẽ tự động sinh ra một bản lofi generative chill.
+7. ✨ **Bắt Đom Đóm:** Đêm xuống, bạn có thể click bắt những chú đom đóm bay lơ lửng.
+8. 🔭 **Gác Xép Ngắm Sao:** Tương tác chuyển góc nhìn Camera rộng ra ngoài mái nhà bằng một cú zoom điện ảnh (TRANS_SINE) cực kỳ chậm rãi.
+
+---
+
+## 4. Hệ Thống Thời Tiết & Ánh Sáng Động (Weather & Sunlight)
+
+- **Post-Processing Shader:** Tích hợp bộ lọc màu thời gian thực bóp méo thị giác nhẹ (Aberration), nhiễu hạt (Grain), tối viền (Vignette).
+  - **Nắng ấm:** Bầu trời ngả cam vàng, hạt bụi bay trong vệt nắng chiếu vào cabin, vệt nắng dịch chuyển chậm từ trái qua phải.
+  - **Mưa rào / Bão táp:** Tone màu lạnh u ám, sấm chớp giật liên hồi, giọt mưa trượt trên cửa sổ. Đèn lồng treo trước hiên đung đưa dữ dội theo gió.
+  - **Bão tuyết / Sương mù dày:** Hơi thở nhân vật tỏa khói trắng (Cold Breath) mỗi 2.5s. Âm thanh bước chân dưới tuyết kêu "xộp xộp".
+  - **Mưa sao băng:** Tone màu tím mộng mơ, vệt sao băng rơi xéo màn hình, tỉ lệ rớt vật phẩm quý tăng mạnh.
+
+---
+
+## 5. Cấu Trúc Dự Án
 
 ```
 insomnia-in-the-dark-war/
@@ -56,62 +85,63 @@ insomnia-in-the-dark-war/
 │   ├── stove.tscn             # Bếp súp lò sưởi
 │   └── hud.tscn               # Giao diện người dùng
 ├── scripts/
+│   ├── chill_manager.gd       # Quản lý 8 cơ chế lofi chill (Guitar, Radio, Polaroids, Animals...)
 │   ├── mailbox_manager.gd     # Quản lý thư từ, độ thân mật, quà bất ngờ
 │   ├── mailbox_ui.gd          # Giao diện thư giấy da cổ điển, lựa chọn hồi âm
 │   ├── art_mailbox.gd         # Vẽ hòm thư, lá cờ đỏ animated
 │   ├── camera_lofi.gd         # Camera zoom chuột, chống rung, bám nhân vật
 │   ├── art_player.gd          # Render nhân vật, cử động leo thang chân tay phối hợp
-│   ├── art_cabin_props.gd     # Vẽ cabin, thang trong nhà, lỗ sàn tầng 2, đèn dây
+│   ├── art_cabin_props.gd     # Vẽ cabin, nắng động, đèn lồng đung đưa, thang, lỗ sàn
+│   ├── art_weather.gd         # Quản lý hạt thời tiết, chớp sấm, shader post-processing
 │   ├── hud.gd                 # Đồng hồ Lofi, pin solar, zoom controls, toasts
 │   ├── game_state.gd          # Tài nguyên toàn cục
 │   └── level_setup.gd         # Khởi tạo màn chơi, sinh hòm thư, wave zombie
 └── shaders/
-    └── lofi_post_process.gdshader # Shader phim nhựa, hạt nhiễu (film grain), vignette ấm
+    ├── lofi_post_process.gdshader # Shader phim nhựa cũ
+    └── weather_post_process.gdshader # Shader blend màu theo 6 thời tiết
 ```
 
-### 3.1 Autoloads Toàn Cục (`project.godot`)
+### 5.1 Autoloads Toàn Cục (`project.godot`)
 
 | Tên Singleton | Script | Trách nhiệm |
 |---------------|--------|-------------|
 | `GameState` | `game_state.gd` | Kho tài nguyên (scrap, seed, water), trạng thái mệt mỏi, relic buffs. |
 | `JournalManager` | `journal_manager.gd` | Quản lý 3 nhiệm vụ hàng ngày, theo dõi tiến trình thực hiện. |
 | `MailboxManager` | `mailbox_manager.gd` | Hệ thống thư từ ngẫu nhiên, độ thân mật pen-pal, quà tiếp tế & quà bất ngờ. |
+| `ChillManager` | `chill_manager.gd` | Nhạc trưởng của lối chơi lofi, điều khiển UI mờ ảo, thú vật, polaroid và minigame. |
 | `SaveManager` | `save_manager.gd` | Lưu trữ và tải tiến trình chơi JSON vào `user://`. |
 | `UnlockManager` | `unlock_manager.gd` | Xử lý mở khóa các tính năng và cổ vật. |
 
 ---
 
-## 4. Hệ Thống Hòm Thư & Bằng Hữu Phương Xa (Wasteland Postal Mailbox)
+## 6. Bằng Hữu Phương Xa & Hòm Thư Dã Chiến (Wasteland Postal)
 
 Hòm thư đặt trước hiên cabin (`x = -225`). Khi có thư mới, **lá cờ đỏ 🚩 sẽ bật đứng dậy** kèm phong thư nhấp nháy:
 
 - **Các Người Bạn Phương Xa**:
-  - 🎣 **Bác Sáu (Câu Cá Sa Mạc)**: Lão già hóm hỉnh, hay kể chuyện hài câu trúng zombie dưới đụn cát, tặng nước ngọt và hạt giống.
-  - 📡 **Bóng Đêm 404 (Trạm Vô Tuyến)**: Nhân vật tuần đêm bí ẩn, cảnh báo những hiện tượng rùng rợn lúc 3h sáng, hỗ trợ linh kiện thép.
-  - 🌻 **Cô Bé Hoa Cúc (Trạm Cứu Hộ)**: Những lá thư ấm áp động viên, gửi tặng hạt hoa cúc dại và trà thảo mộc.
-  - 🔧 **Thợ Máy Râu Kẽm (Xưởng Ngầm)**: Bác thợ máy chuyên chế đồ độ súng AK, gửi phụ tùng giảm giật và phế liệu.
-- **Hồi Âm & Điểm Thân Mật (Affinity)**:
-  - Mỗi bức thư có 3 phương án hồi âm (Thân thiện / Vui vẻ / Khó tính).
-  - Điểm thân mật tăng/giảm ảnh hưởng trực tiếp đến thái độ của người gửi.
-- **Quà Bất Ngờ (Surprise Packages)**:
-  - Khi đạt mốc **30** và **60** điểm thân mật, bạn sẽ nhận được **Thùng Đồ Tri Kỷ** với lượng tài nguyên dồi dào (+40 Phế liệu, +12 Hạt giống, +5 Nước).
+  - 🎣 **Bác Sáu (Câu Cá Sa Mạc)**: Lão già hóm hỉnh, hay kể chuyện hài câu trúng zombie dưới đụn cát.
+  - 📡 **Bóng Đêm 404 (Trạm Vô Tuyến)**: Nhân vật tuần đêm bí ẩn, cảnh báo những hiện tượng rùng rợn lúc 3h sáng.
+  - 🌻 **Cô Bé Hoa Cúc (Trạm Cứu Hộ)**: Những lá thư ấm áp động viên, gửi tặng hạt hoa cúc dại.
+  - 🔧 **Thợ Máy Râu Kẽm (Xưởng Ngầm)**: Bác thợ máy chuyên chế đồ độ súng AK, gửi phụ tùng giảm giật.
+- **Hồi Âm & Điểm Thân Mật (Affinity)**: Mỗi bức thư có 3 phương án hồi âm (Thân thiện / Vui vẻ / Khó tính).
+- **Quà Bất Ngờ (Surprise Packages)**: Khi đạt mốc thân mật, nhận được **Thùng Đồ Tri Kỷ**.
 
 ---
 
-## 5. Hướng Dẫn Điều Khiển & Phím Tắt
+## 7. Hướng Dẫn Điều Khiển & Phím Tắt
 
 - **Di chuyển**: Phím mũi tên hoặc `A` / `D` (Trái / Phải).
 - **Leo thang**: Đứng tại vị trí thang trong nhà (`x = 150`), nhấn `W` / `Mũi tên Lên` để trèo lên gác xép, `S` / `Mũi tên Xuống` để trèo xuống.
-- **Tương tác**: Phím `E` (Nhặt phế liệu, mở hòm thư đọc thư, vuốt ve mèo, thu hoạch cây, nấu súp).
+- **Tương tác**: Phím `E` (Chơi Guitar ở gác xép, mở hòm thư, nhặt đồ, nấu súp, vuốt ve mèo).
+- **Chơi Guitar**: Khi vào minigame, dùng 4 phím Mũi Tên để đón nốt nhạc rớt xuống.
 - **Xây hàng rào**: Di chuột vào ô socket gần pháo đài và **Chuột trái** để xây tường.
 - **Phóng to / Thu nhỏ camera**:
   - **Cuộn chuột (Mouse Wheel)**: Lăn lên để phóng to cận cảnh cabin, lăn xuống để nhìn bao quát sa mạc.
   - **Nút bấm UI**: Click các nút `－`, `1.0x`, `＋` ở góc trên bên phải màn hình.
-- **Nhiệm vụ & Hướng dẫn**: Click nút `📋 Nhiệm Vụ & Hướng Dẫn` ở góc dưới bên phải để mở rộng menu nhiệm vụ.
 
 ---
 
-## 6. Cách Chạy Game
+## 8. Cách Chạy Game
 
 1. Khởi chạy **Godot 4.7** (hoặc bản 4.x tương thích).
 2. Chọn `Import` trỏ đến thư mục `insomnia-in-the-dark-war/project.godot`.
