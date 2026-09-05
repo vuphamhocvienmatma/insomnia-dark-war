@@ -14,15 +14,20 @@ var _mm: Node = null
 
 func _ready() -> void:
 	_mm = get_tree().get_first_node_in_group("mailbox_manager")
+	if _mm:
+		_mm.mail_received.connect(_on_mail_updated)
+		_mm.mail_read.connect(_on_mail_updated)
+		_on_mail_updated({}) # Initial check
 
+func _on_mail_updated(_letter: Dictionary) -> void:
+	if _mm and _mm.has_method("has_unread"):
+		has_unread_mail = bool(_mm.call("has_unread"))
+		queue_redraw()
 
 func _process(delta: float) -> void:
-	_anim_time += delta * 3.0
-	if _mm != null and _mm.has_method("has_unread"):
-		var unread: bool = bool(_mm.call("has_unread"))
-		if unread != has_unread_mail:
-			has_unread_mail = unread
-			queue_redraw()
+	if has_unread_mail:
+		_anim_time += delta * 3.0
+		queue_redraw()
 
 
 func _draw() -> void:

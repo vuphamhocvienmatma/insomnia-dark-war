@@ -9,10 +9,19 @@ uniform float grain_intensity : hint_range(0.0, 0.1) = 0.018;
 uniform vec3 warm_tint : source_color = vec3(0.98, 0.94, 0.90);
 uniform float aberration_amount : hint_range(0.0, 0.01) = 0.0010;
 uniform bool eco_mode = false;
+uniform float wobble_intensity = 0.0; // Audio-Visual Sync Wobble
 
 float random(vec2 uv) {
 	return fract(sin(dot(uv.xy, vec2(12.9898, 78.233))) * 43758.5453123);
 }
+
+// 4x4 Bayer Dither Matrix for retro posterization banding reduction
+const float bayer[16] = float[](
+	0.0, 8.0, 2.0, 10.0,
+	12.0, 4.0, 14.0, 6.0,
+	3.0, 11.0, 1.0, 9.0,
+	15.0, 7.0, 13.0, 5.0
+);
 
 vec3 aces_tonemap(vec3 x) {
 	const float a = 2.51;
@@ -29,10 +38,14 @@ void fragment() {
 	} else {
 		vec2 uv = SCREEN_UV;
 		
+		// Audio-Visual Sync Wobble
+		uv.x += sin(TIME * 6.0 + uv.y * 10.0) * wobble_intensity * 0.005;
+		uv.y += cos(TIME * 4.0 + uv.x * 12.0) * wobble_intensity * 0.005;
+		
 		// Chromatic aberration slightly outward from center
 		vec2 diff = uv - vec2(0.5);
 		float dist_sq = dot(diff, diff);
-		vec2 ca_offset = diff * dist_sq * aberration_amount * 6.0;
+		vec2 ca_offset = diff * dist_sq * aberration_amount * (6.0 + wobble_intensity * 10.0);
 		
 		float r = texture(screen_texture, uv - ca_offset).r;
 		float g = texture(screen_texture, uv).g;
@@ -54,6 +67,12 @@ void fragment() {
 		// Subtle film grain
 		float noise = (random(uv + vec2(sin(TIME * 10.0), cos(TIME * 15.0))) - 0.5) * 2.0;
 		col += noise * grain_intensity;
+		
+		// Retro Bayer Dithering
+		ivec2 frag_coord = ivec2(FRAGCOORD.xy) % 4;
+		int dither_idx = frag_coord.y * 4 + frag_coord.x;
+		float dither_val = (bayer[dither_idx] / 16.0) - 0.5;
+		col += dither_val * 0.05; // Light dither blend
 		
 		// Smooth vignette
 		float vig = smoothstep(0.08, 0.70, dist_sq);

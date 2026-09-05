@@ -172,10 +172,23 @@ func _start_guitar_minigame() -> void:
 	guitar_ui.modulate.a = 0.0
 	guitar_ui.show()
 	var tw = create_tween().set_pause_mode(Tween.TWEEN_PAUSE_PROCESS)
-	tw.tween_property(guitar_ui, "modulate:a", 1.0, 1.0).set_ease(Tween.EASE_OUT)
+	tw.tween_property(guitar_ui, "modulate:a", 1.0, 1.0)
+	
+	_set_shader_wobble(1.0)
+	
 	guitar_notes.clear()
 	guitar_timer = 0.0
 	get_tree().paused = true
+
+func _stop_guitar_minigame() -> void:
+	if not guitar_active: return
+	guitar_active = false
+	get_tree().paused = false
+	_set_shader_wobble(0.0)
+	
+	var tw = create_tween()
+	tw.tween_property(guitar_ui, "modulate:a", 0.0, 1.0)
+	tw.tween_callback(func(): guitar_ui.hide())
 
 func _update_guitar_minigame(delta: float) -> void:
 	if not guitar_active: return
@@ -499,17 +512,48 @@ func _on_stargaze() -> void:
 	add_child(stargaze_cam)
 	stargaze_cam.make_current()
 	
-	var tw = create_tween()
+	var hud: Node = get_tree().get_first_node_in_group("hud")
+	if hud and hud.has_node("TopBar"):
+		hud.get_node("TopBar").modulate.a = 0.0
+	
+	# Add cinematic bars
+	var top_bar = ColorRect.new()
+	top_bar.name = "StargazeTopBar"
+	top_bar.color = Color.BLACK
+	top_bar.set_anchors_preset(Control.PRESET_TOP_WIDE)
+	top_bar.size.y = 120
+	top_bar.position.y = -120
+	add_child(top_bar)
+	
+	var bot_bar = ColorRect.new()
+	bot_bar.name = "StargazeBotBar"
+	bot_bar.color = Color.BLACK
+	bot_bar.set_anchors_preset(Control.PRESET_BOTTOM_WIDE)
+	bot_bar.size.y = 120
+	bot_bar.position.y = get_viewport().get_visible_rect().size.y
+	add_child(bot_bar)
+	
+	var tw = create_tween().set_parallel(true)
 	tw.tween_property(stargaze_cam, "zoom", Vector2(0.5, 0.5), 3.0).set_ease(Tween.EASE_IN_OUT).set_trans(Tween.TRANS_SINE)
+	tw.tween_property(top_bar, "position:y", 0.0, 3.0).set_ease(Tween.EASE_IN_OUT).set_trans(Tween.TRANS_SINE)
+	tw.tween_property(bot_bar, "position:y", get_viewport().get_visible_rect().size.y - 120.0, 3.0).set_ease(Tween.EASE_IN_OUT).set_trans(Tween.TRANS_SINE)
 
 func _stop_stargazing() -> void:
 	is_stargazing = false
 	if is_instance_valid(stargaze_cam):
-		var tw = create_tween()
+		var tw = create_tween().set_parallel(true)
 		tw.tween_property(stargaze_cam, "zoom", Vector2(1.0, 1.0), 2.0).set_ease(Tween.EASE_IN_OUT).set_trans(Tween.TRANS_SINE)
-		tw.tween_callback(func():
+		
+		if has_node("StargazeTopBar"):
+			tw.tween_property(get_node("StargazeTopBar"), "position:y", -120.0, 2.0).set_ease(Tween.EASE_IN_OUT).set_trans(Tween.TRANS_SINE)
+		if has_node("StargazeBotBar"):
+			tw.tween_property(get_node("StargazeBotBar"), "position:y", get_viewport().get_visible_rect().size.y, 2.0).set_ease(Tween.EASE_IN_OUT).set_trans(Tween.TRANS_SINE)
+		
+		tw.chain().tween_callback(func():
 			stargaze_cam.queue_free()
 			stargazing_ui.show()
+			if has_node("StargazeTopBar"): get_node("StargazeTopBar").queue_free()
+			if has_node("StargazeBotBar"): get_node("StargazeBotBar").queue_free()
 		)
 	else:
 		stargazing_ui.show()
@@ -533,3 +577,11 @@ func _on_fish() -> void:
 	if GameState.relics_found.has("golden_fishing_rod"):
 		fish_count += 1
 		aquarium_ui.get_node("FishLbl").text = "Bể Cá Sa Mạc: " + str(fish_count)
+
+func _set_shader_wobble(val: float) -> void:
+	var root = get_tree().root
+	var post_layer = root.find_child("LofiPostProcessLayer", true, false)
+	if post_layer and post_layer.get_child_count() > 0:
+		var crect = post_layer.get_child(0) as ColorRect
+		if crect and crect.material is ShaderMaterial:
+			crect.material.set_shader_parameter("wobble_intensity", val)

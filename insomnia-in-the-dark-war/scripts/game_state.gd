@@ -1,5 +1,22 @@
 extends Node
 
+const PALETTE: Array[Color] = [
+	Color("#1D3557"), # 0: Night Blue
+	Color("#457B9D"), # 1: Twilight Blue
+	Color("#A8DADC"), # 2: Pale Blue
+	Color("#F1FAEE"), # 3: White/Mint
+	Color("#E63946"), # 4: Neon Red (Zombie eyes)
+	Color("#F4A261"), # 5: Pastel Yellow/Orange (Sun)
+	Color("#E76F51"), # 6: Crimson (Sunset)
+	Color("#264653"), # 7: Deep Green/Teal
+	Color("#2A1A1F"), # 8: Dark Wood
+	Color("#4A3020"), # 9: Medium Wood
+	Color("#7A4F30"), # 10: Light Wood
+	Color("#BFA58A"), # 11: Sand/Paper
+	Color("#F4D03F"), # 12: Bright Yellow
+	Color("#58D68D")  # 13: Green (Plants)
+]
+
 signal scrap_changed(new_amount: int)
 signal seeds_changed(new_amount: int)
 signal water_changed(new_amount: int)

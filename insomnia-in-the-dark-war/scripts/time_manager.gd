@@ -7,9 +7,9 @@ signal sunset_warning
 @export var day_duration_seconds: float = 180.0
 @export var night_duration_seconds: float = 90.0
 
-@export var day_color: Color = Color("baa890")
-@export var sunset_color: Color = Color("92584a")
-@export var night_color: Color = Color("1a1c2c")
+@export var day_color: Color = Color("#F4A261")
+@export var sunset_color: Color = Color("#E76F51")
+@export var night_color: Color = Color("#1D3557")
 
 @export var environmental_light: CanvasModulate
 

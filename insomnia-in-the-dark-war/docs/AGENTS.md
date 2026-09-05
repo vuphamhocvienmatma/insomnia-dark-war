@@ -6,3 +6,6 @@
 6.3 Typed arrays: NEVER assign untyped Array into Array[Dictionary]/Array[String] with "=". Use .assign() or append loop. Prefer explicit type declarations over ":=" for complex expressions.
 6.4 Variable scope: declare var ONCE at function top, before if/elif branches; inside branches only reassign, never redeclare the same name.
 6.5 UI Control nodes (Label, Button...) in .tscn: NEVER use position. ALWAYS offset_left, offset_top, offset_right, offset_bottom.
+
+6.6 Lu?t Cache B?t Bi?n: B?t bu?c AI Agent cache m?i Font, StyleBox, Color, Texture trong hàm _ready(). C?M TUY?T Ð?I vi?c g?i ThemeDB.fallback_font hay Color(...) bên trong hàm _draw() ho?c _process(). Hàm _draw() ph?i ch? ch?a các l?nh draw_*() thu?n túy.
+6.7 Tín hi?u (Signals): S? d?ng Signal thay vì g?i hàm chéo nhau b?ng Reference trong vòng l?p _process().

@@ -12,6 +12,8 @@ const FAIRY_WIRE: Color = Color(0.15, 0.15, 0.15, 0.7)
 
 var _time: float = 0.0
 var _tm: Node = null
+var dust_particles: Array[Dictionary] = []
+var _font: Font = null
 
 
 func _ready() -> void:
@@ -32,7 +34,9 @@ func _process(delta: float) -> void:
 
 func _draw() -> void:
 	_draw_ground_window_light_shaft()
+	_draw_interior_overlay()
 	_draw_wall_planks()
+	_draw_diegetic_ui()
 	_draw_wooden_badge_wall()
 	_draw_custom_decorations()
 	_draw_mezzanine_bedding()
@@ -944,5 +948,64 @@ func _draw_lantern() -> void:
 		
 	draw_set_transform(Vector2.ZERO, 0.0, Vector2.ONE)
 
+func _draw_interior_overlay() -> void:
+	# A warm interior tint to separate cabin from wasteland.
+	# Polygons covering the cabin interior area.
+	var interior_poly: PackedVector2Array = PackedVector2Array([
+		Vector2(-195.0, -195.0),
+		Vector2(195.0, -195.0),
+		Vector2(195.0, -12.0),
+		Vector2(-195.0, -12.0)
+	])
+	draw_colored_polygon(interior_poly, Color(0.95, 0.6, 0.2, 0.04))
 
-
+func _draw_diegetic_ui() -> void:
+	if _tm == null: return
+	
+	if _font == null:
+		_font = ThemeDB.fallback_font
+	var font = _font
+	
+	# 1. Analog Voltmeter (Solar Pin)
+	var vx: float = -50.0
+	var vy: float = -120.0
+	
+	# Metal casing
+	var v_rect = Rect2(vx - 20, vy - 15, 40, 30)
+	draw_rect(v_rect, Color(0.4, 0.4, 0.4))
+	_draw_rect_outline(v_rect, OUTLINE)
+	
+	# Glass display
+	var d_rect = Rect2(vx - 16, vy - 10, 32, 20)
+	draw_rect(d_rect, Color(0.9, 0.9, 0.85))
+	_draw_rect_outline(d_rect, OUTLINE)
+	
+	# Needle
+	var solar_pct: float = float(_tm.get("current_solar_energy")) / 100.0
+	var angle = lerpf(PI * 0.8, PI * 0.2, solar_pct)
+	var needle_end = Vector2(vx, vy + 8) + Vector2(cos(angle), -sin(angle)) * 14.0
+	draw_line(Vector2(vx, vy + 8), needle_end, Color(0.8, 0.2, 0.2), 2.0)
+	draw_circle(Vector2(vx, vy + 8), 2.0, OUTLINE)
+	
+	# Text Label "SOLAR" carved in wood
+	draw_string(font, Vector2(vx - 16, vy - 18), "SOLAR", HORIZONTAL_ALIGNMENT_CENTER, -1, 9, Color(0.1, 0.1, 0.1, 0.5))
+	
+	# 2. Digital Clock on Radio
+	var is_n: bool = bool(_tm.get("is_night"))
+	var time_elapsed: float = float(_tm.get("time_elapsed"))
+	var dur: float = float(_tm.get("night_duration_seconds") if is_n else _tm.get("day_duration_seconds"))
+	var ratio = time_elapsed / max(dur, 1.0)
+	
+	# Map ratio to hours (Day 6:00 - 18:00, Night 18:00 - 6:00)
+	var h = 0.0
+	if not is_n: h = 6.0 + ratio * 12.0
+	else: h = 18.0 + ratio * 12.0
+	if h >= 24.0: h -= 24.0
+	var mins = int(fmod(h * 60.0, 60.0))
+	var time_str = "%02d:%02d" % [int(h), mins]
+	
+	# Draw clock on radio at x = 82, y = -43 (Workbench)
+	var rx = 85.0
+	var ry = -43.0
+	draw_rect(Rect2(rx, ry + 2, 20, 8), Color(0.05, 0.05, 0.05))
+	draw_string(font, Vector2(rx + 2, ry + 9), time_str, HORIZONTAL_ALIGNMENT_LEFT, -1, 8, Color(0.9, 0.2, 0.2))

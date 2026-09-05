@@ -563,69 +563,10 @@ func _make_arc_bar(r: float) -> String:
 
 
 func _setup_clock_and_solar_widget() -> void:
-	clock_panel = Panel.new()
-	clock_panel.anchor_left = 0.5
-	clock_panel.anchor_top = 0.0
-	clock_panel.anchor_right = 0.5
-	clock_panel.anchor_bottom = 0.0
-	clock_panel.offset_left = -115.0
-	clock_panel.offset_top = 10.0
-	clock_panel.offset_right = 115.0
-	clock_panel.offset_bottom = 62.0
-
-	var c_sb: StyleBoxFlat = StyleBoxFlat.new()
-	c_sb.bg_color = Color(0.16, 0.12, 0.09, 0.92)
-	c_sb.border_color = Color(0.48, 0.36, 0.24, 1.0)
-	c_sb.set_border_width_all(1)
-	c_sb.set_corner_radius_all(12)
-	c_sb.set_content_margin_all(6)
-	c_sb.shadow_color = Color(0, 0, 0, 0.35)
-	c_sb.shadow_size = 8
-	c_sb.shadow_offset = Vector2(0, 3)
-	clock_panel.add_theme_stylebox_override("panel", c_sb)
-	add_child(clock_panel)
-
-	var c_vbox: VBoxContainer = VBoxContainer.new()
-	c_vbox.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
-	c_vbox.offset_left = 8.0
-	c_vbox.offset_top = 4.0
-	c_vbox.offset_right = -8.0
-	c_vbox.offset_bottom = -4.0
-	c_vbox.add_theme_constant_override("separation", 3)
-	clock_panel.add_child(c_vbox)
-
-	time_arc_label = Label.new()
-	time_arc_label.text = "☀️ Ngày  [●───────]  🌙"
-	time_arc_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	time_arc_label.add_theme_font_size_override("font_size", 12)
-	time_arc_label.add_theme_color_override("font_color", HEADER_COLOR)
-	c_vbox.add_child(time_arc_label)
-
-	var h_box: HBoxContainer = HBoxContainer.new()
-	h_box.add_theme_constant_override("separation", 6)
-	c_vbox.add_child(h_box)
-
-	solar_text = Label.new()
-	solar_text.text = "⚡ Solar: 0%"
-	solar_text.add_theme_font_size_override("font_size", 11)
-	solar_text.add_theme_color_override("font_color", Color(0.92, 0.88, 0.82, 1.0))
-	h_box.add_child(solar_text)
-
-	solar_bar = ProgressBar.new()
-	solar_bar.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	solar_bar.custom_minimum_size = Vector2(60, 10)
-	solar_bar.max_value = 100.0
-	solar_bar.value = 0.0
-	solar_bar.show_percentage = false
-	var s_bg: StyleBoxFlat = StyleBoxFlat.new()
-	s_bg.bg_color = Color(0.1, 0.08, 0.06, 0.8)
-	s_bg.set_corner_radius_all(4)
-	var s_fg: StyleBoxFlat = StyleBoxFlat.new()
-	s_fg.bg_color = Color(0.85, 0.72, 0.28, 1.0)
-	s_fg.set_corner_radius_all(4)
-	solar_bar.add_theme_stylebox_override("background", s_bg)
-	solar_bar.add_theme_stylebox_override("fill", s_fg)
-	h_box.add_child(solar_bar)
+	# Diegetic UI requested by user:
+	# Hide the CanvasLayer clock and solar bar. They will be rendered directly
+	# in the game world in art_cabin_props.gd
+	pass
 
 
 func _setup_vignette_and_toasts() -> void:
