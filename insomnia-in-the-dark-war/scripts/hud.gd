@@ -39,11 +39,11 @@ var fps_label: Label
 
 const WOOD: Color = Color(0.76, 0.62, 0.46, 0.96)
 const BORDER: Color = Color(0.34, 0.24, 0.16, 1.0)
-const TEXT_COLOR: Color = Color(0.20, 0.14, 0.10, 1.0)
+const TEXT_COLOR: Color = Color("#F4EFE6")
 const DONE_COLOR: Color = Color(0.55, 0.92, 0.62, 1.0)
-const TODO_COLOR: Color = Color(0.96, 0.92, 0.85, 1.0)
-const HEADER_COLOR: Color = Color(0.96, 0.84, 0.55, 1.0)
-const GUIDE_COLOR: Color = Color(0.85, 0.80, 0.74, 1.0)
+const TODO_COLOR: Color = Color("#FFD166")
+const HEADER_COLOR: Color = Color("#F4EFE6")
+const GUIDE_COLOR: Color = Color("#FFD166")
 
 
 func _ready() -> void:
@@ -51,6 +51,9 @@ func _ready() -> void:
 	fps_label = Label.new()
 	fps_label.add_theme_font_size_override("font_size", 11)
 	fps_label.add_theme_color_override("font_color", Color(1.0, 1.0, 1.0, 0.5))
+	fps_label.add_theme_color_override("font_shadow_color", Color("#3E2723"))
+	fps_label.add_theme_constant_override("shadow_offset_x", 2)
+	fps_label.add_theme_constant_override("shadow_offset_y", 2)
 	fps_label.set_anchors_and_offsets_preset(Control.PRESET_BOTTOM_LEFT)
 	fps_label.offset_left = 16.0
 	fps_label.offset_top = -26.0
@@ -79,6 +82,9 @@ func _ready() -> void:
 	title.text = "Túi đồ nhỏ [T]"
 	title.add_theme_font_size_override("font_size", 17)
 	title.add_theme_color_override("font_color", TEXT_COLOR)
+	title.add_theme_color_override("font_shadow_color", Color("#3E2723"))
+	title.add_theme_constant_override("shadow_offset_x", 2)
+	title.add_theme_constant_override("shadow_offset_y", 2)
 	vbox.add_child(title)
 
 	scrap_line = Label.new()
@@ -88,6 +94,9 @@ func _ready() -> void:
 	for ln in [scrap_line, seeds_line, water_line, tired_line]:
 		ln.add_theme_font_size_override("font_size", 17)
 		ln.add_theme_color_override("font_color", TEXT_COLOR)
+		ln.add_theme_color_override("font_shadow_color", Color("#3E2723"))
+		ln.add_theme_constant_override("shadow_offset_x", 2)
+		ln.add_theme_constant_override("shadow_offset_y", 2)
 		vbox.add_child(ln)
 
 	stats_panel.visible = false
@@ -182,7 +191,10 @@ func _setup_journal_dropdown() -> void:
 	journal_btn.add_theme_stylebox_override("normal", btn_normal)
 	journal_btn.add_theme_stylebox_override("hover", btn_hover)
 	journal_btn.add_theme_stylebox_override("pressed", btn_hover)
-	journal_btn.add_theme_color_override("font_color", Color(0.96, 0.92, 0.85, 1.0))
+	journal_btn.add_theme_color_override("font_color", Color("#FFD166"))
+	journal_btn.add_theme_color_override("font_shadow_color", Color("#3E2723"))
+	journal_btn.add_theme_constant_override("shadow_offset_x", 2)
+	journal_btn.add_theme_constant_override("shadow_offset_y", 2)
 	journal_btn.add_theme_font_size_override("font_size", 13)
 	journal_btn.pressed.connect(_toggle_journal_dropdown)
 	add_child(journal_btn)
@@ -224,6 +236,9 @@ func _setup_journal_dropdown() -> void:
 	p_title.text = "📜 NHẬT KÝ & HƯỚNG DẪN SINH TỒN"
 	p_title.add_theme_font_size_override("font_size", 14)
 	p_title.add_theme_color_override("font_color", HEADER_COLOR)
+	p_title.add_theme_color_override("font_shadow_color", Color("#3E2723"))
+	p_title.add_theme_constant_override("shadow_offset_x", 2)
+	p_title.add_theme_constant_override("shadow_offset_y", 2)
 	p_vbox.add_child(p_title)
 
 	# Divider 1
@@ -237,6 +252,9 @@ func _setup_journal_dropdown() -> void:
 	obj_head.text = "🎯 NHIỆM VỤ HÀNG NGÀY:"
 	obj_head.add_theme_font_size_override("font_size", 12)
 	obj_head.add_theme_color_override("font_color", HEADER_COLOR)
+	obj_head.add_theme_color_override("font_shadow_color", Color("#3E2723"))
+	obj_head.add_theme_constant_override("shadow_offset_x", 2)
+	obj_head.add_theme_constant_override("shadow_offset_y", 2)
 	p_vbox.add_child(obj_head)
 
 	dropdown_task_labels.clear()
@@ -244,6 +262,9 @@ func _setup_journal_dropdown() -> void:
 		var t_lbl: Label = Label.new()
 		t_lbl.add_theme_font_size_override("font_size", 12)
 		t_lbl.add_theme_color_override("font_color", TODO_COLOR)
+		t_lbl.add_theme_color_override("font_shadow_color", Color("#3E2723"))
+		t_lbl.add_theme_constant_override("shadow_offset_x", 2)
+		t_lbl.add_theme_constant_override("shadow_offset_y", 2)
 		p_vbox.add_child(t_lbl)
 		dropdown_task_labels.append(t_lbl)
 
@@ -258,6 +279,9 @@ func _setup_journal_dropdown() -> void:
 	guide_head.text = "📖 HƯỚNG DẪN ĐIỀU KHIỂN & MẸO:"
 	guide_head.add_theme_font_size_override("font_size", 12)
 	guide_head.add_theme_color_override("font_color", HEADER_COLOR)
+	guide_head.add_theme_color_override("font_shadow_color", Color("#3E2723"))
+	guide_head.add_theme_constant_override("shadow_offset_x", 2)
+	guide_head.add_theme_constant_override("shadow_offset_y", 2)
 	p_vbox.add_child(guide_head)
 
 	var guide_lines: Array[String] = [
@@ -274,6 +298,9 @@ func _setup_journal_dropdown() -> void:
 		g_lbl.text = g_text
 		g_lbl.add_theme_font_size_override("font_size", 11)
 		g_lbl.add_theme_color_override("font_color", GUIDE_COLOR)
+		g_lbl.add_theme_color_override("font_shadow_color", Color("#3E2723"))
+		g_lbl.add_theme_constant_override("shadow_offset_x", 2)
+		g_lbl.add_theme_constant_override("shadow_offset_y", 2)
 		p_vbox.add_child(g_lbl)
 
 	# Start collapsed by default
@@ -424,11 +451,17 @@ func _update_tasks() -> void:
 			if done:
 				ln.text = "✓ " + icon_str + str(task.get("desc", "")) + " [HOÀN THÀNH]"
 				ln.add_theme_color_override("font_color", DONE_COLOR)
+				ln.add_theme_color_override("font_shadow_color", Color("#3E2723"))
+				ln.add_theme_constant_override("shadow_offset_x", 2)
+				ln.add_theme_constant_override("shadow_offset_y", 2)
 			else:
 				var prog: int = int(task.get("progress", 0))
 				var tgt: int = int(task.get("target", 0))
 				ln.text = "• " + icon_str + str(task.get("desc", "")) + " (" + str(prog) + "/" + str(tgt) + ")"
 				ln.add_theme_color_override("font_color", TODO_COLOR)
+				ln.add_theme_color_override("font_shadow_color", Color("#3E2723"))
+				ln.add_theme_constant_override("shadow_offset_x", 2)
+				ln.add_theme_constant_override("shadow_offset_y", 2)
 		else:
 			ln.text = ""
 	_refresh_journal_btn_text()
@@ -581,6 +614,9 @@ func _setup_zoom_controls() -> void:
 	zoom_lbl.text = "1.0x"
 	zoom_lbl.add_theme_font_size_override("font_size", 11)
 	zoom_lbl.add_theme_color_override("font_color", HEADER_COLOR)
+	zoom_lbl.add_theme_color_override("font_shadow_color", Color("#3E2723"))
+	zoom_lbl.add_theme_constant_override("shadow_offset_x", 2)
+	zoom_lbl.add_theme_constant_override("shadow_offset_y", 2)
 	hbox.add_child(zoom_lbl)
 
 	var btn_in: Button = Button.new()
@@ -650,6 +686,9 @@ func _setup_vignette_and_toasts() -> void:
 	toast_label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
 	toast_label.add_theme_font_size_override("font_size", 13)
 	toast_label.add_theme_color_override("font_color", HEADER_COLOR)
+	toast_label.add_theme_color_override("font_shadow_color", Color("#3E2723"))
+	toast_label.add_theme_constant_override("shadow_offset_x", 2)
+	toast_label.add_theme_constant_override("shadow_offset_y", 2)
 	toast_panel.add_child(toast_label)
 
 
@@ -662,6 +701,9 @@ func show_toast(msg: String, duration: float = 3.8, is_warning: bool = false) ->
 
 	if is_warning:
 		toast_label.add_theme_color_override("font_color", Color(1.0, 0.45, 0.35, 1.0))
+		toast_label.add_theme_color_override("font_shadow_color", Color("#3E2723"))
+		toast_label.add_theme_constant_override("shadow_offset_x", 2)
+		toast_label.add_theme_constant_override("shadow_offset_y", 2)
 		if vignette_rect != null:
 			vignette_rect.modulate.a = 0.0
 			if vignette_tween != null and vignette_tween.is_valid():
@@ -671,6 +713,9 @@ func show_toast(msg: String, duration: float = 3.8, is_warning: bool = false) ->
 			vignette_tween.tween_property(vignette_rect, "modulate:a", 0.0, 1.7)
 	else:
 		toast_label.add_theme_color_override("font_color", HEADER_COLOR)
+		toast_label.add_theme_color_override("font_shadow_color", Color("#3E2723"))
+		toast_label.add_theme_constant_override("shadow_offset_x", 2)
+		toast_label.add_theme_constant_override("shadow_offset_y", 2)
 
 	if toast_tween != null and toast_tween.is_valid():
 		toast_tween.kill()

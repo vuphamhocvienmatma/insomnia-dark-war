@@ -223,17 +223,17 @@ func _spawn_death_fx() -> void:
 		get_tree().current_scene.add_child(particles)
 	particles.global_position = global_position
 	particles.amount = 10
-	particles.lifetime = 0.4
+	particles.lifetime = 1.2
 	particles.one_shot = true
 	particles.explosiveness = 0.9
 	particles.direction = Vector2(0, -1)
 	particles.spread = 60.0
-	particles.gravity = Vector2(0.0, 160.0)
-	particles.initial_velocity_min = 25.0
-	particles.initial_velocity_max = 60.0
+	particles.gravity = Vector2(25.0, -15.0)
+	particles.initial_velocity_min = 10.0
+	particles.initial_velocity_max = 20.0
 	particles.scale_amount_min = 2.0
 	particles.scale_amount_max = 3.5
-	particles.color = Color(0.45, 0.65, 0.42, 0.8)
+	particles.color = Color(0.05, 0.05, 0.05, 0.75)
 	particles.emitting = true
 	get_tree().create_timer(0.45).timeout.connect(particles.queue_free)
 

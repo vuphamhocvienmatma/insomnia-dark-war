@@ -4,13 +4,24 @@ var player_inside: bool = false
 var is_cooking: bool = false
 
 
+
+var _noise: FastNoiseLite
+var _time: float = 0.0
+
 func _ready() -> void:
 	add_to_group("stove")
 	body_entered.connect(_on_body_entered)
 	body_exited.connect(_on_body_exited)
 	$CookingTimer.timeout.connect(_on_cooking_timer_timeout)
+	_noise = FastNoiseLite.new()
+	_noise.noise_type = FastNoiseLite.TYPE_SIMPLEX
 
-
+func _process(delta: float) -> void:
+	_time += delta * 15.0
+	if has_node("FireLight"):
+		var light = get_node("FireLight")
+		light.energy = 1.0 + _noise.get_noise_1d(_time) * 0.4
+		light.scale = Vector2.ONE * (1.0 + _noise.get_noise_1d(_time + 100.0) * 0.1)
 func _on_body_entered(body: Node2D) -> void:
 	if body.is_in_group("player"):
 		player_inside = true

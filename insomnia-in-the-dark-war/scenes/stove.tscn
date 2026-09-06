@@ -1,6 +1,17 @@
 [gd_scene load_steps=3 format=3]
 
 [ext_resource type="Script" path="res://scripts/interactive_stove.gd" id="1_stove"]
+
+[sub_resource type="Gradient" id="Gradient_light"]
+colors = PackedColorArray(1, 1, 1, 1, 1, 1, 1, 0)
+
+[sub_resource type="GradientTexture2D" id="GradientTexture2D_light"]
+gradient = SubResource("Gradient_light")
+width = 256
+height = 256
+fill = 1
+fill_from = Vector2(0.5, 0.5)
+fill_to = Vector2(0.5, 0)
 [ext_resource type="Script" path="res://scripts/art_stove.gd" id="2_art"]
 
 [sub_resource type="RectangleShape2D" id="3_rect"]
@@ -33,3 +44,11 @@ color = Color(1.0, 1.0, 1.0, 0.45)
 one_shot = true
 wait_time = 5.0
 autostart = false
+
+[node name="FireLight" type="PointLight2D" parent="."]
+position = Vector2(0, -10)
+color = Color(1, 0.7, 0.28, 1)
+energy = 1.2
+shadow_enabled = true
+shadow_filter = 1
+texture = SubResource("GradientTexture2D_light")

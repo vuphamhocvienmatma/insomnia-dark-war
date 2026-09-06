@@ -7,7 +7,7 @@ const WOOD_LINE: Color = Color(0.18, 0.12, 0.08, 0.85)
 const WOOD_BEAM: Color = Color(0.22, 0.15, 0.10, 1.0)
 const SOLAR: Color = Color(0.12, 0.18, 0.36, 1.0)
 const SOLAR_LINE: Color = Color(0.35, 0.52, 0.78, 1.0)
-const WARM_GLOW: Color = Color(1.0, 0.88, 0.55, 0.9)
+const WARM_GLOW: Color = Color("#FFB347", 0.9) # Amber
 const FAIRY_WIRE: Color = Color(0.15, 0.15, 0.15, 0.7)
 
 var _time: float = 0.0
@@ -19,7 +19,7 @@ var _badge_timer: float = 0.0
 var _tm: Node = null
 var _level_setup: Node = null
 var dust_particles: Array[Dictionary] = []
-@onready var _font: Font = ThemeDB.fallback_font
+@onready var _font: Font = preload('res://assets/fonts/CourierPrime.ttf')
 
 
 func _ready() -> void:
@@ -48,7 +48,16 @@ func _process(delta: float) -> void:
 	if _badge_timer > 2.0:
 		_badge_timer = 0.0
 		_update_badge_cache()
+	var p_pos = Vector2.ZERO
+	var p = get_tree().get_first_node_in_group("player")
+	if p:
+		p_pos = to_local(p.global_position)
 	for d in dust_particles:
+		if p:
+			var diff = d["pos"] - p_pos
+			var dist = diff.length()
+			if dist < 60.0:
+				d["pos"] += diff.normalized() * (60.0 - dist) * 1.5 * delta
 		d["pos"].y -= d["speed"] * delta
 		d["pos"].x += sin(_time + d["speed"]) * 0.2
 		if d["pos"].y < -190.0 or randf() < 0.001:
