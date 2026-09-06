@@ -54,10 +54,10 @@ func _draw() -> void:
 	# Fireplace
 	var fire_alpha = 0.6 + sin(_time * 1.2 * TAU) * 0.15
 	if eco: fire_alpha = 0.5
-	var fire_pos = Vector2(-22, -22)
-	draw_circle(fire_pos, 40.0, Color(1.0, 0.5, 0.1, fire_alpha * 0.8))
-	draw_circle(fire_pos, 80.0, Color(1.0, 0.4, 0.05, fire_alpha * 0.3))
-	draw_circle(fire_pos, 150.0, Color(1.0, 0.3, 0.0, fire_alpha * 0.1))
+	var fire_pos = Vector2(-80, -35)
+	draw_circle(fire_pos, 22.0, Color(1.0, 0.5, 0.1, fire_alpha * 0.8))
+	draw_circle(fire_pos, 45.0, Color(1.0, 0.4, 0.05, fire_alpha * 0.25))
+	draw_circle(fire_pos, 70.0, Color(1.0, 0.3, 0.0, fire_alpha * 0.08))
 	
 	if not eco:
 		# Fairy Lights

@@ -839,7 +839,7 @@ func _draw_guitar() -> void:
 func _update_badge_cache() -> void:
 	_badge_cache[0] = GameState != null and int(GameState.stats.get("days_survived", 0)) >= 7
 	_badge_cache[1] = GameState != null and int(GameState.stats.get("zombies_killed", 0)) >= 50
-	_badge_cache[2] = MailboxManager != null and int(MailboxManager.sender_affinity.get("BÃ¡c SÃ¡u (CÃ¢u CÃ¡ Sa Máº¡c)", 0)) >= 60
+	_badge_cache[2] = MailboxManager != null and int(MailboxManager.sender_affinity.get("Bác Sáu (Câu Cá Sa Mạc)", 0)) >= 60
 	_badge_cache[3] = GameState != null and int(GameState.stats.get("plants_harvested", 0)) >= 15
 	_badge_cache[4] = GameState != null and int(GameState.stats.get("walls_built", 0)) >= 10
 	_badge_cache[5] = GameState != null and bool(GameState.meal_buff)

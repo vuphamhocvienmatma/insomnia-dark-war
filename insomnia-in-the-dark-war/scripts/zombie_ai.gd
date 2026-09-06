@@ -1,4 +1,4 @@
-﻿extends CharacterBody2D
+extends CharacterBody2D
 
 const GROUND_Y: float = 0.0
 const SAFE_RADIUS: float = 125.0
@@ -82,8 +82,6 @@ func _ready() -> void:
 
 func _physics_process(_delta: float) -> void:
 	queue_redraw()
-	queue_redraw()
-func _physics_process_actual(_delta: float) -> void:
 	if is_dead: return
 	
 	position.y = GROUND_Y
@@ -141,7 +139,7 @@ func _physics_process_actual(_delta: float) -> void:
 						stolen_scrap = 1
 					if stolen_scrap > 0:
 						if _hud != null and _hud.has_method("show_toast"):
-							_hud.call("show_toast", "âš ï¸ TÃªn trá»™m Thief Ä‘Ã£ cuá»—m " + str(stolen_scrap) + " pháº¿ liá»‡u!", 3.0, true)
+							_hud.call("show_toast", "⚠️ Tên trộm Thief đã cuỗm " + str(stolen_scrap) + " phế liệu!", 3.0, true)
 				else:
 					if GameState.spend_scrap(1):
 						pass
@@ -206,7 +204,7 @@ func take_damage(amount: float) -> void:
 		if stolen_scrap > 0:
 			GameState.add_scrap(stolen_scrap)
 			if _hud != null and _hud.has_method("show_toast"):
-				_hud.call("show_toast", "ðŸŽ‰ ÄÃ£ háº¡ gá»¥c tÃªn trá»™m! Thu há»“i +" + str(stolen_scrap) + " pháº¿ liá»‡u!", 3.0, false)
+				_hud.call("show_toast", "🎉 Đã hạ gục tên trộm! Thu hồi +" + str(stolen_scrap) + " phế liệu!", 3.0, false)
 
 		var ls: Node = get_tree().root.find_child("LevelSetup", true, false)
 		if ls != null and str(ls.get("current_night_mutation")) == "scrap_jackpot":

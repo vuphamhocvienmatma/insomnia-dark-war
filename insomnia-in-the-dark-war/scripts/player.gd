@@ -37,8 +37,6 @@ var _footprint_timer: float = 0.0
 
 func _physics_process(_delta: float) -> void:
 	queue_redraw()
-	queue_redraw()
-func _physics_process_actual(_delta: float) -> void:
 	var direction: Vector2 = Vector2.ZERO
 	if Input.is_action_pressed("ui_left"):
 		direction.x -= 1.0
