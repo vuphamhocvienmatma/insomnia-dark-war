@@ -1,0 +1,81 @@
+﻿import os
+
+path = 'scripts/art_weather.gd'
+with open(path, 'r', encoding='utf-8') as f:
+    content = f.read()
+
+# 1. Add to _reset_particles
+s1 = '''			d.length = randf_range(15.0, 25.0)
+			d.alpha = randf_range(0.4, 0.7)
+	elif weather_type == "snowstorm":'''
+r1 = '''			d.length = randf_range(15.0, 25.0)
+			d.alpha = randf_range(0.4, 0.7)
+	elif weather_type == "sandstorm":
+		for i in 200:
+			var s = _sand_particles[i]
+			s.x = randf_range(-1500, 1500)
+			s.y = randf_range(-600, 50)
+			s.speed = randf_range(300.0, 500.0)
+	elif weather_type == "snowstorm":'''
+content = content.replace(s1, r1)
+
+# 2. Add to _apply_post_process
+s2 = '''		g_a = 0.15
+		a_a = 0.5
+	elif weather_type == "snowstorm":'''
+r2 = '''		g_a = 0.15
+		a_a = 0.5
+	elif weather_type == "sandstorm":
+		t_c = Color(0.9, 0.6, 0.4)
+		t_a = 0.4
+		v_i = 0.5
+		g_a = 0.3
+		a_a = 0.5
+	elif weather_type == "solar_eclipse":
+		t_c = Color(0.2, 0.2, 0.3)
+		t_a = 0.6
+		v_i = 0.6
+		g_a = 0.1
+		a_a = 0.5
+	elif weather_type == "snowstorm":'''
+content = content.replace(s2, r2)
+
+# 3. Add to _process
+s3 = '''			f.x += f.speed * delta
+			if f.x > 2000: f.x = -2000
+	elif weather_type == "snowstorm":'''
+r3 = '''			f.x += f.speed * delta
+			if f.x > 2000: f.x = -2000
+	elif weather_type == "sandstorm":
+		for i in 200:
+			var s = _sand_particles[i]
+			s.x += s.speed * delta
+			s.y += (s.speed * 0.1) * delta
+			if s.x > 1500.0:
+				s.x = randf_range(-1500, -500)
+				s.y = randf_range(-600, 50)
+	elif weather_type == "snowstorm":'''
+content = content.replace(s3, r3)
+
+# 4. Add to _draw
+s4 = '''			for i in 5:
+				draw_circle(Vector2(f.x + i*400 - 1000, -100 + sin(_time+i)*50), 300, Color(0.8,0.8,0.8, f.alpha))
+	elif weather_type == "snowstorm":'''
+r4 = '''			for i in 5:
+				draw_circle(Vector2(f.x + i*400 - 1000, -100 + sin(_time+i)*50), 300, Color(0.8,0.8,0.8, f.alpha))
+	elif weather_type == "sandstorm":
+		draw_rect(Rect2(-2000, -1000, 4000, 2000), Color(0.8, 0.5, 0.3, 0.35))
+		for i in 200:
+			var s = _sand_particles[i]
+			draw_line(Vector2(s.x, s.y), Vector2(s.x + 20.0, s.y + 2.0), Color(0.9, 0.7, 0.5, 0.6), 2.0)
+	elif weather_type == "solar_eclipse":
+		draw_circle(Vector2(-750, -320), 22.0, Color(0, 0, 0, 1.0))
+		draw_arc(Vector2(-750, -320), 25.0, 0, TAU, 32, Color(1, 1, 1, 0.8), 2.0)
+		draw_arc(Vector2(-750, -320), 30.0, 0, TAU, 32, Color(1, 1, 1, 0.4), 4.0)
+	elif weather_type == "snowstorm":'''
+content = content.replace(s4, r4)
+
+with open(path, 'w', encoding='utf-8') as f:
+    f.write(content)
+
+print("Applied explicitly.")

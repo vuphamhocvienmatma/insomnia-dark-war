@@ -1,4 +1,4 @@
-﻿extends CanvasLayer
+extends CanvasLayer
 
 @onready var label: Label = $Label
 @onready var seeds_label: Label = $SeedsLabel
@@ -735,5 +735,3 @@ func open_cooking_modal() -> void:
 		_setup_cooking_modal()
 	if cooking_modal != null and cooking_modal.has_method("open_menu"):
 		cooking_modal.call("open_menu")
-
-

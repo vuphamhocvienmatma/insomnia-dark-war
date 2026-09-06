@@ -1,8 +1,11 @@
-extends Node
+﻿extends Node
 
 signal phase_changed(is_night: bool)
 signal solar_changed(new_amount: float)
 signal sunset_warning
+signal mood_changed(mood_name: String)
+
+var current_mood: String = ""
 
 @export var day_duration_seconds: float = 180.0
 @export var night_duration_seconds: float = 90.0
@@ -28,6 +31,16 @@ func _process(delta: float) -> void:
 
 	if not is_night:
 		var ratio: float = time_elapsed / day_duration_seconds
+		var new_mood: String = "dawn"
+		if ratio > 0.3 and ratio <= 0.65:
+			new_mood = "golden"
+		elif ratio > 0.65:
+			new_mood = "dusk"
+			
+		if new_mood != current_mood:
+			current_mood = new_mood
+			mood_changed.emit(current_mood)
+			
 		if ratio < 0.65:
 			# Morning to late afternoon golden transition
 			var sub_t: float = ratio / 0.65
@@ -69,13 +82,24 @@ func transition_to_night() -> void:
 	is_night = true
 	time_elapsed = 0.0
 	phase_changed.emit(true)
-	print("ÄÃªm xuá»‘ng, hÃ£y cáº§u nguyá»‡n hÃ ng rÃ o khÃ´ng bá»‹ vá»¡...")
+	
+	# Handle night moods based on game state
+	current_mood = "night"
+	if GameState.is_tired:
+		current_mood = "insomnia"
+	
+	var ls = get_node_or_null("/root/LevelSetup")
+	if ls != null:
+		if ls.get("current_night_mutation") != "":
+			current_mood = "nightmare"
+			
+	mood_changed.emit(current_mood)
+	print("Ã„ÂÃƒÂªm xuÃ¡Â»â€˜ng, hÃƒÂ£y cÃ¡ÂºÂ§u nguyÃ¡Â»â€¡n hÃƒÂ ng rÃƒÂ o khÃƒÂ´ng bÃ¡Â»â€¹ vÃ¡Â»Â¡...")
 
 func transition_to_day() -> void:
 	is_night = false
 	_warned_sunset = false
 	time_elapsed = 0.0
-	current_solar_energy = 0.0  # Reset solar khi ngÃ y má»›i báº¯t Ä‘áº§u
 	phase_changed.emit(false)
 	GameState.start_new_day()
 	if SaveManager:
@@ -87,4 +111,6 @@ func spend_solar(amount: float) -> bool:
 	current_solar_energy -= amount
 	solar_changed.emit(current_solar_energy)
 	return true
+
+
 

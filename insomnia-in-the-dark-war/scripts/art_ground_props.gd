@@ -21,6 +21,10 @@ var _sub_rocks: Array[Dictionary] = []
 var _flora_node: Node2D = null
 
 
+
+var _layer3: Node2D
+var _camera: Node2D
+
 func _ready() -> void:
 	z_index = -7
 	var rng: RandomNumberGenerator = RandomNumberGenerator.new()
@@ -61,9 +65,45 @@ func _ready() -> void:
 	_flora_node.set("flora_items", flora_items)
 	add_child(_flora_node)
 
+	_layer3 = Node2D.new()
+	_layer3.draw.connect(_draw_layer3)
+	add_child(_layer3)
+	move_child(_layer3, 0) # Draw layer 3 behind foreground
+	
+	_camera = get_tree().get_first_node_in_group("main_camera")
 	queue_redraw()
 
+func _process(_delta: float) -> void:
+	if _camera == null:
+		_camera = get_tree().get_first_node_in_group("main_camera")
+	if _camera != null:
+		_layer3.position.x = _camera.global_position.x * 0.6
 
+func _draw_layer3() -> void:
+	# Layer 3: Midground Sand Dunes and Rails
+	_layer3.draw_rect(Rect2(-4000.0, -120.0, 8000.0, 114.0), Color(0.25, 0.18, 0.12, 1.0))
+	# Draw some dunes
+	var rng = RandomNumberGenerator.new()
+	rng.seed = 44
+	var dx = -4000.0
+	while dx < 4000.0:
+		var w = rng.randf_range(200.0, 600.0)
+		var h = rng.randf_range(30.0, 80.0)
+		# A simple triangle for dune
+		var pts = PackedVector2Array([
+			Vector2(dx, -6.0),
+			Vector2(dx + w*0.5, -6.0 - h),
+			Vector2(dx + w, -6.0)
+		])
+		_layer3.draw_colored_polygon(pts, Color(0.28, 0.20, 0.14, 1.0))
+		_layer3.draw_polyline(pts, Color(0.20, 0.14, 0.10, 1.0), 2.0)
+		
+		# Maybe a broken sign or rail
+		if rng.randf() < 0.3:
+			_layer3.draw_line(Vector2(dx + w*0.3, -6.0), Vector2(dx + w*0.3, -40.0), Color(0.1, 0.1, 0.1, 1.0), 3.0)
+			_layer3.draw_rect(Rect2(dx + w*0.3 - 10.0, -40.0, 20.0, 12.0), Color(0.4, 0.3, 0.2, 1.0))
+		
+		dx += w * 0.8
 func _draw() -> void:
 	_draw_25d_ground_plane()
 	_draw_cutaway_cliff_face()

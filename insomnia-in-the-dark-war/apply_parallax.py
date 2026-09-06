@@ -1,20 +1,11 @@
-extends Node2D
+﻿import re, os
 
-const SKY_TOP: Color = Color(0.14, 0.13, 0.26, 1.0)
-const SKY_MID: Color = Color(0.44, 0.26, 0.38, 1.0)
-const SKY_HORIZON: Color = Color(0.76, 0.48, 0.38, 1.0)
-const SUN_CORE: Color = Color(1.0, 0.90, 0.72, 0.95)
-const SUN_HALO: Color = Color(1.0, 0.65, 0.35, 0.12)
-const FAR_BUILDING: Color = Color(0.38, 0.28, 0.36, 0.65)
-const MID_BUILDING: Color = Color(0.25, 0.18, 0.28, 0.85)
-const NEAR_BUILDING: Color = Color(0.16, 0.14, 0.22, 1.0)
-const SILHOUETTE: Color = Color(0.12, 0.11, 0.18, 1.0)
+path = 'scripts/art_skyline.gd'
+with open(path, 'r', encoding='utf-8') as f:
+    content = f.read()
 
-var _far_buildings: Array[Rect2] = []
-var _mid_buildings: Array[Rect2] = []
-
-
-
+# Replace _draw with sub-draws and process
+new_structure = '''
 var layer5: Node2D
 var layer4: Node2D
 var _camera: Node2D
@@ -143,65 +134,14 @@ func _draw_sagging_wire(canvas: Node2D, from_pt: Vector2, to_pt: Vector2, sag: f
 		p.y += sin(t * PI) * sag
 		pts.append(p)
 	canvas.draw_polyline(pts, Color(0.12, 0.10, 0.15, 0.65), 1.0)
+'''
 
+# Use regex to replace from _ready to _draw_sagging_wire
+content = re.sub(r'func _ready\(\) -> void:.*func _draw_sagging_wire[^\n]+\n.*?canvas\.draw_polyline[^\n]+\n', new_structure, content, flags=re.DOTALL)
+# wait, the original didn't have canvas.draw_polyline, it had draw_polyline
+content = re.sub(r'func _ready\(\) -> void:.*func _draw_sagging_wire[^\n]+\n.*?draw_polyline[^\n]+\n', new_structure, content, flags=re.DOTALL)
 
-# --- Lightweight Child Node for Animating Birds & Leaves only ---
-class SkylineAmbient extends Node2D:
-	var _birds: Array[Dictionary] = []
-	var _leaves: Array[Dictionary] = []
-	var _anim_time: float = 0.0
-	var _redraw_cooldown: float = 0.0
+with open(path, 'w', encoding='utf-8') as f:
+    f.write(content)
 
-	func _ready() -> void:
-		var rng := RandomNumberGenerator.new()
-		rng.seed = 88
-		for i in 5:
-			_birds.append({
-				"x": rng.randf_range(-1100.0, 1100.0),
-				"y": rng.randf_range(-380.0, -180.0),
-				"speed": rng.randf_range(25.0, 45.0),
-				"flap_offset": rng.randf_range(0.0, TAU)
-			})
-		for i in 6:
-			_leaves.append({
-				"x": rng.randf_range(-1100.0, 1100.0),
-				"y": rng.randf_range(-140.0, 60.0),
-				"fall": rng.randf_range(15.0, 30.0),
-				"drift": rng.randf_range(-12.0, 12.0),
-				"phase": rng.randf_range(0.0, TAU)
-			})
-
-	func _process(delta: float) -> void:
-		_anim_time += delta
-		for b in _birds:
-			b["x"] = float(b["x"]) + float(b["speed"]) * delta
-			if float(b["x"]) > 1150.0:
-				b["x"] = -1150.0
-				b["y"] = randf_range(-380.0, -180.0)
-
-		for l in _leaves:
-			l["y"] = float(l["y"]) + float(l["fall"]) * delta
-			l["x"] = float(l["x"]) + float(l["drift"]) * delta + sin(float(l["phase"]) + _anim_time * 2.0) * 0.8
-			if float(l["y"]) > 60.0:
-				l["y"] = -140.0
-				l["x"] = randf_range(-1100.0, 1100.0)
-
-		# Throttle redraw to 30 fps instead of uncapped 60+ fps for leaves/birds
-		_redraw_cooldown += delta
-		if _redraw_cooldown >= 0.033:
-			_redraw_cooldown = 0.0
-			queue_redraw()
-
-	func _draw() -> void:
-		# Draw only the 5 birds and 6 leaves
-		for b in _birds:
-			var bx: float = float(b["x"])
-			var by: float = float(b["y"])
-			var flap: float = sin(_anim_time * 4.5 + float(b["flap_offset"])) * 3.5
-			draw_line(Vector2(bx - 5.0, by - flap), Vector2(bx, by), Color(0.15, 0.13, 0.20, 0.8), 1.2)
-			draw_line(Vector2(bx, by), Vector2(bx + 5.0, by - flap), Color(0.15, 0.13, 0.20, 0.8), 1.2)
-
-		for l in _leaves:
-			var lx: float = float(l["x"])
-			var ly: float = float(l["y"])
-			draw_line(Vector2(lx - 2.0, ly), Vector2(lx + 2.0, ly + 1.0), Color(0.85, 0.50, 0.30, 0.7), 1.2)
+print("Updated art_skyline.gd")

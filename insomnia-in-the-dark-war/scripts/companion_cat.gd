@@ -1,4 +1,4 @@
-﻿extends CharacterBody2D
+extends CharacterBody2D
 
 const GROUND_Y: float = 0.0
 
@@ -168,4 +168,3 @@ func _finish_pet_after_delay() -> void:
 	await get_tree().create_timer(2.0).timeout
 	is_being_pet = false
 	modulate = Color.WHITE
-

@@ -13,6 +13,7 @@ var _splashes: Array[Dictionary] = []
 
 # Window Raindrops (Environmental)
 var _window_drops: Array[Dictionary] = []
+var _sand_particles: Array[Dictionary] = []
 
 # Lightning
 var _lightning_timer: float = 0.0
@@ -48,6 +49,7 @@ func _ready() -> void:
 	for i in 150: _snowflakes.append({"x": 0.0, "y": 0.0, "speed": 0.0, "drift": 0.0, "phase": 0.0})
 	for i in 15: _dust.append({"x": 0.0, "y": 0.0, "speed": 0.0, "phase": 0.0})
 	for i in 15: _window_drops.append({"x": 0.0, "y": 0.0, "speed": 0.0})
+	for i in 200: _sand_particles.append({"x": 0.0, "y": 0.0, "speed": 0.0})
 	
 	# 3 fog layers
 	_fog_layers = [{"x": 0.0, "speed": 10.0, "alpha": 0.3}, {"x": 0.0, "speed": 20.0, "alpha": 0.2}, {"x": 0.0, "speed": 35.0, "alpha": 0.15}]
@@ -58,6 +60,8 @@ func _ready() -> void:
 	if tm != null:
 		if tm.has_signal("phase_changed"):
 			tm.phase_changed.connect(_on_phase_changed)
+		if tm.has_signal("mood_changed"):
+			tm.mood_changed.connect(_on_mood_changed)
 			
 	visible = true # Always visible for post-processing
 
@@ -93,6 +97,12 @@ func _reset_particles() -> void:
 			d.speed = randf_range(500.0, 700.0)
 			d.length = randf_range(15.0, 25.0)
 			d.alpha = randf_range(0.4, 0.7)
+	elif weather_type == "sandstorm":
+		for i in 200:
+			var s = _sand_particles[i]
+			s.x = randf_range(-1500, 1500)
+			s.y = randf_range(-600, 50)
+			s.speed = randf_range(300.0, 500.0)
 	elif weather_type == "snowstorm":
 		for i in 150:
 			var s = _snowflakes[i]
@@ -139,6 +149,18 @@ func _apply_post_process() -> void:
 		t_a = 0.05
 		v_i = 0.4
 		g_a = 0.15
+		a_a = 0.5
+	elif weather_type == "sandstorm":
+		t_c = Color(0.9, 0.6, 0.4)
+		t_a = 0.4
+		v_i = 0.5
+		g_a = 0.3
+		a_a = 0.5
+	elif weather_type == "solar_eclipse":
+		t_c = Color(0.2, 0.2, 0.3)
+		t_a = 0.6
+		v_i = 0.6
+		g_a = 0.1
 		a_a = 0.5
 	elif weather_type == "snowstorm":
 		t_c = Color(0.7, 0.8, 1.0)
@@ -196,6 +218,14 @@ func _process(delta: float) -> void:
 		for f in _fog_layers:
 			f.x += f.speed * delta
 			if f.x > 2000: f.x = -2000
+	elif weather_type == "sandstorm":
+		for i in 200:
+			var s = _sand_particles[i]
+			s.x += s.speed * delta
+			s.y += (s.speed * 0.1) * delta
+			if s.x > 1500.0:
+				s.x = randf_range(-1500, -500)
+				s.y = randf_range(-600, 50)
 	elif weather_type == "snowstorm":
 		for i in 150:
 			var s = _snowflakes[i]
@@ -245,6 +275,15 @@ func _draw() -> void:
 			# draw huge soft circles for fog
 			for i in 5:
 				draw_circle(Vector2(f.x + i*400 - 1000, -100 + sin(_time+i)*50), 300, Color(0.8,0.8,0.8, f.alpha))
+	elif weather_type == "sandstorm":
+		draw_rect(Rect2(-2000, -1000, 4000, 2000), Color(0.8, 0.5, 0.3, 0.35))
+		for i in 200:
+			var s = _sand_particles[i]
+			draw_line(Vector2(s.x, s.y), Vector2(s.x + 20.0, s.y + 2.0), Color(0.9, 0.7, 0.5, 0.6), 2.0)
+	elif weather_type == "solar_eclipse":
+		draw_circle(Vector2(-750, -320), 22.0, Color(0, 0, 0, 1.0))
+		draw_arc(Vector2(-750, -320), 25.0, 0, TAU, 32, Color(1, 1, 1, 0.8), 2.0)
+		draw_arc(Vector2(-750, -320), 30.0, 0, TAU, 32, Color(1, 1, 1, 0.4), 4.0)
 	elif weather_type == "snowstorm":
 		draw_rect(Rect2(-2000, 0, 4000, 50), Color(1.0, 1.0, 1.0, 0.3)) # Snow on ground
 		for i in 150:
@@ -256,4 +295,16 @@ func _draw() -> void:
 			draw_circle(Vector2(m.x, m.y), 3.0, Color(1.0, 1.0, 0.8))
 
 func _on_phase_changed(is_night: bool) -> void:
-	pass # Weather persists through day/night in this version, handled by level_setup
+	pass
+
+func _on_mood_changed(mood: String) -> void:
+	if not pp_mat: return
+	if mood == "insomnia":
+		pp_mat.set_shader_parameter("tint_amount", 0.5)
+		pp_mat.set_shader_parameter("vignette_intensity", 0.6)
+		pp_mat.set_shader_parameter("grain_amount", 0.4)
+	elif mood == "nightmare":
+		pp_mat.set_shader_parameter("tint_color", Color(0.8, 0.2, 0.2))
+		pp_mat.set_shader_parameter("tint_amount", 0.4)
+		pp_mat.set_shader_parameter("vignette_intensity", 0.5)
+		pp_mat.set_shader_parameter("aberration_amount", 1.2)

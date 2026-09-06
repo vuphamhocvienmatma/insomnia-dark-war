@@ -1,4 +1,4 @@
-﻿extends Node2D
+extends Node2D
 
 const OUTLINE := Color(0.18, 0.14, 0.12, 1.0)
 const WOOD_PLANK_A: Color = Color(0.36, 0.25, 0.18, 1.0)
@@ -1047,4 +1047,3 @@ func _draw_diegetic_ui() -> void:
 	var ry = -43.0
 	draw_rect(Rect2(rx, ry + 2, 20, 8), Color(0.05, 0.05, 0.05))
 	draw_string(font, Vector2(rx + 2, ry + 9), time_str, HORIZONTAL_ALIGNMENT_LEFT, -1, 8, Color(0.9, 0.2, 0.2))
-
