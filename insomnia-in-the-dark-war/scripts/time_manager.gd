@@ -16,6 +16,11 @@ var current_mood: String = ""
 
 @export var environmental_light: CanvasModulate
 
+var sun_angle: Vector2 = Vector2.ZERO
+var shadow_intensity: float = 1.0
+var cloud_cover: float = 0.0
+var _cloud_timer: float = 0.0
+
 var current_solar_energy: float = 0.0
 var max_solar_storage: float = 100.0
 var is_night: bool = false
@@ -75,8 +80,45 @@ func _process(delta: float) -> void:
 		if time_elapsed >= night_duration_seconds:
 			transition_to_day()
 
+	# Cloud events
+	if not is_night:
+		_cloud_timer -= delta
+		if _cloud_timer <= 0.0:
+			if cloud_cover > 0.0:
+				cloud_cover -= delta * 0.5
+				if cloud_cover <= 0.0:
+					cloud_cover = 0.0
+					_cloud_timer = randf_range(60.0, 120.0)
+			else:
+				if randf() < 0.3:
+					cloud_cover += delta * 0.5
+					if cloud_cover >= 0.6:
+						cloud_cover = 0.6
+						_cloud_timer = randf_range(5.0, 15.0)
+				else:
+					_cloud_timer = randf_range(10.0, 30.0)
+	
+	# Compute Sun Angle and Shadow Intensity
+	var ls = get_node_or_null("/root/LevelSetup")
+	var w = "sunny"
+	if ls: w = str(ls.get("current_weather"))
+	
+	if is_night:
+		var ratio = time_elapsed / night_duration_seconds
+		sun_angle = Vector2(lerp(1.5, -1.5, ratio), 0.5)
+		shadow_intensity = 0.6
+	else:
+		var ratio = time_elapsed / day_duration_seconds
+		sun_angle = Vector2(lerp(-2.0, 2.0, ratio), 0.5)
+		shadow_intensity = 1.0 - (cloud_cover * 0.8)
+	
+	if w == "heavy_rain" or w == "thick_fog" or w == "sandstorm":
+		shadow_intensity = 0.0
+	elif w == "drizzle" or w == "snowstorm":
+		shadow_intensity *= 0.3
+
 	if environmental_light != null:
-		environmental_light.color = target_color
+		environmental_light.color = target_color.lerp(Color(0.5, 0.5, 0.5, 1.0), cloud_cover * 0.4)
 
 func transition_to_night() -> void:
 	is_night = true
@@ -111,6 +153,7 @@ func spend_solar(amount: float) -> bool:
 	current_solar_energy -= amount
 	solar_changed.emit(current_solar_energy)
 	return true
+
 
 
 

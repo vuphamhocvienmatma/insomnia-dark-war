@@ -36,6 +36,9 @@ var _footprint_timer: float = 0.0
 
 
 func _physics_process(_delta: float) -> void:
+	queue_redraw()
+	queue_redraw()
+func _physics_process_actual(_delta: float) -> void:
 	var direction: Vector2 = Vector2.ZERO
 	if Input.is_action_pressed("ui_left"):
 		direction.x -= 1.0
@@ -177,3 +180,33 @@ func _on_floor_changed(_floor_name: String) -> void:
 		if art != null and art.has_method("set_climbing"):
 			art.call("set_climbing", false)
 	)
+
+
+func _draw() -> void:
+	var eco = false
+	if GameState != null and GameState.eco_mode: eco = true
+	
+	if not eco:
+		var tm = get_tree().get_first_node_in_group("time_manager")
+		if tm != null:
+			var is_night = bool(tm.get("is_night"))
+			var sun_ang = tm.get("sun_angle")
+			var sh_int = float(tm.get("shadow_intensity"))
+			if sh_int > 0.05:
+				var sh_col = Color(0, 0, 0, 0.4 * sh_int)
+				if is_night: sh_col = Color(0.1, 0.1, 0.3, 0.5 * sh_int)
+				
+				# Directional shadow
+				var h = 30.0
+				var w = 16.0
+				var dx = sun_ang.x * h
+				var pts = PackedVector2Array([
+					Vector2(-w/2, 0),
+					Vector2(w/2, 0),
+					Vector2(w/2 + dx, -h * 0.3),
+					Vector2(-w/2 + dx, -h * 0.3)
+				])
+				draw_colored_polygon(pts, sh_col)
+				
+				# Contact shadow
+				draw_circle(Vector2(0, 0), w/1.5, Color(0,0,0,0.5))

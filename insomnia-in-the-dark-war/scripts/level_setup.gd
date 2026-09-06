@@ -12,6 +12,7 @@ const CABIN_PROPS_SCRIPT := preload("res://scripts/art_cabin_props.gd")
 const CABIN_FRONT_SCRIPT := preload("res://scripts/art_cabin_front.gd")
 const WEATHER_SCRIPT := preload("res://scripts/art_weather.gd")
 const GROUND_PROPS_SCRIPT := preload("res://scripts/art_ground_props.gd")
+const LIGHTING_SCRIPT := preload("res://scripts/art_lighting.gd")
 const MAILBOX_SCENE := preload("res://scenes/mailbox.tscn")
 const CABIN_DOOR_SCENE := preload("res://scenes/cabin_door.tscn")
 const MERCHANT_DOG_SCENE := preload("res://scenes/merchant_dog.tscn")
@@ -62,6 +63,11 @@ func _ready() -> void:
 	weather.set_script(WEATHER_SCRIPT)
 	add_child(weather)
 	_weather = weather
+	
+	var lighting = Node2D.new()
+	lighting.name = "Lighting"
+	lighting.set_script(LIGHTING_SCRIPT)
+	add_child(lighting)
 
 	if SaveManager:
 		SaveManager.load_game()

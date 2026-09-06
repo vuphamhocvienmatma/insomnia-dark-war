@@ -79,3 +79,33 @@ func _on_fire_rate_timer_timeout() -> void:
 			# Bullet casings or impact mark near target
 			ground.call("add_decal", "bullet", current_target.global_position + Vector2(randf_range(-15, 15), 0))
 
+
+
+func _draw() -> void:
+	var eco = false
+	if GameState != null and GameState.eco_mode: eco = true
+	
+	if not eco:
+		var tm = get_tree().get_first_node_in_group("time_manager")
+		if tm != null:
+			var is_night = bool(tm.get("is_night"))
+			var sun_ang = tm.get("sun_angle")
+			var sh_int = float(tm.get("shadow_intensity"))
+			if sh_int > 0.05:
+				var sh_col = Color(0, 0, 0, 0.4 * sh_int)
+				if is_night: sh_col = Color(0.1, 0.1, 0.3, 0.5 * sh_int)
+				
+				# Directional shadow
+				var h = 30.0
+				var w = 16.0
+				var dx = sun_ang.x * h
+				var pts = PackedVector2Array([
+					Vector2(-w/2, 0),
+					Vector2(w/2, 0),
+					Vector2(w/2 + dx, -h * 0.3),
+					Vector2(-w/2 + dx, -h * 0.3)
+				])
+				draw_colored_polygon(pts, sh_col)
+				
+				# Contact shadow
+				draw_circle(Vector2(0, 0), w/1.5, Color(0,0,0,0.5))

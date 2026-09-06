@@ -123,6 +123,14 @@ func _draw_sign(a: float) -> void:
 func _draw_porch_light(a: float) -> void:
 	var px: float = 120.0
 	var py: float = -100.0
+	
+	# Sway logic
+	var sway = sin(_time * 1.5) * 4.0
+	px += sway
+	py += abs(sway) * 0.2
+	
+	# Rope
+	draw_line(Vector2(120.0, -145.0), Vector2(px, py), Color(0.1, 0.1, 0.1, a), 2.0)
 	draw_rect(Rect2(px-6.0, py, 12.0, 16.0), Color(0.2, 0.2, 0.2, a))
 	
 	var is_night: bool = _tm != null and bool(_tm.get("is_night"))

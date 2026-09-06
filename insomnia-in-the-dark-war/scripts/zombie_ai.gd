@@ -81,6 +81,9 @@ func _ready() -> void:
 
 
 func _physics_process(_delta: float) -> void:
+	queue_redraw()
+	queue_redraw()
+func _physics_process_actual(_delta: float) -> void:
 	if is_dead: return
 	
 	position.y = GROUND_Y
@@ -235,3 +238,33 @@ func _spawn_death_fx() -> void:
 	particles.color = Color(0.45, 0.65, 0.42, 0.8)
 	particles.emitting = true
 	get_tree().create_timer(0.45).timeout.connect(particles.queue_free)
+
+
+func _draw() -> void:
+	var eco = false
+	if GameState != null and GameState.eco_mode: eco = true
+	
+	if not eco:
+		var tm = get_tree().get_first_node_in_group("time_manager")
+		if tm != null:
+			var is_night = bool(tm.get("is_night"))
+			var sun_ang = tm.get("sun_angle")
+			var sh_int = float(tm.get("shadow_intensity"))
+			if sh_int > 0.05:
+				var sh_col = Color(0, 0, 0, 0.4 * sh_int)
+				if is_night: sh_col = Color(0.1, 0.1, 0.3, 0.5 * sh_int)
+				
+				# Directional shadow
+				var h = 30.0
+				var w = 16.0
+				var dx = sun_ang.x * h
+				var pts = PackedVector2Array([
+					Vector2(-w/2, 0),
+					Vector2(w/2, 0),
+					Vector2(w/2 + dx, -h * 0.3),
+					Vector2(-w/2 + dx, -h * 0.3)
+				])
+				draw_colored_polygon(pts, sh_col)
+				
+				# Contact shadow
+				draw_circle(Vector2(0, 0), w/1.5, Color(0,0,0,0.5))
