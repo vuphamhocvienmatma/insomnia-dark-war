@@ -370,7 +370,7 @@ func _take_polaroid(id: String, desc: String) -> void:
 	# "mực in hằn sâu (multiply blend mode)"
 	lbl.material = CanvasItemMaterial.new()
 	lbl.material.blend_mode = CanvasItemMaterial.BLEND_MODE_MUL
-	lbl.add_theme_color_override("font_color", Color(0.25, 0.15, 0.1, 0.6) # Brown ink, low opacity)
+	lbl.add_theme_color_override("font_color", Color(0.25, 0.15, 0.1, 0.6))
 	lbl.add_theme_font_size_override("font_size", 10)
 	lbl.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	lbl.size = Vector2(140, 42)
