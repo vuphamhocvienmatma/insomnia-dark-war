@@ -1,4 +1,4 @@
-extends CharacterBody2D
+﻿extends CharacterBody2D
 
 const GROUND_Y: float = 0.0
 
@@ -100,7 +100,7 @@ func _seek_x(target_x: float, stop_dist: float) -> void:
 
 	var diff: float = target_x - global_position.x
 	if abs(diff) > stop_dist:
-		velocity = Vector2(sign(diff) * follow_speed, 0.0)
+		velocity = Vector2(signf(diff) * follow_speed, 0.0)
 	else:
 		velocity = Vector2.ZERO
 	var art: Node2D = get_node_or_null("Art") as Node2D
@@ -150,7 +150,7 @@ func _deliver_item() -> void:
 		"water":
 			GameState.add_water(amount)
 
-	print("Mèo mang về ", amount, " ", item_type, "!")
+	print("MÃ¨o mang vá» ", amount, " ", item_type, "!")
 	carried_item_node.queue_free()
 	carried_item_node = null
 	is_carrying_item = false
@@ -160,7 +160,7 @@ func _unhandled_input(event: InputEvent) -> void:
 		if event.is_action_pressed("interact") and global_position.distance_to(target_player.global_position) < 40.0:
 			is_being_pet = true
 			pet_happiness = min(pet_happiness + 10.0, 100.0)
-			print("Vuốt ve mèo... purrr... Mood: ", pet_happiness)
+			print("Vuá»‘t ve mÃ¨o... purrr... Mood: ", pet_happiness)
 			modulate = Color(1.0, 0.8, 0.5, 1.0)
 			_finish_pet_after_delay()
 
@@ -168,3 +168,4 @@ func _finish_pet_after_delay() -> void:
 	await get_tree().create_timer(2.0).timeout
 	is_being_pet = false
 	modulate = Color.WHITE
+

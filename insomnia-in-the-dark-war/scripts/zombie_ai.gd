@@ -89,7 +89,7 @@ func _physics_process(_delta: float) -> void:
 		if dist_to_safe < SAFE_RADIUS:
 			var away: Vector2 = global_position - safe_zone.global_position
 			if away.length() < 1.0:
-				away = Vector2(sign(spawn_position.x), 0.0)
+				away = Vector2(signf(spawn_position.x), 0.0)
 			velocity = away.normalized() * speed * 1.25
 			if _art_node != null and velocity.x != 0.0:
 				_art_node.scale.x = -1.0 if velocity.x < 0.0 else 1.0
@@ -109,17 +109,17 @@ func _physics_process(_delta: float) -> void:
 		return
 
 	if abs(global_position.x) > 232.0:
-		var dir: float = -sign(global_position.x)
+		var dir: float = -signf(global_position.x)
 		velocity = Vector2(dir * speed, 0.0)
 		if _art_node != null:
 			_art_node.scale.x = -1.0 if global_position.x > 0.0 else 1.0
 		move_and_slide()
 	else:
-		var side: float = sign(global_position.x)
+		var side: float = signf(global_position.x)
 		var has_gap: bool = false
 		for socket in get_tree().get_nodes_in_group("critical_socket"):
 			if socket is BuildSocket2D and not socket.is_occupied:
-				if sign(socket.global_position.x) == side:
+				if signf(socket.global_position.x) == side:
 					has_gap = true
 					break
 
@@ -137,7 +137,7 @@ func _physics_process(_delta: float) -> void:
 						stolen_scrap = 1
 					if stolen_scrap > 0:
 						if _hud != null and _hud.has_method("show_toast"):
-							_hud.call("show_toast", "⚠️ Tên trộm Thief đã cuỗm " + str(stolen_scrap) + " phế liệu!", 3.0, true)
+							_hud.call("show_toast", "âš ï¸ TÃªn trá»™m Thief Ä‘Ã£ cuá»—m " + str(stolen_scrap) + " pháº¿ liá»‡u!", 3.0, true)
 				else:
 					if GameState.spend_scrap(1):
 						pass
@@ -153,7 +153,7 @@ func _has_wall_in_front() -> bool:
 	return false
 
 func _do_leave() -> void:
-	var dir: float = sign(spawn_position.x)
+	var dir: float = signf(spawn_position.x)
 	velocity = Vector2(dir * speed, 0.0)
 	if _art_node != null:
 		_art_node.scale.x = -1.0 if dir < 0.0 else 1.0
@@ -198,7 +198,7 @@ func take_damage(amount: float) -> void:
 		if stolen_scrap > 0:
 			GameState.add_scrap(stolen_scrap)
 			if _hud != null and _hud.has_method("show_toast"):
-				_hud.call("show_toast", "🎉 Đã hạ gục tên trộm! Thu hồi +" + str(stolen_scrap) + " phế liệu!", 3.0, false)
+				_hud.call("show_toast", "ðŸŽ‰ ÄÃ£ háº¡ gá»¥c tÃªn trá»™m! Thu há»“i +" + str(stolen_scrap) + " pháº¿ liá»‡u!", 3.0, false)
 
 		var ls: Node = get_tree().root.find_child("LevelSetup", true, false)
 		if ls != null and str(ls.get("current_night_mutation")) == "scrap_jackpot":

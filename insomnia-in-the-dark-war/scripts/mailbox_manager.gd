@@ -167,6 +167,7 @@ func _check_milestone_surprise(sender: String, aff: int) -> void:
 			]
 		}
 		receive_letter(s_pkg)
+		letter_history.append(s_pkg.duplicate())
 		surprise_gift_unlocked.emit(sender, title, "Kích hoạt bảo vật vĩnh viễn: " + relic_name)
 	elif aff >= 30 and not bool(SaveManager.has_unlocked("surprise_30_" + sender) if SaveManager else false):
 		if SaveManager:
@@ -174,15 +175,16 @@ func _check_milestone_surprise(sender: String, aff: int) -> void:
 		var s_pkg: Dictionary = {
 			"id": "surprise_30_" + str(Time.get_ticks_msec()),
 			"sender": sender,
-			"title": "🎉 [THÂN THIẾT] Món Quà Bất Ngờ Từ " + sender,
-			"content": "Tôi rất vui vì những lá thư qua lại cùng bạn. Nơi hoang vắng này có một người biết lắng nghe thật đáng quý. Tặng bạn hộp linh kiện và hạt giống tôi chắt chiu được.",
-			"gift": {"scrap": 25, "seeds": 6, "water": 2},
+			"title": "🎁 Gói quà Tri Kỷ từ " + sender,
+			"content": "Một chút quà mọn gửi người anh em phương xa. Mong cậu luôn vững vàng!",
+			"gift": {"scrap": 15, "water": 3},
 			"replies": [
-				{"text": "Cảm ơn bạn rất nhiều, giữ an toàn nhé!", "affinity": 5, "reaction": "Sợi dây liên kết ngày càng khăng khít."}
+				{"text": "Cảm ơn món quà ý nghĩa!", "affinity": 5, "reaction": "Tình bạn thêm gắn kết."}
 			]
 		}
 		receive_letter(s_pkg)
-		surprise_gift_unlocked.emit(sender, "Gói Quà Thân Thiết", "+25 🔩 Phế liệu, +6 🌱 Hạt giống, +2 💧 Nước")
+		letter_history.append(s_pkg.duplicate())
+		surprise_gift_unlocked.emit(sender, s_pkg["title"], "Nhận tài nguyên thiết yếu.")
 
 
 func generate_random_letter() -> void:

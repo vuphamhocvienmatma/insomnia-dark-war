@@ -23,6 +23,11 @@ var _spawned_zombies: Array[Node2D] = []
 var _night_sky: Node2D = null
 var _weather: Node2D = null
 var day_count: int = 1
+var current_night_mutation: String = ""
+var current_weather: String = "sunny"
+var _hud: Node = null
+var _tm: Node = null
+var _dog: Node2D = null
 
 
 func _ready() -> void:
@@ -60,9 +65,13 @@ func _ready() -> void:
 	if SaveManager:
 		SaveManager.load_game()
 
-	var tm := get_tree().get_first_node_in_group("time_manager")
-	if tm != null:
-		tm.phase_changed.connect(_on_phase_changed)
+	
+	_hud = get_tree().get_first_node_in_group("hud")
+	_tm = get_tree().get_first_node_in_group("time_manager")
+	_dog = get_tree().get_first_node_in_group("merchant_dog") as Node2D
+
+	if _tm != null:
+		_tm.phase_changed.connect(_on_phase_changed)
 
 	if OS.get_cmdline_args().has("--take-screenshots"):
 		var auto = preload("res://scripts/screenshot_automator.gd").new()
@@ -134,9 +143,6 @@ func _create_night_sky() -> void:
 	_night_sky.set_script(NIGHT_SKY_SCRIPT)
 	add_child(_night_sky)
 
-var current_night_mutation: String = ""
-var current_weather: String = "sunny"
-
 
 func _on_phase_changed(is_night: bool) -> void:
 	if not is_night:
@@ -159,7 +165,8 @@ func _on_phase_changed(is_night: bool) -> void:
 				tm.set("current_solar_energy", float(tm.get("current_solar_energy")) * 0.5)
 		_respawn_zombie_wave()
 	else:
-		for zombie in get_tree().get_nodes_in_group("zombie"):
+		current_night_mutation = ""
+		for zombie in _spawned_zombies:
 			if is_instance_valid(zombie):
 				zombie.queue_free()
 		_spawned_zombies.clear()
@@ -178,11 +185,14 @@ func _roll_daily_weather() -> void:
 		elif current_weather == "thick_fog":
 			hud.call("show_toast", "🌫️ Sương mù dày: Tầm nhìn hạn chế, âm thanh tắc nghẽn.", 5.0, false)
 		elif current_weather == "snowstorm":
-			hud.call("show_toast", "❄️ Bão tuyết: Lạnh giá bao trùm, tuyết rơi trắng xóa.", 5.0, true)
+			_hud.call("show_toast", "❄️ Bão tuyết: Lạnh giá bao trùm, tuyết rơi trắng xóa.", 5.0, true)
 		elif current_weather == "meteor_shower":
-			hud.call("show_toast", "🌠 Mưa sao băng: Bầu trời rực rỡ, phế liệu hiếm rơi rụng!", 5.0, false)
+			_hud.call("show_toast", "🌠 Mưa sao băng: Bầu trời rực rỡ, phế liệu hiếm rơi rụng!", 5.0, false)
 		else:
-			hud.call("show_toast", "🌤️ Nắng vàng êm: Bầu trời trong xanh ấm áp.", 5.0, false)
+			_hud.call("show_toast", "🌤️ Nắng vàng êm: Bầu trời trong xanh ấm áp.", 5.0, false)
+
+	if current_weather == "meteor_shower" and _hud and _hud.has_method("show_toast"):
+		_hud.call("show_toast", "🌠 Mưa sao băng đỏ rực chân trời, cẩn thận điềm gở!", 5.0, true)
 
 	if current_weather == "meteor_shower" and GameState != null:
 		GameState.add_scrap(12)
@@ -192,19 +202,18 @@ func _check_nightmare_night_announcement() -> void:
 	if day_count % 5 == 0:
 		var mutations: Array[String] = ["zombie_speed_boost", "scrap_jackpot", "solar_eclipse", "dense_fog"]
 		current_night_mutation = mutations[randi() % mutations.size()]
-		var hud: Node = get_tree().get_first_node_in_group("hud")
 		var m_desc: String = ""
 		if current_night_mutation == "zombie_speed_boost":
 			m_desc = "Zombie cuồng nộ tăng 30% tốc độ chạy!"
 		elif current_night_mutation == "scrap_jackpot":
-			m_desc = "Đàn zombie đông x1.5 nhưng rơi gấp đôi phế liệu!"
+			m_desc = "Zombie đeo vàng: Tỉ lệ rớt Phế liệu tăng gấp 3!"
 		elif current_night_mutation == "solar_eclipse":
-			m_desc = "Bão từ làm sụt giảm 50% pin Solar!"
+			m_desc = "Nhật thực: Pin mặt trời hôm qua bị hỏng, Súng ngưng trệ 50%!"
 		elif current_night_mutation == "dense_fog":
-			m_desc = "Sương mù dày đặc che khuất bầy zombie!"
+			m_desc = "Sương mù: Zombie ngụy trang trong lớp sương dày!"
 
-		if hud != null and hud.has_method("show_toast"):
-			hud.call("show_toast", "📻 [RADIO CẢNH BÁO] ĐÊM ÁC MỘNG NGÀY " + str(day_count) + ": " + m_desc, 6.0, true)
+		if _hud and _hud.has_method("show_toast"):
+			_hud.call("show_toast", "⚠️ CẢNH BÁO ĐÊM NAY: " + m_desc, 6.0, true)
 	else:
 		current_night_mutation = ""
 
