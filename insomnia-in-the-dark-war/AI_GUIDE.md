@@ -1,46 +1,32 @@
-﻿# 🤖 AI SYSTEM GUIDE & ARCHITECTURE 
+# AI Guide & Coding Architecture (AGENTS.md)
 
-Welcome, fellow AI Assistant! This document contains the critical context and rules you need to understand, maintain, and expand **Insomnia in the Dark War** without breaking the codebase.
+Đây là tài liệu hướng dẫn bắt buộc cho mọi AI/LLM tham gia viết code cho **Insomnia in the Dark War**.
 
-## 1. Core Paradigm: "Procedural 2.5D Diorama"
-**CRITICAL RULE:** DO NOT USE TEXTURES OR SPRITES (unless absolutely necessary for UI fonts).
-This game renders everything purely via code using Godot's _draw() function. 
-- You must use draw_colored_polygon, draw_circle, draw_line, etc.
-- To create 3D/2.5D illusions, manually calculate perspective lines (e.g., in rt_cabin_props.gd and rt_player.gd).
-- Use warm, muted color palettes (Color(r, g, b, a)).
+## 1. QUY TẮC TỐI THƯỢNG (THE ZERO-SPRITE RULE)
+- **TUYỆT ĐỐI KHÔNG sử dụng Sprite2D, TextureRect, hay bất kỳ file hình ảnh nào (.png, .jpg).**
+- Mọi hình ảnh trong game (từ đám mây, nhân vật, cây cỏ, cho tới ánh sáng và UI) đều phải được vẽ procedural thông qua hàm _draw() của Godot.
+- **KHÔNG SỬ DỤNG Godot Light2D hay PointLight2D**. Mọi ánh sáng phải được vẽ bằng thuật toán BLEND_MODE_ADD thông qua CanvasItemMaterial.
 
-## 2. Strict Performance & Optimization Rules (Godot 4)
-We have optimized this game for seamless Web HTML5 exports and low-end devices:
-- **No Unconditional Redraws:** DO NOT call queue_redraw() unconditionally inside _process() unless drawing dynamic particles. Use dirty flags, Timers, or signal-based redraws.
-- **Cache All Rendering Resources:** NEVER instantiate Color(), PackedVector2Array(), Font(), or StyleBox() directly inside a _draw() function. Allocate them in _ready() or as file-level global variables (ar _poly: PackedVector2Array). 
-- **Tween Management:** Whenever using create_tween() on UI elements (like toasts or vignette), always store the reference (e.g. ar toast_tween: Tween) and call .kill() on it before creating a new one to prevent memory leaks and flickering.
-- **Strict Static Typing:** Use strict types for all variables and function returns (e.g. ar speed: float = 10.0, unc do_x() -> void:). Avoid instance() (use instantiate()) or Godot 3 syntaxes.
+## 2. KIẾN TRÚC RENDER 2.5D DIORAMA
+- Game tuân theo góc nhìn Diorama (nhà búp bê mặt cắt).
+- Trục X là không gian di chuyển. Trục Y là độ cao/độ sâu. Trục Z (Z-Index) quyết định lớp layer.
+- Hệ thống chia làm nhiều file Art tĩnh để dễ quản lý:
+  - rt_skyline.gd: Vẽ bầu trời, mặt trời, trăng và bối cảnh thành phố xa. Tự động nội suy Parallax theo vị trí camera.
+  - rt_ground_props.gd: Vẽ 6 vùng mặt đất, cắt lớp địa tầng, bụi cỏ, sỏi, và quản lý Decals (dấu chân, vỏ đạn). Chứa State Machine quản lý thời tiết.
+  - rt_lighting.gd: Layer Additive trên cùng (Z-Index=50). Vẽ Lò sưởi, God Rays, Fairy Lights, và Dust Motes.
+  - rt_weather.gd: Hệ thống Shader Post-Processing và GPU Particles (mưa, bão cát).
+  - Khối tĩnh Cabin: rt_cabin_front.gd, rt_cabin_props.gd.
 
-## 3. Architecture & Singletons
-The game relies heavily on Global Singletons (Autoloads) defined in project.godot:
-- **GameState (game_state.gd)**: Stores player stats, inventory (scrap, seed, water), and relics.
-- **ChillManager (chill_manager.gd)**: The heart of the "lofi indie" vibe. Handles UI fade-ins, weather interactions (Sound Garden), animals, polaroids, and minigames.
-- **JournalManager, SaveManager, MailboxManager, CabinDecorationManager**: Handle sub-systems.
-- **Fonts & Web Export**: We use a custom global theme (ssets/theme.tres) with MainFont.tres (CourierPrime with NotoColorEmoji fallback) to ensure Emojis render correctly on Web HTML5. Do NOT use ThemeDB.fallback_font in scripts; preload MainFont.tres instead.
+## 3. HIỆU NĂNG VÀ BỘ NHỚ (MEMORY LEAKS)
+- Godot 4 Tween sẽ sinh rác nếu không kill. Luôn lưu reference vào biến cục bộ của class và kiểm tra: if tw != null and tw.is_valid(): tw.kill() trước khi tạo mới.
+- **Arrays & Decals:** Các mảng sinh rác (như array dấu chân _decals, mảng _spawned_zombies) phải có giới hạn (Max = 50-80 phần tử) và tự động 
+emove_at(0).
+- **Hạn chế _process:** Không dùng _process() để poll trạng thái (ví dụ check khoảng cách Camera). Dùng Timer, Signal, hoặc call_deferred.
 
-## 4. The "Chill Lofi" Vibe & Polish Rules
-- **No rigid linear movements:** Always use Tween. 
-- **Organic Easing:** Default to .set_trans(Tween.TRANS_SINE) or Tween.TRANS_CUBIC and .set_ease(Tween.EASE_IN_OUT). Avoid TRANS_BOUNCE or TRANS_LINEAR.
-- **Diegetic UIs:** Draw UI elements onto the environment whenever possible (e.g., rt_cabin_props.gd).
-- **Living World:** Animate static objects using sin(_time * speed). Use this for floating animals, swaying lanterns, or breathing characters.
+## 4. UI VÀ THUẬT TOÁN
+- **KHÔNG sử dụng position cho Control nodes (UI).** Bắt buộc dùng offset_left/right/top/bottom và hệ thống Anchor.
+- **Hàm sign():** Trong Godot 4, sign() trả về int. Tuyệt đối sử dụng signf() cho các phép toán vật lý float để tránh giật lag (snapping).
+- **Âm thanh:** Mọi âm thanh SFX phải đi qua udio_manager.gd (Hệ thống Pool array 10 kênh) để tránh bị clipping tiếng súng.
 
-## 5. Zombie AI & Combat Mechanics
-- Zombies must immediately stop processing physics (set_physics_process(false)) and stop monitoring areas when their health reaches 0 to avoid collision glitches during their death animation.
-- Turrets (uto_turret.gd) track multiple targets in an array via Area2D and smoothly switch targets when one dies. 
-
-## 6. How to Test (Headless CLI)
-You MUST test your GDScript code before reporting success to the user. Use the local Godot CLI in headless mode to check for parse/compilation errors:
-`ash
-C:\Users\ezral\Downloads\Godot_v4.7.2-stable_win64.exe\Godot_v4.7.2-stable_win64_console.exe --headless --quit-after 50
-`
-If the command exits with Code 0, your syntax is valid. 
-
-## 7. Version Control & Git
-1. Double-check that it works headlessly.
-2. Ensure you haven't broken the _draw() rendering loops.
-3. Push everything automatically. The user explicitly enabled automated Push permissions.
+## 5. HỆ THỐNG ECO MODE
+Mọi thuật toán tính toán góc bóng đổ (Directional Shadows) và tia nắng (God rays) phải đọc cờ GameState.eco_mode. Nếu bật, bỏ qua việc render để tiết kiệm pin tối đa cho nền tảng Web di động.
