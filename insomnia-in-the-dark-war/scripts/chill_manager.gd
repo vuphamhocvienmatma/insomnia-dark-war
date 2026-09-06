@@ -233,22 +233,23 @@ func _catch_note() -> void:
 			return
 
 func _draw_guitar_notes() -> void:
-	# Draw strings
+	# Diegetic: Guitar strings vibrating and lighting
+	# Instead of falling notes, we draw the strings of the guitar over the character
+	# Note: Since this is an overlay, we simulate the 4 strings
 	for i in 4:
 		var x = 50 + i * 50
-		guitar_ui.draw_line(Vector2(x, 0), Vector2(x, 200), Color(1, 1, 1, 0.1), 2.0)
+		var string_vibration = 0.0
+		# Check if there is a note in the catch zone for this lane
+		for n in guitar_notes:
+			if n.lane == i and n.y > 130.0 and n.y < 190.0:
+				string_vibration = sin(Time.get_ticks_msec() * 0.05) * 6.0
 		
-	# Draw falling notes
-	for n in guitar_notes:
-		var x = 50 + n.lane * 50
-		guitar_ui.draw_circle(Vector2(x, n.y), 15.0, Color(1.0, 0.8, 0.4, 0.9))
-		guitar_ui.draw_arc(Vector2(x, n.y), 15.0, 0, TAU, 16, Color(1, 1, 1, 0.8), 2.0)
+		# Draw the string vibrating
+		guitar_ui.draw_line(Vector2(x + string_vibration, 0), Vector2(x - string_vibration, 200), Color(0.8, 0.8, 0.8, 0.6), 2.0)
 		
-	# Draw targets
-	for i in 4:
-		var x = 50 + i * 50
-		guitar_ui.draw_arc(Vector2(x, 160.0), 20.0, 0, TAU, 16, Color(1.0, 0.9, 0.6, 0.6), 2.5)
-
+		# Draw subtle highlight on the string if note is perfect
+		if string_vibration != 0.0:
+			guitar_ui.draw_circle(Vector2(x, 160.0), 12.0 + string_vibration, Color(1.0, 0.8, 0.4, 0.3))
 func _create_guitar_ui() -> void:
 	guitar_ui = Panel.new()
 	guitar_ui.size = Vector2(260, 210)
@@ -312,53 +313,62 @@ func _update_wild_animals(is_night: bool, delta: float) -> void:
 			animals_list.remove_at(i)
 
 # Polaroids
+
 func _take_polaroid(id: String, desc: String) -> void:
 	if polaroids_taken.has(id): return
 	polaroids_taken.append(id)
 	
-	var p = ColorRect.new()
+	# Diegetic Polaroid: Hanging on a string
+	var p = Node2D.new()
 	p.name = "Polaroid_Frame"
-	p.color = Color(0.96, 0.94, 0.88) # vintage paper
-	p.size = Vector2(160, 190)
-	p.position = Vector2(100, -220) # slide from top
-	p.rotation = randf_range(-0.06, 0.06)
+	# Hanging position
+	var string_y = 60.0
+	var drop_x = randf_range(150.0, 450.0)
+	p.position = Vector2(drop_x, -100)
+	p.rotation = randf_range(-0.15, 0.15)
+	
+	var paper = ColorRect.new()
+	paper.color = Color(0.96, 0.94, 0.88)
+	paper.size = Vector2(160, 190)
+	paper.position = Vector2(-80, 0)
+	p.add_child(paper)
 	
 	var p_img = ColorRect.new()
 	p_img.color = Color(0.22, 0.25, 0.32)
 	p_img.size = Vector2(140, 125)
 	p_img.position = Vector2(10, 10)
-	p.add_child(p_img)
-
-	var p_scene = Label.new()
-	p_scene.text = "☀️ 🐱 🌿"
-	p_scene.add_theme_font_size_override("font_size", 26)
-	p_scene.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	p_scene.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
-	p_scene.size = Vector2(140, 125)
-	p_img.add_child(p_scene)
+	paper.add_child(p_img)
 	
 	var lbl = Label.new()
 	lbl.text = desc
-	lbl.add_theme_color_override("font_color", Color(0.15, 0.15, 0.15, 0.9))
+	# "mực in hằn sâu (multiply blend mode)"
+	lbl.material = CanvasItemMaterial.new()
+	lbl.material.blend_mode = CanvasItemMaterial.BLEND_MODE_MUL
+	lbl.add_theme_color_override("font_color", Color(0.1, 0.05, 0.05, 0.95))
 	lbl.add_theme_font_size_override("font_size", 10)
 	lbl.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	lbl.size = Vector2(140, 42)
-	lbl.position = Vector2(10, 140)
-	p.add_child(lbl)
+	lbl.position = Vector2(10, 142)
+	paper.add_child(lbl)
 	
-	add_child(p)
+	# Physics: Drop and swing on string
+	var tween = create_tween().set_trans(Tween.TRANS_BOUNCE).set_ease(Tween.EASE_OUT)
+	tween.tween_property(p, "position:y", string_y, 0.8)
 	
-	var tw = create_tween()
-	tw.set_parallel(true)
-	tw.tween_property(p, "position:y", 100.0, 1.8).set_ease(Tween.EASE_OUT).set_trans(Tween.TRANS_CUBIC)
-	tw.tween_property(p, "rotation", randf_range(-0.08, 0.08), 1.8).set_ease(Tween.EASE_OUT).set_trans(Tween.TRANS_CUBIC)
-	tw.chain().tween_interval(4.5)
-	tw.chain().tween_property(p, "position:y", -200.0, 1.5).set_ease(Tween.EASE_IN).set_trans(Tween.TRANS_CUBIC)
-	tw.tween_callback(p.queue_free)
+	var swing_tween = create_tween().set_loops()
+	swing_tween.tween_property(p, "rotation", p.rotation + 0.05, 1.5).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN_OUT)
+	swing_tween.tween_property(p, "rotation", p.rotation - 0.05, 1.5).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN_OUT)
+	
+	# Add wooden peg (kẹp gỗ)
+	var peg = ColorRect.new()
+	peg.color = Color(0.3, 0.18, 0.1)
+	peg.size = Vector2(8, 20)
+	peg.position = Vector2(-4, -10)
+	p.add_child(peg)
 	
 	var hud = get_tree().get_first_node_in_group("hud")
-	if hud and hud.has_method("show_toast"):
-		hud.call("show_toast", "📸 Đã chụp: " + desc, 3.0, false)
+	if hud:
+		hud.add_child(p)
 
 func _check_continuous_polaroids() -> void:
 	var w = "sunny"

@@ -517,6 +517,7 @@ func _process(_delta: float) -> void:
 
 
 func _setup_eco_toggle_button() -> void:
+	return
 	eco_btn = Button.new()
 	eco_btn.anchor_left = 1.0
 	eco_btn.anchor_top = 0.0
@@ -576,6 +577,7 @@ func _apply_eco_mode(enabled: bool) -> void:
 
 
 func _setup_zoom_controls() -> void:
+	return
 	var z_panel: Panel = Panel.new()
 	z_panel.anchor_left = 1.0
 	z_panel.anchor_top = 0.0
@@ -785,3 +787,37 @@ func open_cooking_modal() -> void:
 		_setup_cooking_modal()
 	if cooking_modal != null and cooking_modal.has_method("open_menu"):
 		cooking_modal.call("open_menu")
+
+func _process(delta: float) -> void:
+	queue_redraw()
+
+func _draw() -> void:
+	var sw = get_viewport().size.x
+	var sh = get_viewport().size.y
+	
+	# Draw Eco Breaker (Rusty)
+	var bx = sw - 120
+	var by = 60
+	draw_rect(Rect2(bx, by, 50, 80), Color("#4A3B32")) # Rusty box
+	draw_rect(Rect2(bx+5, by+5, 40, 70), Color("#2A1F1A")) # Inner box
+	var eco_mode = false
+	var ls = get_tree().get_first_node_in_group("level_setup")
+	if ls and "eco_mode" in ls: eco_mode = ls.eco_mode
+	if eco_mode:
+		draw_rect(Rect2(bx+15, by+40, 20, 25), Color("#555555")) # Switch down
+		draw_line(Vector2(bx+25, by+40), Vector2(bx+25, by+65), Color("#888888"), 4.0)
+	else:
+		draw_rect(Rect2(bx+15, by+15, 20, 25), Color("#A03030")) # Switch up
+		draw_line(Vector2(bx+25, by+15), Vector2(bx+25, by+40), Color("#FF6060"), 4.0)
+	
+	# Draw Binoculars for Zoom
+	var zx = sw - 150
+	var zy = sh - 100
+	draw_rect(Rect2(zx, zy, 80, 50), Color("#303525")) # Army green
+	draw_circle(Vector2(zx+20, zy+25), 18, Color("#151810"))
+	draw_circle(Vector2(zx+60, zy+25), 18, Color("#151810"))
+	draw_circle(Vector2(zx+20, zy+25), 12, Color("#101525")) # Glass
+	draw_circle(Vector2(zx+60, zy+25), 12, Color("#101525")) # Glass
+	# Reflection
+	draw_line(Vector2(zx+12, zy+17), Vector2(zx+28, zy+33), Color("#FFFFFF", 0.3), 3.0)
+	draw_line(Vector2(zx+52, zy+17), Vector2(zx+68, zy+33), Color("#FFFFFF", 0.3), 3.0)

@@ -12,7 +12,22 @@ var _last_pos: Vector2 = Vector2(-999, -999)
 var _pulse_timer: float = 0.0
 
 
+
+var _click_timer: float = 0.0
+
+func _unhandled_input(event: InputEvent) -> void:
+	if event is InputEventMouseButton and event.pressed:
+		_click_timer = 0.15
+		# Âm thanh cạch ( giả lập bằng việc gọi play_sfx nếu có )
+		var am = get_tree().get_first_node_in_group("audio_manager")
+		if am and am.has_method("play_sfx"):
+			am.play_sfx("click_wood") # Assuming it exists, or just ui_click
+
 func _process(delta: float) -> void:
+	if _click_timer > 0.0:
+		_click_timer -= delta
+		queue_redraw()
+
 	var m_pos: Vector2 = get_viewport().get_mouse_position()
 	var parent: CanvasLayer = get_parent() as CanvasLayer
 	var has_dynamic_target: bool = parent != null and (
@@ -47,19 +62,20 @@ func _draw() -> void:
 		var halo_col: Color = Color(1.0, 0.78, 0.30, 0.35 + sin(pulse * 4.0) * 0.15)
 		draw_circle(m_pos, halo_rad, halo_col)
 
-		# Action Pointer Hand Cursor 👆
+		
+		# Action Pointer
+		var click_squeeze = 1.0
+		if _click_timer > 0.0:
+			click_squeeze = 0.8
+		var hw = 6.0 * click_squeeze
+		var hl = 16.0 * click_squeeze
 		var hand_pts: PackedVector2Array = PackedVector2Array([
 			m_pos,
-			m_pos + Vector2(0.0, 16.0),
-			m_pos + Vector2(4.0, 14.0),
-			m_pos + Vector2(8.0, 22.0),
-			m_pos + Vector2(11.0, 21.0),
-			m_pos + Vector2(7.0, 13.0),
-			m_pos + Vector2(13.0, 13.0),
-			m_pos + Vector2(11.0, 7.0),
-			m_pos + Vector2(5.0, 6.0)
+			m_pos + Vector2(-hw, hl),
+			m_pos + Vector2(0, hl - 4.0),
+			m_pos + Vector2(hw, hl)
 		])
-		draw_colored_polygon(hand_pts, ACTION_GLOW)
+draw_colored_polygon(hand_pts, ACTION_GLOW)
 		draw_polyline(hand_pts, OUTLINE, 1.5)
 
 		# Action Tooltip Banner
