@@ -253,10 +253,7 @@ func _respawn_zombie_wave() -> void:
 		else:
 			zombie.set("speed", float(zombie.get("speed")) * speed_multiplier)
 
-		_spawn_zombies.append(zombie)
-
-
-var _spawn_zombies: Array[Node2D] = []
+		_spawned_zombies.append(zombie)
 
 
 func _spawn_mailbox() -> void:

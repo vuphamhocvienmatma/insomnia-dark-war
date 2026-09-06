@@ -1,4 +1,4 @@
-extends Node
+﻿extends Node
 
 signal phase_changed(is_night: bool)
 signal solar_changed(new_amount: float)
@@ -67,13 +67,13 @@ func transition_to_night() -> void:
 	is_night = true
 	time_elapsed = 0.0
 	phase_changed.emit(true)
-	print("Đêm xuống, hãy cầu nguyện hàng rào không bị vỡ...")
+	print("ÄÃªm xuá»‘ng, hÃ£y cáº§u nguyá»‡n hÃ ng rÃ o khÃ´ng bá»‹ vá»¡...")
 
 func transition_to_day() -> void:
 	is_night = false
 	_warned_sunset = false
 	time_elapsed = 0.0
-	current_solar_energy = 0.0  # Reset solar khi ngày mới bắt đầu
+	current_solar_energy = 0.0  # Reset solar khi ngÃ y má»›i báº¯t Ä‘áº§u
 	phase_changed.emit(false)
 	GameState.start_new_day()
 	if SaveManager:
@@ -85,3 +85,4 @@ func spend_solar(amount: float) -> bool:
 	current_solar_energy -= amount
 	solar_changed.emit(current_solar_energy)
 	return true
+

@@ -282,25 +282,48 @@ func _setup_journal_dropdown() -> void:
 	_refresh_journal_btn_text()
 
 
+var _journal_tw: Tween
 func _toggle_journal_dropdown() -> void:
 	journal_open = not journal_open
+	if _journal_tw != null and _journal_tw.is_valid():
+		_journal_tw.kill()
+	
 	if journal_open:
 		journal_panel.visible = true
 		journal_panel.modulate.a = 0.0
 		journal_panel.scale = Vector2(0.96, 0.96)
-		var tw: Tween = create_tween()
-		tw.tween_property(journal_panel, "modulate:a", 1.0, 0.15)
-		tw.parallel().tween_property(journal_panel, "scale", Vector2.ONE, 0.15)
+		_journal_tw = create_tween()
+		_journal_tw.tween_property(journal_panel, "modulate:a", 1.0, 0.15)
+		_journal_tw.parallel().tween_property(journal_panel, "scale", Vector2.ONE, 0.15)
 		journal_btn.text = "📋 Đóng Hướng Dẫn & Nhiệm Vụ  ▼"
 	else:
-		var tw: Tween = create_tween()
-		tw.tween_property(journal_panel, "modulate:a", 0.0, 0.12)
-		tw.tween_callback(func() -> void: journal_panel.visible = false)
+		_journal_tw = create_tween()
+		_journal_tw.tween_property(journal_panel, "modulate:a", 0.0, 0.12)
+		_journal_tw.tween_callback(func() -> void: journal_panel.visible = false)
 		_refresh_journal_btn_text()
+
+var _stats_tw: Tween
+func _toggle_stats() -> void:
+	if not stats_panel.visible:
+		if _stats_tw != null and _stats_tw.is_valid():
+			_stats_tw.kill()
+		_refresh_stats()
+		stats_panel.visible = true
+		stats_panel.modulate.a = 0.0
+		stats_panel.scale = Vector2(0.96, 0.96)
+		_stats_tw = create_tween()
+		_stats_tw.tween_property(stats_panel, "modulate:a", 1.0, 0.15)
+		_stats_tw.parallel().tween_property(stats_panel, "scale", Vector2.ONE, 0.15)
+	else:
+		if _stats_tw != null and _stats_tw.is_valid():
+			_stats_tw.kill()
+		_stats_tw = create_tween()
+		_stats_tw.tween_property(stats_panel, "modulate:a", 0.0, 0.12)
+		_stats_tw.tween_callback(func() -> void: stats_panel.visible = false)
 
 
 func _refresh_journal_btn_text() -> void:
-	if not journal_open and journal_btn != null:
+	if journal_open and journal_btn != null:
 		var tasks: Array = JournalManager.daily_tasks
 		var done_count: int = 0
 		for t in tasks:
