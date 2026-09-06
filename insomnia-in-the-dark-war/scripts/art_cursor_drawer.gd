@@ -75,7 +75,7 @@ func _draw() -> void:
 			m_pos + Vector2(0, hl - 4.0),
 			m_pos + Vector2(hw, hl)
 		])
-draw_colored_polygon(hand_pts, ACTION_GLOW)
+		draw_colored_polygon(hand_pts, ACTION_GLOW)
 		draw_polyline(hand_pts, OUTLINE, 1.5)
 
 		# Action Tooltip Banner
@@ -108,10 +108,12 @@ draw_colored_polygon(hand_pts, ACTION_GLOW)
 			m_pos + Vector2(10.5, 18.0),
 			m_pos + Vector2(6.5, 10.5)
 		])
-		draw_colored_polygon(stem_pts, ARROW_COL)
-		draw_polyline(stem_pts, OUTLINE, 1.3)
-		draw_colored_polygon(head_pts, ARROW_COL)
-		draw_polyline(head_pts, OUTLINE, 1.3)
+		draw_colored_polygon(PackedVector2Array([stem_pts[0], stem_pts[1], stem_pts[2]]), ARROW_COL)
+		draw_colored_polygon(PackedVector2Array([stem_pts[0], stem_pts[2], stem_pts[3]]), ARROW_COL)
+		draw_polyline(PackedVector2Array([stem_pts[0], stem_pts[1], stem_pts[2], stem_pts[3], stem_pts[0]]), OUTLINE, 1.3)
+		draw_colored_polygon(PackedVector2Array([head_pts[0], head_pts[1], head_pts[2]]), ARROW_COL)
+		draw_colored_polygon(PackedVector2Array([head_pts[0], head_pts[2], head_pts[3]]), ARROW_COL)
+		draw_polyline(PackedVector2Array([head_pts[0], head_pts[1], head_pts[2], head_pts[3], head_pts[0]]), OUTLINE, 1.3)
 		# Inner bevel highlight
 		draw_line(m_pos + Vector2(1.0, 2.0), m_pos + Vector2(1.0, 14.0), Color(1.0, 1.0, 1.0, 0.6), 1.0)
 

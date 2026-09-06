@@ -245,7 +245,19 @@ func _draw_guitar_notes() -> void:
 				string_vibration = sin(Time.get_ticks_msec() * 0.05) * 6.0
 		
 		# Draw the string vibrating
-		guitar_ui.draw_line(Vector2(x + string_vibration, 0), Vector2(x - string_vibration, 200), Color(0.8, 0.8, 0.8, 0.6), 2.0)
+		
+		# Fixed endpoints, motion blur in the middle
+		if string_vibration == 0.0:
+			guitar_ui.draw_line(Vector2(x, 0), Vector2(x, 200), Color(0.8, 0.8, 0.8, 0.6), 2.0)
+		else:
+			for v_step in range(-2, 3):
+				var offset_x = (float(v_step)/2.0) * string_vibration
+				var alpha = 0.6 - abs(float(v_step)) * 0.2
+				# We draw a curve using 3 points (top, middle+offset, bottom) via polyline to simulate a plucked string
+				# Since draw_line is straight, we draw 2 segments
+				var pts = PackedVector2Array([Vector2(x, 0), Vector2(x + offset_x, 100), Vector2(x, 200)])
+				guitar_ui.draw_polyline(pts, Color(0.8, 0.8, 0.8, max(0.1, alpha)), 1.5)
+
 		
 		# Draw subtle highlight on the string if note is perfect
 		if string_vibration != 0.0:
@@ -327,8 +339,22 @@ func _take_polaroid(id: String, desc: String) -> void:
 	p.position = Vector2(drop_x, -100)
 	p.rotation = randf_range(-0.15, 0.15)
 	
-	var paper = ColorRect.new()
-	paper.color = Color(0.96, 0.94, 0.88)
+	
+	var n_tex = NoiseTexture2D.new()
+	var noise = FastNoiseLite.new()
+	noise.noise_type = FastNoiseLite.TYPE_SIMPLEX
+	noise.frequency = 0.03
+	n_tex.noise = noise
+	n_tex.width = 160
+	n_tex.height = 190
+	var grad = Gradient.new()
+	grad.add_point(0.0, Color("#F5E6C8"))
+	grad.add_point(1.0, Color("#E2CE99"))
+	n_tex.color_ramp = grad
+	
+	var paper = TextureRect.new()
+	paper.texture = n_tex
+
 	paper.size = Vector2(160, 190)
 	paper.position = Vector2(-80, 0)
 	p.add_child(paper)
@@ -344,7 +370,7 @@ func _take_polaroid(id: String, desc: String) -> void:
 	# "mực in hằn sâu (multiply blend mode)"
 	lbl.material = CanvasItemMaterial.new()
 	lbl.material.blend_mode = CanvasItemMaterial.BLEND_MODE_MUL
-	lbl.add_theme_color_override("font_color", Color(0.1, 0.05, 0.05, 0.95))
+	lbl.add_theme_color_override("font_color", Color(0.25, 0.15, 0.1, 0.6) # Brown ink, low opacity)
 	lbl.add_theme_font_size_override("font_size", 10)
 	lbl.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	lbl.size = Vector2(140, 42)
@@ -364,6 +390,7 @@ func _take_polaroid(id: String, desc: String) -> void:
 	peg.color = Color(0.3, 0.18, 0.1)
 	peg.size = Vector2(8, 20)
 	peg.position = Vector2(-4, -10)
+	paper.position = Vector2(-80, 10) # Offset down from pivot # Peg is center pivot
 	p.add_child(peg)
 	
 	var hud = get_tree().get_first_node_in_group("hud")

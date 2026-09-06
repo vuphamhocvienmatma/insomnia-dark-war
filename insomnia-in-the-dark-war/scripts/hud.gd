@@ -171,22 +171,29 @@ func _setup_journal_dropdown() -> void:
 	journal_btn.offset_bottom = -12.0
 	journal_btn.text = "📋 Nhiệm Vụ & Hướng Dẫn  ▲"
 
-	var btn_normal: StyleBoxFlat = StyleBoxFlat.new()
-	btn_normal.bg_color = Color(0.22, 0.16, 0.12, 0.92)
-	btn_normal.border_color = Color(0.55, 0.42, 0.30, 1.0)
-	btn_normal.set_border_width_all(1)
-	btn_normal.set_corner_radius_all(10)
-	btn_normal.set_content_margin_all(8)
-	btn_normal.shadow_color = Color(0, 0, 0, 0.35)
-	btn_normal.shadow_size = 6
-	btn_normal.shadow_offset = Vector2(0, 2)
+	var n_tex = NoiseTexture2D.new()
+	var noise = FastNoiseLite.new()
+	noise.noise_type = FastNoiseLite.TYPE_SIMPLEX
+	noise.frequency = 0.05
+	n_tex.noise = noise
+	n_tex.width = 128
+	n_tex.height = 32
+	var grad = Gradient.new()
+	grad.add_point(0.0, Color("#3A2A20"))
+	grad.add_point(1.0, Color("#4A3A28"))
+	n_tex.color_ramp = grad
 
-	var btn_hover: StyleBoxFlat = StyleBoxFlat.new()
-	btn_hover.bg_color = Color(0.32, 0.23, 0.16, 0.98)
-	btn_hover.border_color = Color(0.88, 0.72, 0.45, 1.0)
-	btn_hover.set_border_width_all(1)
-	btn_hover.set_corner_radius_all(10)
-	btn_hover.set_content_margin_all(8)
+	var btn_normal = StyleBoxTexture.new()
+	btn_normal.texture = n_tex
+	btn_normal.texture_margin_left = 10
+	btn_normal.texture_margin_right = 10
+	btn_normal.texture_margin_top = 8
+	btn_normal.texture_margin_bottom = 8
+	
+	var btn_hover = StyleBoxTexture.new()
+	btn_hover.texture = n_tex
+	btn_hover.modulate_color = Color(1.2, 1.2, 1.2)
+
 
 	journal_btn.add_theme_stylebox_override("normal", btn_normal)
 	journal_btn.add_theme_stylebox_override("hover", btn_hover)
@@ -517,7 +524,6 @@ func _process(_delta: float) -> void:
 
 
 func _setup_eco_toggle_button() -> void:
-	return
 	eco_btn = Button.new()
 	eco_btn.anchor_left = 1.0
 	eco_btn.anchor_top = 0.0
@@ -577,7 +583,6 @@ func _apply_eco_mode(enabled: bool) -> void:
 
 
 func _setup_zoom_controls() -> void:
-	return
 	var z_panel: Panel = Panel.new()
 	z_panel.anchor_left = 1.0
 	z_panel.anchor_top = 0.0
@@ -787,37 +792,3 @@ func open_cooking_modal() -> void:
 		_setup_cooking_modal()
 	if cooking_modal != null and cooking_modal.has_method("open_menu"):
 		cooking_modal.call("open_menu")
-
-func _process(delta: float) -> void:
-	queue_redraw()
-
-func _draw() -> void:
-	var sw = get_viewport().size.x
-	var sh = get_viewport().size.y
-	
-	# Draw Eco Breaker (Rusty)
-	var bx = sw - 120
-	var by = 60
-	draw_rect(Rect2(bx, by, 50, 80), Color("#4A3B32")) # Rusty box
-	draw_rect(Rect2(bx+5, by+5, 40, 70), Color("#2A1F1A")) # Inner box
-	var eco_mode = false
-	var ls = get_tree().get_first_node_in_group("level_setup")
-	if ls and "eco_mode" in ls: eco_mode = ls.eco_mode
-	if eco_mode:
-		draw_rect(Rect2(bx+15, by+40, 20, 25), Color("#555555")) # Switch down
-		draw_line(Vector2(bx+25, by+40), Vector2(bx+25, by+65), Color("#888888"), 4.0)
-	else:
-		draw_rect(Rect2(bx+15, by+15, 20, 25), Color("#A03030")) # Switch up
-		draw_line(Vector2(bx+25, by+15), Vector2(bx+25, by+40), Color("#FF6060"), 4.0)
-	
-	# Draw Binoculars for Zoom
-	var zx = sw - 150
-	var zy = sh - 100
-	draw_rect(Rect2(zx, zy, 80, 50), Color("#303525")) # Army green
-	draw_circle(Vector2(zx+20, zy+25), 18, Color("#151810"))
-	draw_circle(Vector2(zx+60, zy+25), 18, Color("#151810"))
-	draw_circle(Vector2(zx+20, zy+25), 12, Color("#101525")) # Glass
-	draw_circle(Vector2(zx+60, zy+25), 12, Color("#101525")) # Glass
-	# Reflection
-	draw_line(Vector2(zx+12, zy+17), Vector2(zx+28, zy+33), Color("#FFFFFF", 0.3), 3.0)
-	draw_line(Vector2(zx+52, zy+17), Vector2(zx+68, zy+33), Color("#FFFFFF", 0.3), 3.0)

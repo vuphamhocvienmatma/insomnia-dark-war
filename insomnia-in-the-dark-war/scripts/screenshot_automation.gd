@@ -25,13 +25,18 @@ func _suppress_initial_polaroids() -> void:
 func _clear_all_overlays() -> void:
 	if ChillManager:
 		for c in ChillManager.get_children():
-			if c is ColorRect and (c.name.begins_with("Polaroid") or c.size == Vector2(160, 190) or c.size == Vector2(150, 180)):
+			if c.name.begins_with("Polaroid") or (c is ColorRect and (c.size == Vector2(160, 190) or c.size == Vector2(150, 180))):
 				c.queue_free()
 		if ChillManager.coffee_ui:
 			ChillManager.coffee_ui.hide()
 		if ChillManager.guitar_ui:
 			ChillManager.guitar_ui.hide()
 		ChillManager.guitar_active = false
+	var hud = get_tree().get_first_node_in_group("hud")
+	if hud:
+		for c in hud.get_children():
+			if c.name.begins_with("Polaroid"):
+				c.queue_free()
 	get_tree().paused = false
 
 func _get_ls() -> Node:
