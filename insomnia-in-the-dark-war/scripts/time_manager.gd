@@ -1,4 +1,4 @@
-﻿extends Node
+extends Node
 
 signal phase_changed(is_night: bool)
 signal solar_changed(new_amount: float)
@@ -39,12 +39,14 @@ func _process(delta: float) -> void:
 			target_color = sunset_color.lerp(night_color, eased_dusk)
 			
 		if GameState:
+			var old_int: int = int(current_solar_energy)
 			current_solar_energy = clamp(
 				current_solar_energy + (delta * 5.0 * GameState.solar_charge_multiplier),
 				0.0,
 				max_solar_storage
 			)
-			solar_changed.emit(current_solar_energy)
+			if int(current_solar_energy) != old_int:
+				solar_changed.emit(current_solar_energy)
 
 		if not _warned_sunset and (day_duration_seconds - time_elapsed) <= 10.0:
 			_warned_sunset = true

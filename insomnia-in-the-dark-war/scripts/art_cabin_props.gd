@@ -1,4 +1,4 @@
-extends Node2D
+﻿extends Node2D
 
 const OUTLINE := Color(0.18, 0.14, 0.12, 1.0)
 const WOOD_PLANK_A: Color = Color(0.36, 0.25, 0.18, 1.0)
@@ -17,11 +17,13 @@ var _clock_timer: float = 0.0
 var _badge_cache: Array[bool] = [false, false, false, false, false, false, false]
 var _badge_timer: float = 0.0
 var _tm: Node = null
+var _level_setup: Node = null
 var dust_particles: Array[Dictionary] = []
 @onready var _font: Font = ThemeDB.fallback_font
 
 
 func _ready() -> void:
+	_level_setup = _level_setup
 	z_index = -3
 	for i in 50:
 		dust_particles.append({
@@ -391,7 +393,7 @@ func _draw_ground_window_light_shaft() -> void:
 		return
 		
 	var w = "sunny"
-	if get_node_or_null("/root/LevelSetup"): w = get_node("/root/LevelSetup").get("current_weather")
+	if _level_setup: w = _level_setup.get("current_weather")
 	if w != "sunny": return # Only draw strong sun shafts if sunny
 		
 	var ratio = _tm.get("time_elapsed") / max(float(_tm.get("day_duration_seconds")), 1.0)
@@ -837,7 +839,7 @@ func _draw_guitar() -> void:
 func _update_badge_cache() -> void:
 	_badge_cache[0] = GameState != null and int(GameState.stats.get("days_survived", 0)) >= 7
 	_badge_cache[1] = GameState != null and int(GameState.stats.get("zombies_killed", 0)) >= 50
-	_badge_cache[2] = MailboxManager != null and int(MailboxManager.sender_affinity.get("Bác Sáu (Câu Cá Sa Mạc)", 0)) >= 60
+	_badge_cache[2] = MailboxManager != null and int(MailboxManager.sender_affinity.get("BÃ¡c SÃ¡u (CÃ¢u CÃ¡ Sa Máº¡c)", 0)) >= 60
 	_badge_cache[3] = GameState != null and int(GameState.stats.get("plants_harvested", 0)) >= 15
 	_badge_cache[4] = GameState != null and int(GameState.stats.get("walls_built", 0)) >= 10
 	_badge_cache[5] = GameState != null and bool(GameState.meal_buff)
@@ -954,8 +956,8 @@ func _draw_custom_decorations() -> void:
 
 func _draw_lantern() -> void:
 	var w = "sunny"
-	if get_node_or_null("/root/LevelSetup"):
-		w = get_node("/root/LevelSetup").get("current_weather")
+	if _level_setup:
+		w = _level_setup.get("current_weather")
 	
 	# Lantern sways more in storm or snow
 	var sway_amt = 0.05
@@ -1045,3 +1047,4 @@ func _draw_diegetic_ui() -> void:
 	var ry = -43.0
 	draw_rect(Rect2(rx, ry + 2, 20, 8), Color(0.05, 0.05, 0.05))
 	draw_string(font, Vector2(rx + 2, ry + 9), time_str, HORIZONTAL_ALIGNMENT_LEFT, -1, 8, Color(0.9, 0.2, 0.2))
+

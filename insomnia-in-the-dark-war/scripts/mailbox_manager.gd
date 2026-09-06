@@ -24,17 +24,18 @@ func _ready() -> void:
 	add_to_group("mailbox_manager")
 	_init_letter_templates()
 	
-	# Initial welcome mail on Day 1
 	var starter_letter: Dictionary = _get_starter_letter()
 	receive_letter(starter_letter)
-
-
-func _process(delta: float) -> void:
-	_timer += delta
-	if _timer >= _next_letter_delay:
-		_timer = 0.0
-		_next_letter_delay = randf_range(60.0, 95.0)
+	
+	var timer := Timer.new()
+	timer.wait_time = randf_range(60.0, 95.0)
+	timer.autostart = true
+	timer.one_shot = false
+	timer.timeout.connect(func():
 		generate_random_letter()
+		timer.wait_time = randf_range(60.0, 95.0)
+	)
+	add_child(timer)
 
 
 func has_unread() -> bool:

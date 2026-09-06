@@ -1,4 +1,4 @@
-extends CanvasLayer
+﻿extends CanvasLayer
 
 @onready var label: Label = $Label
 @onready var seeds_label: Label = $SeedsLabel
@@ -25,7 +25,6 @@ var dropdown_task_labels: Array[Label] = []
 var clock_panel: Panel
 var time_arc_label: Label
 var solar_bar: ProgressBar
-var solar_text: Label
 
 # Screen Warning Vignette & Toast System
 var vignette_rect: ColorRect
@@ -76,7 +75,7 @@ func _ready() -> void:
 	stats_panel.add_child(vbox)
 
 	var title: Label = Label.new()
-	title.text = "Túi đồ nhỏ [T]"
+	title.text = "TÃƒÂºi Ã„â€˜Ã¡Â»â€œ nhÃ¡Â»Â [T]"
 	title.add_theme_font_size_override("font_size", 17)
 	title.add_theme_color_override("font_color", TEXT_COLOR)
 	vbox.add_child(title)
@@ -128,21 +127,21 @@ func _ready() -> void:
 
 	if MailboxManager != null:
 		MailboxManager.mail_received.connect(func(_l: Dictionary) -> void:
-			show_toast("📬 Có thư mới trong hòm thư trước nhà!", 4.0, false)
+			show_toast("Ã°Å¸â€œÂ¬ CÃƒÂ³ thÃ†Â° mÃ¡Â»â€ºi trong hÃƒÂ²m thÃ†Â° trÃ†Â°Ã¡Â»â€ºc nhÃƒÂ !", 4.0, false)
 		)
 		MailboxManager.surprise_gift_unlocked.connect(func(sender: String, title: String, _rewards: String) -> void:
-			show_toast("🎉 " + sender + " vừa gửi món quà bất ngờ: " + title + "!", 5.0, false)
+			show_toast("Ã°Å¸Å½â€° " + sender + " vÃ¡Â»Â«a gÃ¡Â»Â­i mÃƒÂ³n quÃƒÂ  bÃ¡ÂºÂ¥t ngÃ¡Â»Â: " + title + "!", 5.0, false)
 		)
 
 	# Day 1 Auto Hints (3 gentle toasts on day start)
 	get_tree().create_timer(1.5).timeout.connect(func() -> void:
-		show_toast("🖐️ Phím [E]: Nhặt phế liệu & thu hoạch hạt giống", 3.8)
+		show_toast("Ã°Å¸â€“ÂÃ¯Â¸Â PhÃƒÂ­m [E]: NhÃ¡ÂºÂ·t phÃ¡ÂºÂ¿ liÃ¡Â»â€¡u & thu hoÃ¡ÂºÂ¡ch hÃ¡ÂºÂ¡t giÃ¡Â»â€˜ng", 3.8)
 	)
 	get_tree().create_timer(6.5).timeout.connect(func() -> void:
-		show_toast("🎯 Chuột trái: Bắn súng phòng thủ bảo vệ căn cứ", 3.8)
+		show_toast("Ã°Å¸Å½Â¯ ChuÃ¡Â»â„¢t trÃƒÂ¡i: BÃ¡ÂºÂ¯n sÃƒÂºng phÃƒÂ²ng thÃ¡Â»Â§ bÃ¡ÂºÂ£o vÃ¡Â»â€¡ cÃ„Æ’n cÃ¡Â»Â©", 3.8)
 	)
 	get_tree().create_timer(11.5).timeout.connect(func() -> void:
-		show_toast("🔨 Phím [C]: Chế tạo rào chắn & công sự", 3.8)
+		show_toast("Ã°Å¸â€Â¨ PhÃƒÂ­m [C]: ChÃ¡ÂºÂ¿ tÃ¡ÂºÂ¡o rÃƒÂ o chÃ¡ÂºÂ¯n & cÃƒÂ´ng sÃ¡Â»Â±", 3.8)
 	)
 
 	_refresh_stats()
@@ -160,7 +159,7 @@ func _setup_journal_dropdown() -> void:
 	journal_btn.offset_top = -46.0
 	journal_btn.offset_right = -16.0
 	journal_btn.offset_bottom = -12.0
-	journal_btn.text = "📋 Nhiệm Vụ & Hướng Dẫn  ▲"
+	journal_btn.text = "Ã°Å¸â€œâ€¹ NhiÃ¡Â»â€¡m VÃ¡Â»Â¥ & HÃ†Â°Ã¡Â»â€ºng DÃ¡ÂºÂ«n  Ã¢â€“Â²"
 
 	var btn_normal: StyleBoxFlat = StyleBoxFlat.new()
 	btn_normal.bg_color = Color(0.22, 0.16, 0.12, 0.92)
@@ -221,7 +220,7 @@ func _setup_journal_dropdown() -> void:
 
 	# Header Title
 	var p_title: Label = Label.new()
-	p_title.text = "📜 NHẬT KÝ & HƯỚNG DẪN SINH TỒN"
+	p_title.text = "Ã°Å¸â€œÅ“ NHÃ¡ÂºÂ¬T KÃƒÂ & HÃ†Â¯Ã¡Â»Å¡NG DÃ¡ÂºÂªN SINH TÃ¡Â»â€™N"
 	p_title.add_theme_font_size_override("font_size", 14)
 	p_title.add_theme_color_override("font_color", HEADER_COLOR)
 	p_vbox.add_child(p_title)
@@ -234,7 +233,7 @@ func _setup_journal_dropdown() -> void:
 
 	# Section 1: Daily Objectives
 	var obj_head: Label = Label.new()
-	obj_head.text = "🎯 NHIỆM VỤ HÀNG NGÀY:"
+	obj_head.text = "Ã°Å¸Å½Â¯ NHIÃ¡Â»â€ M VÃ¡Â»Â¤ HÃƒâ‚¬NG NGÃƒâ‚¬Y:"
 	obj_head.add_theme_font_size_override("font_size", 12)
 	obj_head.add_theme_color_override("font_color", HEADER_COLOR)
 	p_vbox.add_child(obj_head)
@@ -255,19 +254,19 @@ func _setup_journal_dropdown() -> void:
 
 	# Section 2: Controls & Guide
 	var guide_head: Label = Label.new()
-	guide_head.text = "📖 HƯỚNG DẪN ĐIỀU KHIỂN & MẸO:"
+	guide_head.text = "Ã°Å¸â€œâ€“ HÃ†Â¯Ã¡Â»Å¡NG DÃ¡ÂºÂªN Ã„ÂIÃ¡Â»â‚¬U KHIÃ¡Â»â€šN & MÃ¡ÂºÂ¸O:"
 	guide_head.add_theme_font_size_override("font_size", 12)
 	guide_head.add_theme_color_override("font_color", HEADER_COLOR)
 	p_vbox.add_child(guide_head)
 
 	var guide_lines: Array[String] = [
-		"• [A / D] hoặc [← / →] : Di chuyển trái / phải",
-		"• [W] hoặc [↑] : Leo thang gác xép & lên mái nhà",
-		"• [E] : Tương tác (Hái quả, nhặt phế liệu, vào hầm)",
-		"• [Chuột trái] : Bắn súng phòng thủ",
-		"• [C] : Mở Menu Chế Tạo công trình",
-		"• [T] : Mở Túi Đồ Sinh Tồn",
-		"💡 Ban ngày tìm đồ & sửa rào; ban đêm cố thủ trên mái súng AK!"
+		"Ã¢â‚¬Â¢ [A / D] hoÃ¡ÂºÂ·c [Ã¢â€ Â / Ã¢â€ â€™] : Di chuyÃ¡Â»Æ’n trÃƒÂ¡i / phÃ¡ÂºÂ£i",
+		"Ã¢â‚¬Â¢ [W] hoÃ¡ÂºÂ·c [Ã¢â€ â€˜] : Leo thang gÃƒÂ¡c xÃƒÂ©p & lÃƒÂªn mÃƒÂ¡i nhÃƒÂ ",
+		"Ã¢â‚¬Â¢ [E] : TÃ†Â°Ã†Â¡ng tÃƒÂ¡c (HÃƒÂ¡i quÃ¡ÂºÂ£, nhÃ¡ÂºÂ·t phÃ¡ÂºÂ¿ liÃ¡Â»â€¡u, vÃƒÂ o hÃ¡ÂºÂ§m)",
+		"Ã¢â‚¬Â¢ [ChuÃ¡Â»â„¢t trÃƒÂ¡i] : BÃ¡ÂºÂ¯n sÃƒÂºng phÃƒÂ²ng thÃ¡Â»Â§",
+		"Ã¢â‚¬Â¢ [C] : MÃ¡Â»Å¸ Menu ChÃ¡ÂºÂ¿ TÃ¡ÂºÂ¡o cÃƒÂ´ng trÃƒÂ¬nh",
+		"Ã¢â‚¬Â¢ [T] : MÃ¡Â»Å¸ TÃƒÂºi Ã„ÂÃ¡Â»â€œ Sinh TÃ¡Â»â€œn",
+		"Ã°Å¸â€™Â¡ Ban ngÃƒÂ y tÃƒÂ¬m Ã„â€˜Ã¡Â»â€œ & sÃ¡Â»Â­a rÃƒÂ o; ban Ã„â€˜ÃƒÂªm cÃ¡Â»â€˜ thÃ¡Â»Â§ trÃƒÂªn mÃƒÂ¡i sÃƒÂºng AK!"
 	]
 	for g_text in guide_lines:
 		var g_lbl: Label = Label.new()
@@ -295,7 +294,7 @@ func _toggle_journal_dropdown() -> void:
 		_journal_tw = create_tween()
 		_journal_tw.tween_property(journal_panel, "modulate:a", 1.0, 0.15)
 		_journal_tw.parallel().tween_property(journal_panel, "scale", Vector2.ONE, 0.15)
-		journal_btn.text = "📋 Đóng Hướng Dẫn & Nhiệm Vụ  ▼"
+		journal_btn.text = "Ã°Å¸â€œâ€¹ Ã„ÂÃƒÂ³ng HÃ†Â°Ã¡Â»â€ºng DÃ¡ÂºÂ«n & NhiÃ¡Â»â€¡m VÃ¡Â»Â¥  Ã¢â€“Â¼"
 	else:
 		_journal_tw = create_tween()
 		_journal_tw.tween_property(journal_panel, "modulate:a", 0.0, 0.12)
@@ -329,7 +328,7 @@ func _refresh_journal_btn_text() -> void:
 		for t in tasks:
 			if bool(t.get("completed", false)):
 				done_count += 1
-		journal_btn.text = "📋 Nhiệm Vụ & Hướng Dẫn (" + str(done_count) + "/3)  ▲"
+		journal_btn.text = "Ã°Å¸â€œâ€¹ NhiÃ¡Â»â€¡m VÃ¡Â»Â¥ & HÃ†Â°Ã¡Â»â€ºng DÃ¡ÂºÂ«n (" + str(done_count) + "/3)  Ã¢â€“Â²"
 
 
 func _unhandled_input(event: InputEvent) -> void:
@@ -357,11 +356,11 @@ func _set_stats_visible(v: bool) -> void:
 
 
 func _refresh_stats() -> void:
-	scrap_line.text = "🔩  Phế liệu: " + str(GameState.scrap_count)
-	seeds_line.text = "🌱  Hạt giống: " + str(GameState.seeds_count)
-	water_line.text = "💧  Nước: " + str(GameState.water_count)
+	scrap_line.text = "Ã°Å¸â€Â©  PhÃ¡ÂºÂ¿ liÃ¡Â»â€¡u: " + str(GameState.scrap_count)
+	seeds_line.text = "Ã°Å¸Å’Â±  HÃ¡ÂºÂ¡t giÃ¡Â»â€˜ng: " + str(GameState.seeds_count)
+	water_line.text = "Ã°Å¸â€™Â§  NÃ†Â°Ã¡Â»â€ºc: " + str(GameState.water_count)
 	tired_line.visible = GameState.is_tired
-	tired_line.text = "😴  Mất ngủ - bước chân nặng"
+	tired_line.text = "Ã°Å¸ËœÂ´  MÃ¡ÂºÂ¥t ngÃ¡Â»Â§ - bÃ†Â°Ã¡Â»â€ºc chÃƒÂ¢n nÃ¡ÂºÂ·ng"
 
 
 func _on_scrap_changed(new_amount: int) -> void:
@@ -389,12 +388,15 @@ func _on_tired_changed(is_tired: bool) -> void:
 			tw.tween_method(func(val): crect.material.set_shader_parameter("insomnia_level", val), 0.0 if not is_tired else 0.8, 0.8 if is_tired else 0.0, 3.0)
 
 
+var _pulse_tween: Tween
 func _pulse(ln: Label) -> void:
 	if not stats_panel.visible:
 		return
+	if _pulse_tween != null and _pulse_tween.is_valid():
+		_pulse_tween.kill()
 	ln.scale = Vector2(1.05, 1.05)
-	var tw: Tween = create_tween()
-	tw.tween_property(ln, "scale", Vector2.ONE, 0.12)
+	_pulse_tween = create_tween()
+	_pulse_tween.tween_property(ln, "scale", Vector2.ONE, 0.12)
 
 
 func _on_tasks_updated() -> void:
@@ -408,20 +410,20 @@ func _update_tasks() -> void:
 		if i < tasks.size():
 			var task: Dictionary = tasks[i]
 			var task_type: String = str(task.get("type", ""))
-			var icon_str: String = "🪵 "
+			var icon_str: String = "Ã°Å¸ÂªÂµ "
 			if task_type == "seed":
-				icon_str = "🌱 "
+				icon_str = "Ã°Å¸Å’Â± "
 			elif task_type == "zombie_kill":
-				icon_str = "🧟 "
+				icon_str = "Ã°Å¸Â§Å¸ "
 
 			var done: bool = bool(task.get("completed", false))
 			if done:
-				ln.text = "✓ " + icon_str + str(task.get("desc", "")) + " [HOÀN THÀNH]"
+				ln.text = "Ã¢Å“â€œ " + icon_str + str(task.get("desc", "")) + " [HOÃƒâ‚¬N THÃƒâ‚¬NH]"
 				ln.add_theme_color_override("font_color", DONE_COLOR)
 			else:
 				var prog: int = int(task.get("progress", 0))
 				var tgt: int = int(task.get("target", 0))
-				ln.text = "• " + icon_str + str(task.get("desc", "")) + " (" + str(prog) + "/" + str(tgt) + ")"
+				ln.text = "Ã¢â‚¬Â¢ " + icon_str + str(task.get("desc", "")) + " (" + str(prog) + "/" + str(tgt) + ")"
 				ln.add_theme_color_override("font_color", TODO_COLOR)
 		else:
 			ln.text = ""
@@ -435,7 +437,6 @@ var _last_arc_slot: int = -1
 var _last_phase_is_n: int = -1
 var _last_arc_text: String = ""
 var _last_solar_int: int = -999
-var _last_solar_text: String = ""
 var _last_zoom_str: String = ""
 var eco_btn: Button
 
@@ -454,7 +455,7 @@ func _process(_delta: float) -> void:
 		if time_arc_label != null and (current_slot != _last_arc_slot or phase_val != _last_phase_is_n):
 			_last_arc_slot = current_slot
 			_last_phase_is_n = phase_val
-			var phase_icon: String = "🌙 Đêm" if is_n else "☀️ Ngày"
+			var phase_icon: String = "Ã°Å¸Å’â„¢ Ã„ÂÃƒÂªm" if is_n else "Ã¢Ëœâ‚¬Ã¯Â¸Â NgÃƒÂ y"
 			var arc_bar: String = _make_arc_bar(r)
 			var new_arc_text: String = phase_icon + "  " + arc_bar
 			if new_arc_text != _last_arc_text:
@@ -468,10 +469,7 @@ func _process(_delta: float) -> void:
 			_last_solar_int = sol_int
 			if solar_bar != null:
 				solar_bar.value = sol
-			var new_solar_text: String = "⚡ Solar: " + str(sol_int) + "%"
-			if new_solar_text != _last_solar_text and solar_text != null:
-				_last_solar_text = new_solar_text
-				solar_text.text = new_solar_text
+			
 
 	# Update Zoom level indicator ONLY when value changes
 	if zoom_lbl != null and _cached_cam != null and _cached_cam.has_method("get_zoom_level"):
@@ -512,10 +510,10 @@ func _update_eco_btn_ui() -> void:
 	if eco_btn == null:
 		return
 	if GameState.eco_mode:
-		eco_btn.text = "⚡ Eco: BẬT"
+		eco_btn.text = "Ã¢Å¡Â¡ Eco: BÃ¡ÂºÂ¬T"
 		eco_btn.modulate = Color(0.65, 1.0, 0.65, 1.0)
 	else:
-		eco_btn.text = "⚡ Eco: TẮT"
+		eco_btn.text = "Ã¢Å¡Â¡ Eco: TÃ¡ÂºÂ®T"
 		eco_btn.modulate = Color(1.0, 0.92, 0.82, 0.9)
 
 
@@ -525,9 +523,9 @@ func _on_eco_mode_changed(enabled: bool) -> void:
 	if SaveManager != null:
 		SaveManager.save_game()
 	if enabled:
-		show_toast("⚡ Chế độ Tiết kiệm: BẬT (Đã tắt hậu kỳ & tắt bóng đèn PointLight2D)", 3.2, false)
+		show_toast("Ã¢Å¡Â¡ ChÃ¡ÂºÂ¿ Ã„â€˜Ã¡Â»â„¢ TiÃ¡ÂºÂ¿t kiÃ¡Â»â€¡m: BÃ¡ÂºÂ¬T (Ã„ÂÃƒÂ£ tÃ¡ÂºÂ¯t hÃ¡ÂºÂ­u kÃ¡Â»Â³ & tÃ¡ÂºÂ¯t bÃƒÂ³ng Ã„â€˜ÃƒÂ¨n PointLight2D)", 3.2, false)
 	else:
-		show_toast("✨ Chế độ Tiết kiệm: TẮT (Đã bật đầy đủ hiệu ứng)", 3.2, false)
+		show_toast("Ã¢Å“Â¨ ChÃ¡ÂºÂ¿ Ã„â€˜Ã¡Â»â„¢ TiÃ¡ÂºÂ¿t kiÃ¡Â»â€¡m: TÃ¡ÂºÂ®T (Ã„ÂÃƒÂ£ bÃ¡ÂºÂ­t Ã„â€˜Ã¡ÂºÂ§y Ã„â€˜Ã¡Â»Â§ hiÃ¡Â»â€¡u Ã¡Â»Â©ng)", 3.2, false)
 
 
 func _apply_eco_mode(enabled: bool) -> void:
@@ -568,7 +566,7 @@ func _setup_zoom_controls() -> void:
 	z_panel.add_child(hbox)
 
 	var btn_out: Button = Button.new()
-	btn_out.text = "－"
+	btn_out.text = "Ã¯Â¼Â"
 	btn_out.custom_minimum_size = Vector2(24, 22)
 	btn_out.pressed.connect(func() -> void:
 		if _cached_cam != null and _cached_cam.has_method("zoom_out"):
@@ -583,7 +581,7 @@ func _setup_zoom_controls() -> void:
 	hbox.add_child(zoom_lbl)
 
 	var btn_in: Button = Button.new()
-	btn_in.text = "＋"
+	btn_in.text = "Ã¯Â¼â€¹"
 	btn_in.custom_minimum_size = Vector2(24, 22)
 	btn_in.pressed.connect(func() -> void:
 		if _cached_cam != null and _cached_cam.has_method("zoom_in"):
@@ -598,9 +596,9 @@ func _make_arc_bar(r: float) -> String:
 	var s: String = "["
 	for i in slots:
 		if i == pos:
-			s += "●"
+			s += "Ã¢â€”Â"
 		else:
-			s += "─"
+			s += "Ã¢â€â‚¬"
 	s += "]"
 	return s
 
@@ -681,22 +679,20 @@ func show_toast(msg: String, duration: float = 3.8, is_warning: bool = false) ->
 
 
 func _on_sunset_warning() -> void:
-	show_toast("🌙 Trời sắp tối! Hãy chuẩn bị phòng thủ căn cứ!", 5.0, true)
+	show_toast("Ã°Å¸Å’â„¢ TrÃ¡Â»Âi sÃ¡ÂºÂ¯p tÃ¡Â»â€˜i! HÃƒÂ£y chuÃ¡ÂºÂ©n bÃ¡Â»â€¹ phÃƒÂ²ng thÃ¡Â»Â§ cÃ„Æ’n cÃ¡Â»Â©!", 5.0, true)
 
 
 func _on_phase_changed(is_night: bool) -> void:
 	if is_night:
-		show_toast("⚠️ ĐÊM ĐÃ XUỐNG! Zombie đang tiến tới!", 4.0, true)
+		show_toast("Ã¢Å¡Â Ã¯Â¸Â Ã„ÂÃƒÅ M Ã„ÂÃƒÆ’ XUÃ¡Â»ÂNG! Zombie Ã„â€˜ang tiÃ¡ÂºÂ¿n tÃ¡Â»â€ºi!", 4.0, true)
 	else:
-		show_toast("☀️ Bình minh đã lên! Căn cứ an toàn.", 3.5, false)
+		show_toast("Ã¢Ëœâ‚¬Ã¯Â¸Â BÃƒÂ¬nh minh Ã„â€˜ÃƒÂ£ lÃƒÂªn! CÃ„Æ’n cÃ¡Â»Â© an toÃƒÂ n.", 3.5, false)
 
 
 func _on_solar_changed(new_amount: float) -> void:
 	if solar_bar != null:
 		solar_bar.value = new_amount
-	if solar_text != null:
-		solar_text.text = "⚡ Solar: " + str(int(new_amount)) + "%"
-
+	
 
 func _setup_mailbox_modal() -> void:
 	var script: GDScript = preload("res://scripts/mailbox_ui.gd")
@@ -739,3 +735,5 @@ func open_cooking_modal() -> void:
 		_setup_cooking_modal()
 	if cooking_modal != null and cooking_modal.has_method("open_menu"):
 		cooking_modal.call("open_menu")
+
+

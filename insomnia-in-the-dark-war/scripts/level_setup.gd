@@ -163,6 +163,8 @@ func _on_phase_changed(is_night: bool) -> void:
 			var tm: Node = get_tree().get_first_node_in_group("time_manager")
 			if tm != null and "current_solar_energy" in tm:
 				tm.set("current_solar_energy", float(tm.get("current_solar_energy")) * 0.5)
+				if tm.has_signal("solar_changed"):
+					tm.emit_signal("solar_changed", tm.get("current_solar_energy"))
 		_respawn_zombie_wave()
 	else:
 		current_night_mutation = ""

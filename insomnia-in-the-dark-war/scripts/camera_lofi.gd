@@ -16,14 +16,15 @@ func _ready() -> void:
 	top_level = true
 	position = Vector2(0.0, CAM_Y)
 	zoom = Vector2(1.05, 1.05)
-	_player = get_tree().get_first_node_in_group("player") as Node2D
+	call_deferred("_fetch_player")
+
+func _fetch_player() -> void:
+	_player = get_parent() as Node2D
+	if _player == null or not _player.is_in_group("player"):
+		_player = get_tree().get_first_node_in_group("player") as Node2D
 
 
 func _process(delta: float) -> void:
-	if _player == null:
-		_player = get_parent() as Node2D
-		if _player == null or not _player.is_in_group("player"):
-			_player = get_tree().get_first_node_in_group("player") as Node2D
 
 	var is_in_cabin: bool = false
 	

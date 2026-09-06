@@ -63,12 +63,7 @@ func _connect_tm() -> void:
 		crossfade_bgm(is_night)
 
 
-func _process(_delta: float) -> void:
-	# Ensure music keeps playing
-	if bgm_day.stream != null and not bgm_day.playing and bgm_day.volume_db > -40.0:
-		bgm_day.play()
-	if bgm_night.stream != null and not bgm_night.playing and bgm_night.volume_db > -40.0:
-		bgm_night.play()
+
 
 
 func crossfade_bgm(is_night: bool) -> void:
@@ -98,19 +93,26 @@ func _fade(player: AudioStreamPlayer, up: bool) -> void:
 
 
 func play_sfx(sfx_name: String, pos: Vector2 = Vector2.ZERO) -> void:
-	var player: AudioStreamPlayer = null
-	if sfx_pool.has(sfx_name):
-		player = sfx_pool[sfx_name]
-	else:
-		player = AudioStreamPlayer.new()
-		add_child(player)
-		sfx_pool[sfx_name] = player
 	var sfx_path: String = "res://assets/sfx/" + sfx_name + ".ogg"
 	if not ResourceLoader.exists(sfx_path):
 		sfx_path = "res://assets/sfx/" + sfx_name + ".wav"
 
-	if ResourceLoader.exists(sfx_path):
-		var stream: AudioStream = load(sfx_path) as AudioStream
-		if stream != null:
-			player.stream = stream
-			player.play()
+	if not ResourceLoader.exists(sfx_path):
+		return
+
+	var pool: Array = sfx_pool.get(sfx_name, [])
+	var player: AudioStreamPlayer = null
+	for p in pool:
+		if not p.playing:
+			player = p
+			break
+	if player == null:
+		player = AudioStreamPlayer.new()
+		add_child(player)
+		pool.append(player)
+		sfx_pool[sfx_name] = pool
+
+	var stream: AudioStream = load(sfx_path) as AudioStream
+	if stream != null:
+		player.stream = stream
+		player.play()
