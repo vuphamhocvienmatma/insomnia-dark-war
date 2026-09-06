@@ -1,5 +1,10 @@
 # AI Guide & Coding Architecture (AGENTS.md)
 
+> **QUY TẮC BẮT BUỘC VỀ TESTING:**
+> 1. TRƯỚC KHI sửa bất kỳ file nào: chạy tất cả test case (`run_tests.bat`) và đảm bảo PASS toàn bộ.
+> 2. SAU KHI sửa xong: chạy lại tất cả test case và đảm bảo vẫn PASS toàn bộ.
+> 3. Không được phép PR/commit nếu có test nào FAIL.
+
 Đây là tài liệu hướng dẫn bắt buộc cho mọi AI/LLM tham gia viết code cho **Insomnia in the Dark War**.
 
 ## 1. QUY TẮC TỐI THƯỢNG (THE ZERO-SPRITE RULE)

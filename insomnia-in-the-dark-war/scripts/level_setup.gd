@@ -83,6 +83,9 @@ func _ready() -> void:
 	if OS.get_cmdline_args().has("--take-screenshots"):
 		var auto = preload("res://scripts/screenshot_automator.gd").new()
 		add_child(auto)
+	elif OS.get_cmdline_args().has("--screenshot-automation") or OS.get_cmdline_user_args().has("--screenshot-automation"):
+		var auto = preload("res://scripts/screenshot_automation.gd").new()
+		add_child(auto)
 
 func _spawn_sockets() -> void:
 	var socket_x: Array[float] = [-232.0, 232.0]
