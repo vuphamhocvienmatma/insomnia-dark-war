@@ -56,7 +56,7 @@ void fragment() {
 		vec3 col = vec3(r, g, b);
 
 		// Insomnia Shift
-		if (insomnia_level > 0.0) {
+		if (insomnia_level > 0.01) {
 			vec2 insom_shift = vec2(sin(TIME * 2.5) * 0.0008, cos(TIME * 1.5) * 0.0008) * insomnia_level;
 			col.r = texture(screen_texture, uv + insom_shift).r;
 			col.b = texture(screen_texture, uv - insom_shift).b;

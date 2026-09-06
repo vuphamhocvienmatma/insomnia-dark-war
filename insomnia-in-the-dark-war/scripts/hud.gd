@@ -375,6 +375,7 @@ func _on_water_changed(new_amount: int) -> void:
 	_refresh_stats()
 	_pulse(water_line)
 
+var _insomnia_tw: Tween
 func _on_tired_changed(is_tired: bool) -> void:
 	_refresh_stats()
 	_pulse(tired_line)
@@ -384,8 +385,10 @@ func _on_tired_changed(is_tired: bool) -> void:
 	if post_layer and post_layer.get_child_count() > 0:
 		var crect = post_layer.get_child(0) as ColorRect
 		if crect and crect.material is ShaderMaterial:
-			var tw = create_tween()
-			tw.tween_method(func(val): crect.material.set_shader_parameter("insomnia_level", val), 0.0 if not is_tired else 0.8, 0.8 if is_tired else 0.0, 3.0)
+			if _insomnia_tw != null and _insomnia_tw.is_valid():
+				_insomnia_tw.kill()
+			_insomnia_tw = create_tween()
+			_insomnia_tw.tween_method(func(val): crect.material.set_shader_parameter("insomnia_level", val), 0.0 if not is_tired else 0.8, 0.8 if is_tired else 0.0, 3.0)
 
 
 var _pulse_tween: Tween

@@ -8,6 +8,8 @@ var is_player_near: bool = false
 
 func _ready() -> void:
 	add_to_group("merchant_dog")
+	collision_layer = 16 # Layer 5 (NPC)
+	collision_mask = 1   # Mask 1 (Player)
 	position.y = 0.0
 	_update_prompt()
 

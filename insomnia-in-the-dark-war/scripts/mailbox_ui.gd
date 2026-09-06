@@ -2,6 +2,7 @@ extends Panel
 
 var current_letter: Dictionary = {}
 var _typewriter_tween: Tween
+var _am: Node = null
 
 var header_lbl: Label
 var sender_lbl: Label
@@ -268,8 +269,8 @@ func _typewriter_step(val: int) -> void:
 	content_lbl.visible_characters = val
 	if val > prev:
 		# Play sound
-		var am: Node = get_tree().get_first_node_in_group("audio_manager")
-		if am and am.has_method("play_sfx"): am.call("play_sfx", "typewriter_tick")
+		if _am == null: _am = get_tree().get_first_node_in_group("audio_manager")
+		if _am and _am.has_method("play_sfx"): _am.call("play_sfx", "typewriter_tick")
 
 func _on_claim_gift_pressed() -> void:
 	var mm: Node = get_tree().get_first_node_in_group("mailbox_manager")

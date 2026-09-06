@@ -92,7 +92,7 @@ func _fade(player: AudioStreamPlayer, up: bool) -> void:
 		tw.tween_property(player, "volume_db", -80.0, 2.0)
 
 
-func play_sfx(sfx_name: String, pos: Vector2 = Vector2.ZERO) -> void:
+func play_sfx(sfx_name: String, pos: Vector2 = Vector2.ZERO, custom_pitch: float = 1.0) -> void:
 	var sfx_path: String = "res://assets/sfx/" + sfx_name + ".ogg"
 	if not ResourceLoader.exists(sfx_path):
 		sfx_path = "res://assets/sfx/" + sfx_name + ".wav"
