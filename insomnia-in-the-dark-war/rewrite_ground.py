@@ -1,4 +1,7 @@
-extends Node2D
+﻿import os
+
+path = 'scripts/art_ground_props.gd'
+content = '''extends Node2D
 
 var _layer3: Node2D
 var _camera: Node2D
@@ -299,3 +302,7 @@ class FloraAmbient extends Node2D:
 				draw_line(Vector2(x, y), Vector2(x + sway, y - sz * 1.5), grass_col, 1.2)
 				var flower_col: Color = Color(0.95, 0.82, 0.32, 1.0) if (int(ph * 10.0) % 2 == 0) else Color(0.92, 0.92, 0.88, 1.0)
 				draw_circle(Vector2(x + sway, y - sz * 1.5), 2.2, flower_col)
+'''
+with open(path, 'w', encoding='utf-8') as f:
+    f.write(content)
+print("Rewrote art_ground_props.gd")

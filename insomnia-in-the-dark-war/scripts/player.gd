@@ -32,6 +32,8 @@ func _ready() -> void:
 
 var ladder_prompt: Label
 
+var _footprint_timer: float = 0.0
+
 
 func _physics_process(_delta: float) -> void:
 	var direction: Vector2 = Vector2.ZERO
@@ -42,6 +44,12 @@ func _physics_process(_delta: float) -> void:
 
 	if direction != Vector2.ZERO:
 		direction = direction.normalized()
+		_footprint_timer -= _delta
+		if _footprint_timer <= 0.0:
+			_footprint_timer = 0.35 # Step interval
+			var ground = get_tree().get_first_node_in_group("ground_props")
+			if ground and ground.has_method("add_decal"):
+				ground.call("add_decal", "footprint", global_position)
 
 	# Ladder interaction only triggered by pressing E when near the ladder (x = 150)
 	var near_ladder: bool = absf(position.x - 150.0) < 22.0

@@ -21,6 +21,7 @@ var is_dead: bool = false
 
 var is_attacking: bool = false
 var current_target_fence: Node2D = null
+var _footprint_timer: float = 0.0
 var safe_zone: Area2D = null
 var _art_node: Node2D = null
 var _hud: Node = null
@@ -182,6 +183,10 @@ func _on_attack_timer_timeout() -> void:
 		if cam != null and cam.has_method("trigger_shake"):
 			var shake_pwr: float = 14.0 if zombie_type == "brute" else 6.0
 			cam.call("trigger_shake", shake_pwr)
+		
+		var ground = get_tree().get_first_node_in_group("ground_props")
+		if ground and ground.has_method("add_decal"):
+			ground.call("add_decal", "scratch", global_position + Vector2(randf_range(-10, 10), 0))
 	else:
 		is_attacking = false
 		attack_timer.stop()

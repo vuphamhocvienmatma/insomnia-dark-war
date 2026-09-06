@@ -73,3 +73,9 @@ func _on_fire_rate_timer_timeout() -> void:
 		var am := get_tree().get_first_node_in_group("audio_manager")
 		if am != null and am.has_method("play_sfx"):
 			am.call("play_sfx", "turret_shoot")
+			
+		var ground = get_tree().get_first_node_in_group("ground_props")
+		if ground and ground.has_method("add_decal"):
+			# Bullet casings or impact mark near target
+			ground.call("add_decal", "bullet", current_target.global_position + Vector2(randf_range(-15, 15), 0))
+

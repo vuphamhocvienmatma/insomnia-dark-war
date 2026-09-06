@@ -22,6 +22,7 @@ const GROUND_Y: float = 0.0
 var _spawned_zombies: Array[Node2D] = []
 var _night_sky: Node2D = null
 var _weather: Node2D = null
+var _ground_props: Node2D = null
 var day_count: int = 1
 var current_night_mutation: String = ""
 var current_weather: String = "sunny"
@@ -134,6 +135,7 @@ func _spawn_ground_details() -> void:
 	var ground_props := Node2D.new()
 	ground_props.set_script(GROUND_PROPS_SCRIPT)
 	add_child(ground_props)
+	_ground_props = ground_props
 
 func _create_night_sky() -> void:
 	_night_sky = Node2D.new()
@@ -143,6 +145,16 @@ func _create_night_sky() -> void:
 	_night_sky.set_script(NIGHT_SKY_SCRIPT)
 	add_child(_night_sky)
 
+
+func _update_ground_state_from_weather() -> void:
+	if _ground_props and _ground_props.has_method("set_state"):
+		var st = "dry"
+		if current_weather == "drizzle" or current_weather == "heavy_rain": st = "wet"
+		elif current_weather == "snowstorm": st = "snowy"
+		elif current_weather == "sandstorm": st = "sandy"
+		if current_night_mutation == "scorched_earth" or current_night_mutation == "solar_eclipse":
+			st = "scorched"
+		_ground_props.call("set_state", st)
 
 func _on_phase_changed(is_night: bool) -> void:
 	if not is_night:
@@ -157,6 +169,7 @@ func _on_phase_changed(is_night: bool) -> void:
 		_weather.visible = is_night or current_weather != "sunny"
 		if _weather.has_method("set_weather"):
 			_weather.call("set_weather", current_weather)
+	_update_ground_state_from_weather()
 
 	if is_night:
 		if current_night_mutation == "solar_eclipse":
@@ -175,8 +188,10 @@ func _on_phase_changed(is_night: bool) -> void:
 
 
 func _roll_daily_weather() -> void:
-	var weathers: Array[String] = ["sunny", "drizzle", "heavy_rain", "thick_fog", "snowstorm", "meteor_shower"]
+	var weathers: Array[String] = ["sunny", "drizzle", "heavy_rain", "thick_fog", "snowstorm", "meteor_shower", "sandstorm"]
 	current_weather = weathers[randi() % weathers.size()]
+	
+	_update_ground_state_from_weather()
 	
 	var hud: Node = get_tree().get_first_node_in_group("hud")
 	if hud and hud.has_method("show_toast"):
@@ -302,3 +317,4 @@ func load_save_data(data: Dictionary) -> void:
 	if data.has("current_night_mutation"):
 		current_night_mutation = str(data["current_night_mutation"])
 	update_merchant_dog_visibility()
+	_update_ground_state_from_weather()
