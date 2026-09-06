@@ -251,14 +251,6 @@ environmental_light = NodePath("../EnvironmentLight")
 [node name="IntegrityTracker" type="Node" parent="." unique_id=485428721]
 script = ExtResource("6_integrity")
 
-[node name="AudioManager" type="Node" parent="." unique_id=1919772236]
-script = ExtResource("7_audio")
-time_manager = NodePath("../TimeManager")
-
-[node name="DayLofiPlayer" type="AudioStreamPlayer" parent="AudioManager" unique_id=1215752836]
-
-[node name="NightAmbientPlayer" type="AudioStreamPlayer" parent="AudioManager" unique_id=1085463670]
-
 [node name="BuildingManager" type="Node2D" parent="." unique_id=164663087]
 script = ExtResource("8_bm")
 

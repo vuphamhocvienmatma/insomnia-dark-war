@@ -79,6 +79,15 @@ func crossfade_bgm(is_night: bool) -> void:
 		_fade(bgm_night, false)
 		_fade(bgm_day, true)
 
+func _update_audio_zone(in_cabin: bool) -> void:
+	var tw = create_tween().set_parallel(true)
+	if in_cabin:
+		tw.tween_property(bgm_day, "pitch_scale", 0.9, 1.0) # Muffled/Cozy
+		tw.tween_property(bgm_night, "pitch_scale", 0.9, 1.0)
+	else:
+		tw.tween_property(bgm_day, "pitch_scale", 1.0, 1.0) # Clear
+		tw.tween_property(bgm_night, "pitch_scale", 1.0, 1.0)
+
 
 func _fade(player: AudioStreamPlayer, up: bool) -> void:
 	var tw := create_tween()
@@ -97,6 +106,9 @@ func play_sfx(sfx_name: String, pos: Vector2 = Vector2.ZERO) -> void:
 		add_child(player)
 		sfx_pool[sfx_name] = player
 	var sfx_path: String = "res://assets/sfx/" + sfx_name + ".ogg"
+	if not ResourceLoader.exists(sfx_path):
+		sfx_path = "res://assets/sfx/" + sfx_name + ".wav"
+
 	if ResourceLoader.exists(sfx_path):
 		var stream: AudioStream = load(sfx_path) as AudioStream
 		if stream != null:
