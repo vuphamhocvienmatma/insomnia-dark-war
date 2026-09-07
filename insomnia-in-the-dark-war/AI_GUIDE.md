@@ -1,4 +1,4 @@
-# AI Guide & Coding Architecture (AGENTS.md)
+﻿# AI Guide & Coding Architecture (AGENTS.md)
 
 > **QUY TẮC BẮT BUỘC VỀ TESTING:**
 > 1. TRƯỚC KHI sửa bất kỳ file nào: chạy tất cả test case (`run_tests.bat`) và đảm bảo PASS toàn bộ.
@@ -16,22 +16,21 @@
 - Game tuân theo góc nhìn Diorama (nhà búp bê mặt cắt).
 - Trục X là không gian di chuyển. Trục Y là độ cao/độ sâu. Trục Z (Z-Index) quyết định lớp layer.
 - Hệ thống chia làm nhiều file Art tĩnh để dễ quản lý:
-  - rt_skyline.gd: Vẽ bầu trời, mặt trời, trăng và bối cảnh thành phố xa. Tự động nội suy Parallax theo vị trí camera.
-  - rt_ground_props.gd: Vẽ 6 vùng mặt đất, cắt lớp địa tầng, bụi cỏ, sỏi, và quản lý Decals (dấu chân, vỏ đạn). Chứa State Machine quản lý thời tiết.
-  - rt_lighting.gd: Layer Additive trên cùng (Z-Index=50). Vẽ Lò sưởi, God Rays, Fairy Lights, và Dust Motes.
-  - rt_weather.gd: Hệ thống Shader Post-Processing và GPU Particles (mưa, bão cát).
-  - Khối tĩnh Cabin: rt_cabin_front.gd, rt_cabin_props.gd.
+  - art_skyline.gd: Vẽ bầu trời, mặt trời, trăng và bối cảnh thành phố xa. Tự động nội suy Parallax theo vị trí camera.
+  - art_ground_props.gd: Vẽ 6 vùng mặt đất, cắt lớp địa tầng, bụi cỏ, sỏi, và quản lý Decals (dấu chân, vỏ đạn). Chứa State Machine quản lý thời tiết.
+  - art_lighting.gd: Layer Additive trên cùng (Z-Index=50). Vẽ Lò sưởi, God Rays, Fairy Lights, và Dust Motes.
+  - art_weather.gd: Hệ thống Shader Post-Processing và CPUParticles2D (mưa, bão cát). Hỗ trợ Cinematic Weather Readability (Radial Mask, Zoom Density).
+  - Khối tĩnh Cabin: art_cabin_front.gd, art_cabin_props.gd.
 
 ## 3. HIỆU NĂNG VÀ BỘ NHỚ (MEMORY LEAKS)
-- Godot 4 Tween sẽ sinh rác nếu không kill. Luôn lưu reference vào biến cục bộ của class và kiểm tra: if tw != null and tw.is_valid(): tw.kill() trước khi tạo mới.
-- **Arrays & Decals:** Các mảng sinh rác (như array dấu chân _decals, mảng _spawned_zombies) phải có giới hạn (Max = 50-80 phần tử) và tự động 
-emove_at(0).
+- Godot 4 Tween sẽ sinh rác nếu không kill. Luôn lưu reference vào biến cục bộ của class và kiểm tra: `if tw != null and tw.is_valid(): tw.kill()` trước khi tạo mới.
+- **Arrays & Decals:** Các mảng sinh rác (như array dấu chân _decals, mảng _spawned_zombies) phải có giới hạn (Max = 50-80 phần tử) và tự động remove_at(0).
 - **Hạn chế _process:** Không dùng _process() để poll trạng thái (ví dụ check khoảng cách Camera). Dùng Timer, Signal, hoặc call_deferred.
 
 ## 4. UI VÀ THUẬT TOÁN
 - **KHÔNG sử dụng position cho Control nodes (UI).** Bắt buộc dùng offset_left/right/top/bottom và hệ thống Anchor.
 - **Hàm sign():** Trong Godot 4, sign() trả về int. Tuyệt đối sử dụng signf() cho các phép toán vật lý float để tránh giật lag (snapping).
-- **Âm thanh:** Mọi âm thanh SFX phải đi qua udio_manager.gd (Hệ thống Pool array 10 kênh) để tránh bị clipping tiếng súng.
+- **Âm thanh:** Mọi âm thanh SFX phải đi qua **AudioDirector.gd** (Hệ thống Pool array Autoload) để tránh bị clipping tiếng súng. Tuyệt đối không dùng `.wav`, chỉ được dùng `.ogg` (Vorbis). Dùng `AudioDirector.play_sfx_positional` để bật panning 3D cho Zombie.
 
 ## 5. HỆ THỐNG ECO MODE
-Mọi thuật toán tính toán góc bóng đổ (Directional Shadows) và tia nắng (God rays) phải đọc cờ GameState.eco_mode. Nếu bật, bỏ qua việc render để tiết kiệm pin tối đa cho nền tảng Web di động.
+Mọi thuật toán tính toán góc bóng đổ (Directional Shadows), tia nắng (God rays), và số lượng hạt CPUParticles2D (mưa/cát) phải đọc cờ `GameState.eco_mode`. Nếu bật, bỏ qua việc render nâng cao hoặc giảm 50% số hạt để tiết kiệm pin tối đa cho nền tảng Web di động.
