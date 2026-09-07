@@ -38,6 +38,7 @@ func _apply_fonts(node: Node) -> void:
 func _ready() -> void:
 	_apply_fonts(self)
 
+	# Responsive anchors: fill viewport but clamp max size for ultrawide/mobile
 	anchor_left = 0.5
 	anchor_top = 0.5
 	anchor_right = 0.5
@@ -46,6 +47,14 @@ func _ready() -> void:
 	offset_top = -205.0
 	offset_right = 250.0
 	offset_bottom = 205.0
+	# Clamp to viewport safe area
+	var vp = get_viewport_rect().size
+	var max_w: float = min(500.0, vp.x * 0.85)
+	var max_h: float = min(410.0, vp.y * 0.85)
+	offset_left = -max_w * 0.5
+	offset_right = max_w * 0.5
+	offset_top = -max_h * 0.5
+	offset_bottom = max_h * 0.5
 
 	var sb: StyleBoxFlat = StyleBoxFlat.new()
 	sb.bg_color = WOOD_BG

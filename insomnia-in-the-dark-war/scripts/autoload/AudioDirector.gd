@@ -276,10 +276,17 @@ func play_sfx_positional(id: String, world_pos: Vector2, pitch_variance: float =
 		play_sfx(id, pitch_variance)
 		return
 		
+	# Adjust max_distance based on camera zoom to prevent volume whiplash
+	var cam = get_viewport().get_camera_2d()
+	var zoom_factor: float = 1.0
+	if cam != null:
+		zoom_factor = max(cam.zoom.x, 0.5)
+		
 	for p in _sfx_2d_pool:
 		if not p.playing:
 			p.stream = stream
 			p.global_position = world_pos
+			p.max_distance = 1500.0 / zoom_factor
 			p.pitch_scale = 1.0 + randf_range(-pitch_variance, pitch_variance)
 			p.play()
 			return

@@ -592,8 +592,11 @@ func _on_eco_mode_changed(enabled: bool) -> void:
 
 func _apply_eco_mode(enabled: bool) -> void:
 	var post_layer: Node = get_tree().root.find_child("LofiPostProcessLayer", true, false)
-	if post_layer != null and "visible" in post_layer:
-		post_layer.set("visible", not enabled)
+	if post_layer != null and post_layer.get_child_count() > 0:
+		var crect = post_layer.get_child(0) as ColorRect
+		if crect and crect.material is ShaderMaterial:
+			# Use shader uniform instead of visibility toggle to avoid orphaned shaders on WebGL
+			crect.material.set_shader_parameter("eco_mode", enabled)
 	if get_tree().current_scene != null:
 		for light in get_tree().current_scene.find_children("", "PointLight2D", true, false):
 			if light is PointLight2D:

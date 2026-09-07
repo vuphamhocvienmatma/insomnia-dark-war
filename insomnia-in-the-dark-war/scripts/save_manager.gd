@@ -99,7 +99,7 @@ func save_game() -> void:
 
 	var file := FileAccess.open(SAVE_PATH, FileAccess.WRITE)
 	if file:
-		file.store_string(JSON.stringify(save_data, "\t"))
+		file.store_string(JSON.stringify(save_data))
 		file.close()
 		print("💾 Đã lưu game thành công!")
 
