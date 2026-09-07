@@ -190,11 +190,12 @@ func set_weather(w_type: String) -> void:
 		
 	if has_node("/root/AudioDirector"):
 		AudioDirector.set_weather(w_type)
+		# Defer weather BGM crossfade to avoid conflict with phase change BGM
 		match w_type:
 			"heavy_rain":
-				AudioDirector.crossfade_bgm("bgm_rain", 4.0)
+				call_deferred("_deferred_weather_bgm", "bgm_rain")
 			"sandstorm", "nightmare_sandstorm":
-				AudioDirector.crossfade_bgm("bgm_sandstorm", 4.0)
+				call_deferred("_deferred_weather_bgm", "bgm_sandstorm")
 			"sunny", "drizzle", "thick_fog", "meteor_shower":
 				# BGM returns to day/night phase — AudioDirector handles via TimeManager
 				pass
@@ -206,6 +207,10 @@ func set_weather(w_type: String) -> void:
 		stove_light.on_weather_changed(weather_type)
 		
 	_apply_post_process()
+
+func _deferred_weather_bgm(track: String) -> void:
+	if has_node("/root/AudioDirector"):
+		AudioDirector.crossfade_bgm(track, 4.0)
 
 func _apply_post_process() -> void:
 	if not pp_mat: return

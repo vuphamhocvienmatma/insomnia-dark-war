@@ -1,6 +1,7 @@
 extends CanvasLayer
 
 var tm: Node = null
+var _label_font = preload("res://assets/fonts/ShareTechMono.ttf")
 
 # 1. Sound Garden
 var sound_garden_active: bool = false
@@ -277,6 +278,7 @@ func _create_guitar_ui() -> void:
 	add_child(guitar_ui)
 	
 	var lbl = Label.new()
+	lbl.add_theme_font_override("font", _label_font)
 	lbl.text = "🎸 GẢY ĐÀN LOFI (Phím A-S-D-F)\nThư giãn đón hoàng hôn..."
 	lbl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	lbl.position = Vector2(0, -45)
@@ -372,6 +374,7 @@ func _take_polaroid(id: String, desc: String) -> void:
 	paper.add_child(p_img)
 	
 	var lbl = Label.new()
+	lbl.add_theme_font_override("font", _label_font)
 	lbl.text = desc
 	# "mực in hằn sâu (multiply blend mode)"
 	lbl.material = CanvasItemMaterial.new()
@@ -465,7 +468,10 @@ func _update_cat_forecast() -> void:
 	var cat_node = get_tree().get_first_node_in_group("companion_cat")
 	if not cat_node: return
 	if not is_instance_valid(cat_forecast_label):
-		cat_forecast_label = Label.new(); cat_node.add_child(cat_forecast_label); cat_forecast_label.position = Vector2(-40, -50)
+		cat_forecast_label = Label.new()
+		cat_forecast_label.add_theme_font_override("font", _label_font)
+		cat_node.add_child(cat_forecast_label)
+		cat_forecast_label.position = Vector2(-40, -50)
 	var w = tomorrow_weather
 	if get_node_or_null("/root/LevelSetup"): w = get_node("/root/LevelSetup").get("current_weather")
 	if w == "sunny": cat_forecast_label.text = "🐱 Phơi nắng, đuôi vẫy chậm"
@@ -488,6 +494,7 @@ func _create_coffee_ui() -> void:
 	vbox.add_theme_constant_override("separation", 15)
 	coffee_ui.add_child(vbox)
 	var lbl = Label.new()
+	lbl.add_theme_font_override("font", _label_font)
 	lbl.text = "☕ NGHI THỨC CÀ PHÊ SÁNG ♨️"
 	lbl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	lbl.add_theme_font_size_override("font_size", 16)
@@ -528,6 +535,7 @@ func _on_coffee_btn_pressed(btn: Button) -> void:
 
 func _create_radio_ui() -> void:
 	radio_ui = Label.new()
+	radio_ui.add_theme_font_override("font", _label_font)
 	radio_ui.set_anchors_preset(Control.PRESET_TOP_RIGHT)
 	radio_ui.position = Vector2(800, 50)
 	radio_ui.add_theme_color_override("font_color", Color("aaffaa"))
@@ -611,6 +619,7 @@ func _create_aquarium_ui() -> void:
 	aquarium_ui.size = Vector2(150, 100)
 	aquarium_ui.position = Vector2(20, 160)
 	var lbl = Label.new()
+	lbl.add_theme_font_override("font", _label_font)
 	lbl.text = "Bể Cá Sa Mạc: 0"
 	lbl.name = "FishLbl"
 	aquarium_ui.add_child(lbl)
