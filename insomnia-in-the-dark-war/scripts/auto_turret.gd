@@ -69,7 +69,7 @@ func _on_fire_rate_timer_timeout() -> void:
 			art_node.call("trigger_muzzle_flash")
 			
 		var am := get_tree().get_first_node_in_group("audio_manager")
-		if am != null and am.has_method("play_sfx"):
+		if true:
 			AudioDirector.play_sfx("turret_shoot")
 			
 		var ground = get_tree().get_first_node_in_group("ground_props")

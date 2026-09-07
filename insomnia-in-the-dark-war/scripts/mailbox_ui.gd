@@ -269,7 +269,7 @@ func _typewriter_step(val: int) -> void:
 	content_lbl.visible_characters = val
 	if val > prev:
 		# Play sound
-		if _am == null: var _am_placeholder = null
+		if _am == null: 
 		if _am and _am.has_method("play_sfx"): _AudioDirector.play_sfx("typewriter_tick")
 
 func _on_claim_gift_pressed() -> void:

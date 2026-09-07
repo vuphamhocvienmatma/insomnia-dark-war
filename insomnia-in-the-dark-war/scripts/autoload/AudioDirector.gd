@@ -15,6 +15,7 @@ var _sfx_players: Array[AudioStreamPlayer] = []
 var _bgm_players: Array[AudioStreamPlayer] = []
 var _weather_players: Array[AudioStreamPlayer] = []
 
+var _sfx_2d_pool: Array[AudioStreamPlayer2D] = []
 var _active_bgm_idx: int = 0
 var _current_bgm_name: String = ""
 var _current_weather_id: String = ""
@@ -62,6 +63,12 @@ func _init_pools() -> void:
 		p.bus = BUS_SFX
 		add_child(p)
 		_sfx_players.append(p)
+		var p2 = AudioStreamPlayer2D.new()
+		p2.bus = BUS_SFX
+		p2.max_distance = 1500.0
+		p2.attenuation = 2.0
+		add_child(p2)
+		_sfx_2d_pool.append(p2)
 		
 	# BGM Pool (2 for crossfade)
 	for i in 2:
@@ -194,3 +201,27 @@ func _on_time_phase_changed(is_night: bool) -> void:
 		crossfade_bgm("bgm_night_watch", 4.0)
 	else:
 		crossfade_bgm("bgm_day_clear", 4.0)
+
+func play_sfx_positional(id: String, world_pos: Vector2, pitch_variance: float = 0.05) -> void:
+	var stream = load(SFX_DIR + id + ".ogg")
+	if not stream: return
+	
+	# Only pan if weather is bad
+	var level = get_node_or_null("/root/LevelSetup")
+	var is_bad_weather = false
+	if level and level.has_node("ArtWeather"):
+		var w_type = level.get_node("ArtWeather").get("weather_type")
+		if w_type and w_type != "sunny" and w_type != "clear":
+			is_bad_weather = true
+			
+	if not is_bad_weather:
+		play_sfx(id, pitch_variance)
+		return
+		
+	for p in _sfx_2d_pool:
+		if not p.playing:
+			p.stream = stream
+			p.global_position = world_pos
+			p.pitch_scale = 1.0 + randf_range(-pitch_variance, pitch_variance)
+			p.play()
+			return

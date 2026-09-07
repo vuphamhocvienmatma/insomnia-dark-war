@@ -19,7 +19,7 @@ func _unhandled_input(event: InputEvent) -> void:
 	if event is InputEventMouseButton and event.pressed:
 		_click_timer = 0.15
 		# Âm thanh cạch ( giả lập bằng việc gọi play_sfx nếu có )
-		var _am_placeholder = null
+		
 		if am and am.has_method("play_sfx"):
 			AudioDirector.play_sfx("click_wood") # Assuming it exists, or just ui_click
 

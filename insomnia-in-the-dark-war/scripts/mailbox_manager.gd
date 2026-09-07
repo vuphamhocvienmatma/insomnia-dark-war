@@ -50,8 +50,8 @@ func get_current_unread() -> Dictionary:
 func receive_letter(letter: Dictionary) -> void:
 	unread_letters.append(letter)
 	mail_received.emit(letter)
-	var _am_placeholder = null
-	if am != null and am.has_method("play_sfx"):
+	
+	if true:
 		AudioDirector.play_sfx("item_pickup")
 
 

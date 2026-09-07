@@ -3,313 +3,301 @@ extends Node2D
 var weather_type: String = "sunny"
 var _time: float = 0.0
 
-# Particles
-var _raindrops: Array[Dictionary] = []
-var _snowflakes: Array[Dictionary] = []
-var _dust: Array[Dictionary] = []
-var _fog_layers: Array[Dictionary] = []
-var _meteors: Array[Dictionary] = []
-var _splashes: Array[Dictionary] = []
-
-# Window Raindrops (Environmental)
-var _window_drops: Array[Dictionary] = []
-var _sand_particles: Array[Dictionary] = []
-
-# Lightning
-var _lightning_timer: float = 0.0
-var _lightning_flash: float = 0.0
-
 # Post Process
 var pp_rect: ColorRect
 var pp_mat: ShaderMaterial
 
-# Lantern Sway
-var _lantern_angle: float = 0.0
+var cabin_world_pos = Vector2(0, -50)
+var particle_group: CanvasGroup
+
+# Particle Nodes
+var p_rain_far: CPUParticles2D
+var p_rain_mid: CPUParticles2D
+var p_rain_near: CPUParticles2D
+
+var p_sand_far: CPUParticles2D
+var p_sand_mid: CPUParticles2D
+var p_sand_near: CPUParticles2D
+
+var p_dust: CPUParticles2D
+
+var _lightning_timer: float = 0.0
+var _lightning_flash: float = 0.0
+var flash_rect: ColorRect
 
 func _ready() -> void:
-	z_index = -6
+	z_index = 10
 	
+	particle_group = CanvasGroup.new()
+	add_child(particle_group)
+	
+	# Apply mask shader to particle group
+	var mask_shader = ShaderMaterial.new()
+	mask_shader.shader = load("res://shaders/particle_mask.gdshader")
+	particle_group.material = mask_shader
+	
+	_create_particles()
+	
+	# PP Rect
 	pp_rect = ColorRect.new()
 	pp_rect.set_anchors_preset(Control.PRESET_FULL_RECT)
 	pp_rect.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	
 	var shader = load("res://shaders/weather_post_process.gdshader")
 	if shader:
 		pp_mat = ShaderMaterial.new()
 		pp_mat.shader = shader
 		pp_rect.material = pp_mat
+		
+	var cl = CanvasLayer.new()
+	cl.layer = 10
+	add_child(cl)
+	cl.add_child(pp_rect)
 	
-	var canvas = CanvasLayer.new()
-	canvas.layer = 90
-	canvas.add_child(pp_rect)
-	add_child(canvas)
-	
-	# Pre-allocate particle pools
-	for i in 150: _raindrops.append({"x": 0.0, "y": 0.0, "speed": 0.0, "length": 0.0, "alpha": 0.0})
-	for i in 150: _snowflakes.append({"x": 0.0, "y": 0.0, "speed": 0.0, "drift": 0.0, "phase": 0.0})
-	for i in 15: _dust.append({"x": 0.0, "y": 0.0, "speed": 0.0, "phase": 0.0})
-	for i in 15: _window_drops.append({"x": 0.0, "y": 0.0, "speed": 0.0})
-	for i in 200: _sand_particles.append({"x": 0.0, "y": 0.0, "speed": 0.0})
-	
-	# 3 fog layers
-	_fog_layers = [{"x": 0.0, "speed": 10.0, "alpha": 0.3}, {"x": 0.0, "speed": 20.0, "alpha": 0.2}, {"x": 0.0, "speed": 35.0, "alpha": 0.15}]
+	flash_rect = ColorRect.new()
+	flash_rect.color = Color(0.4, 0.2, 0.8, 0.0)
+	flash_rect.set_anchors_preset(Control.PRESET_FULL_RECT)
+	cl.add_child(flash_rect)
 
-	_reset_particles()
+func _create_particles() -> void:
+	# Rain Near
+	p_rain_near = CPUParticles2D.new()
+	p_rain_near.amount = 100
+	p_rain_near.emission_shape = CPUParticles2D.EMISSION_SHAPE_RECTANGLE
+	p_rain_near.emission_rect_extents = Vector2(2000, 1)
+	p_rain_near.position = Vector2(0, -800)
+	p_rain_near.direction = Vector2(-0.25, 1.0)
+	p_rain_near.spread = 0.0
+	p_rain_near.gravity = Vector2(0, 0)
+	p_rain_near.initial_velocity_min = 700.0
+	p_rain_near.initial_velocity_max = 900.0
+	p_rain_near.lifetime = 2.0
+	p_rain_near.color = Color(0.6, 0.7, 0.9, 0.6)
+	p_rain_near.scale_amount_min = 2.0
+	p_rain_near.scale_amount_max = 2.0
+	var tex = _create_line_texture(Vector2(0,0), Vector2(-5, 20))
+	p_rain_near.texture = tex
+	particle_group.add_child(p_rain_near)
 	
-	var tm = get_tree().get_first_node_in_group("time_manager")
-	if tm != null:
-		if tm.has_signal("phase_changed"):
-			tm.phase_changed.connect(_on_phase_changed)
-		if tm.has_signal("mood_changed"):
-			tm.mood_changed.connect(_on_mood_changed)
-			
-	visible = true # Always visible for post-processing
+	p_rain_mid = p_rain_near.duplicate()
+	p_rain_mid.amount = 80
+	p_rain_mid.initial_velocity_min = 500.0
+	p_rain_mid.initial_velocity_max = 600.0
+	p_rain_mid.color = Color(0.6, 0.7, 0.9, 0.45)
+	p_rain_mid.texture = _create_line_texture(Vector2(0,0), Vector2(-3, 12))
+	particle_group.add_child(p_rain_mid)
+	
+	p_rain_far = p_rain_near.duplicate()
+	p_rain_far.amount = 70
+	p_rain_far.initial_velocity_min = 300.0
+	p_rain_far.initial_velocity_max = 400.0
+	p_rain_far.color = Color(0.6, 0.7, 0.9, 0.25)
+	p_rain_far.texture = _create_line_texture(Vector2(0,0), Vector2(-2, 8))
+	particle_group.add_child(p_rain_far)
+	
+	# Sand
+	p_sand_near = CPUParticles2D.new()
+	p_sand_near.amount = 100
+	p_sand_near.emission_shape = CPUParticles2D.EMISSION_SHAPE_RECTANGLE
+	p_sand_near.emission_rect_extents = Vector2(1, 600)
+	p_sand_near.position = Vector2(-2000, -300)
+	p_sand_near.direction = Vector2(1.0, 0.05)
+	p_sand_near.spread = 5.0
+	p_sand_near.gravity = Vector2(0, 0)
+	p_sand_near.initial_velocity_min = 1000.0
+	p_sand_near.initial_velocity_max = 1300.0
+	p_sand_near.lifetime = 4.0
+	p_sand_near.color = Color(0.9, 0.7, 0.5, 0.6)
+	p_sand_near.texture = _create_line_texture(Vector2(0,0), Vector2(30, 2))
+	particle_group.add_child(p_sand_near)
+	
+	p_sand_mid = p_sand_near.duplicate()
+	p_sand_mid.initial_velocity_min = 700.0
+	p_sand_mid.initial_velocity_max = 900.0
+	p_sand_mid.color = Color(0.9, 0.7, 0.5, 0.5)
+	p_sand_mid.texture = _create_line_texture(Vector2(0,0), Vector2(20, 1))
+	particle_group.add_child(p_sand_mid)
+	
+	p_sand_far = p_sand_near.duplicate()
+	p_sand_far.initial_velocity_min = 400.0
+	p_sand_far.initial_velocity_max = 600.0
+	p_sand_far.color = Color(0.9, 0.7, 0.5, 0.8) # Far haze is thick
+	p_sand_far.texture = _create_line_texture(Vector2(0,0), Vector2(10, 1))
+	particle_group.add_child(p_sand_far)
+	
+	# Dust
+	p_dust = CPUParticles2D.new()
+	p_dust.amount = 50
+	p_dust.emission_shape = CPUParticles2D.EMISSION_SHAPE_RECTANGLE
+	p_dust.emission_rect_extents = Vector2(1500, 600)
+	p_dust.position = Vector2(0, -300)
+	p_dust.direction = Vector2(0, -1)
+	p_dust.gravity = Vector2(0, -10)
+	p_dust.initial_velocity_min = 5.0
+	p_dust.initial_velocity_max = 10.0
+	p_dust.lifetime = 10.0
+	p_dust.color = Color(1.0, 0.9, 0.5, 0.6)
+	var dt = GradientTexture2D.new()
+	dt.width = 3
+	dt.height = 3
+	dt.fill = GradientTexture2D.FILL_RADIAL
+	dt.fill_from = Vector2(0.5, 0.5)
+	dt.fill_to = Vector2(1, 1)
+	var g = Gradient.new()
+	g.set_color(0, Color.WHITE)
+	g.set_color(1, Color.TRANSPARENT)
+	dt.gradient = g
+	p_dust.texture = dt
+	particle_group.add_child(p_dust)
+	
+	_turn_off_all()
+
+func _create_line_texture(start: Vector2, end: Vector2) -> Texture2D:
+	# Create a simple line texture dynamically or just use a small rect
+	var img = Image.create(int(max(abs(end.x), 1.0)), int(max(abs(end.y), 1.0)), false, Image.FORMAT_RGBA8)
+	img.fill(Color.WHITE)
+	return ImageTexture.create_from_image(img)
+
+func _turn_off_all() -> void:
+	p_rain_near.emitting = false
+	p_rain_mid.emitting = false
+	p_rain_far.emitting = false
+	p_sand_near.emitting = false
+	p_sand_mid.emitting = false
+	p_sand_far.emitting = false
+	p_dust.emitting = false
 
 func set_weather(w_type: String) -> void:
 	weather_type = w_type
-	_reset_particles()
-	_apply_post_process()
+	_turn_off_all()
+	
+	if w_type == "sunny":
+		p_dust.emitting = true
+	elif w_type == "drizzle" or w_type == "heavy_rain":
+		p_rain_near.emitting = true
+		p_rain_mid.emitting = true
+		p_rain_far.emitting = true
+	elif w_type == "sandstorm" or w_type == "nightmare_sandstorm":
+		p_sand_near.emitting = true
+		p_sand_mid.emitting = true
+		p_sand_far.emitting = true
+		
 	if has_node("/root/AudioDirector"):
 		AudioDirector.set_weather(w_type)
-
-
-func _reset_particles() -> void:
-	if weather_type == "sunny":
-		for d in _dust:
-			d.x = randf_range(-1000, 1000)
-			d.y = randf_range(-600, 0)
-			d.speed = randf_range(5.0, 10.0)
-			d.phase = randf_range(0.0, TAU)
-	elif weather_type == "drizzle":
-		for i in 50:
-			var d = _raindrops[i]
-			d.x = randf_range(-1300, 1300)
-			d.y = randf_range(-600, 50)
-			d.speed = randf_range(200.0, 300.0)
-			d.length = randf_range(5.0, 10.0)
-			d.alpha = randf_range(0.2, 0.3)
-		for w in _window_drops:
-			w.x = randf_range(-100, 100) # Cabin window x range approx
-			w.y = randf_range(-150, -50)
-			w.speed = randf_range(10.0, 30.0)
-	elif weather_type == "heavy_rain":
-		for i in 150:
-			var d = _raindrops[i]
-			d.x = randf_range(-1500, 1500)
-			d.y = randf_range(-600, 50)
-			d.speed = randf_range(500.0, 700.0)
-			d.length = randf_range(15.0, 25.0)
-			d.alpha = randf_range(0.4, 0.7)
-	elif weather_type == "sandstorm":
-		for i in 200:
-			var s = _sand_particles[i]
-			s.x = randf_range(-1500, 1500)
-			s.y = randf_range(-600, 50)
-			s.speed = randf_range(300.0, 500.0)
-	elif weather_type == "snowstorm":
-		for i in 150:
-			var s = _snowflakes[i]
-			s.x = randf_range(-1500, 1500)
-			s.y = randf_range(-600, 50)
-			s.speed = randf_range(100.0, 200.0)
-			s.drift = randf_range(20.0, 50.0)
-			s.phase = randf_range(0.0, TAU)
+		
+	_apply_post_process()
 
 func _apply_post_process() -> void:
 	if not pp_mat: return
-	# Sunny,+0.15 vàng,0.1,0.05,0.0
-	# Drizzle,-0.05 xanh,0.2,0.1,0.5
-	# Storm,-0.1 xanh đậm,0.35,0.2,1.5
-	# Fog,-0.05 xám,0.4,0.15,0.5
-	# Snow,-0.2 xanh lạnh,0.25,0.1,0.5
-	# Meteor,+0.05 tím,0.15,0.05,0.0
 	var t_c = Color(1.0, 1.0, 1.0)
 	var t_a = 0.0
 	var v_i = 0.0
 	var g_a = 0.0
 	var a_a = 0.0
+	var desat = 0.0
+	var cr_uv = 0.2
 	
 	if weather_type == "sunny":
 		t_c = Color(1.0, 0.9, 0.7)
-		t_a = 0.15
-		v_i = 0.1
-		g_a = 0.05
-		a_a = 0.0
+		t_a = 0.0
+		cr_uv = 0.1
 	elif weather_type == "drizzle":
 		t_c = Color(0.8, 0.9, 1.0)
-		t_a = 0.05
-		v_i = 0.2
-		g_a = 0.1
-		a_a = 0.5
+		t_a = 0.1
+		desat = 0.1
+		cr_uv = 0.2
 	elif weather_type == "heavy_rain":
 		t_c = Color(0.6, 0.7, 0.9)
-		t_a = 0.1
+		t_a = 0.15
+		desat = 0.15
 		v_i = 0.35
-		g_a = 0.2
 		a_a = 1.5
-	elif weather_type == "thick_fog":
-		t_c = Color(0.8, 0.8, 0.8)
-		t_a = 0.05
-		v_i = 0.4
-		g_a = 0.15
-		a_a = 0.5
+		cr_uv = 0.15
 	elif weather_type == "sandstorm":
-		t_c = Color(0.9, 0.6, 0.4)
-		t_a = 0.4
+		t_c = Color(0.85, 0.7, 0.5)
+		t_a = 0.35
+		desat = 0.25
 		v_i = 0.5
 		g_a = 0.3
-		a_a = 0.5
-	elif weather_type == "solar_eclipse":
-		t_c = Color(0.2, 0.2, 0.3)
-		t_a = 0.6
+		cr_uv = 0.12
+	elif weather_type == "nightmare_sandstorm":
+		t_c = Color(0.6, 0.2, 0.3)
+		t_a = 0.4
+		desat = 0.3
 		v_i = 0.6
-		g_a = 0.1
-		a_a = 0.5
-	elif weather_type == "snowstorm":
-		t_c = Color(0.7, 0.8, 1.0)
-		t_a = 0.2
-		v_i = 0.25
-		g_a = 0.1
-		a_a = 0.5
-	elif weather_type == "meteor_shower":
-		t_c = Color(0.9, 0.7, 1.0)
-		t_a = 0.05
-		v_i = 0.15
-		g_a = 0.05
-		a_a = 0.0
+		a_a = 2.0
+		cr_uv = 0.1
 		
 	pp_mat.set_shader_parameter("tint_color", t_c)
 	pp_mat.set_shader_parameter("tint_amount", t_a)
+	pp_mat.set_shader_parameter("desaturate_amount", desat)
 	pp_mat.set_shader_parameter("vignette_intensity", v_i)
 	pp_mat.set_shader_parameter("grain_amount", g_a)
 	pp_mat.set_shader_parameter("aberration_amount", a_a)
+	pp_mat.set_shader_parameter("clarity_radius_uv", cr_uv)
+	
+	if particle_group and particle_group.material:
+		particle_group.material.set_shader_parameter("clarity_radius_uv", cr_uv)
+
+func _get_zoom_factor() -> float:
+	var cam = get_viewport().get_camera_2d()
+	if cam:
+		return clamp((cam.zoom.x - 0.5) / 0.5, 0.0, 1.0)
+	return 1.0
 
 func _process(delta: float) -> void:
 	if not visible or not is_visible_in_tree(): return
 	_time += delta
-	queue_redraw()
 	
-	if weather_type == "sunny":
-		for d in _dust:
-			d.y -= d.speed * delta
-			d.x += sin(_time * 0.5 + d.phase) * 10.0 * delta
-			if d.y < -600: d.y = 50
-	elif weather_type == "drizzle":
-		for i in 50:
-			var d = _raindrops[i]
-			d.y += d.speed * delta
-			if d.y > 10.0: d.y = -600; d.x = randf_range(-1300, 1300)
-		for w in _window_drops:
-			w.y += w.speed * delta
-			if w.y > -50: w.y = -150; w.x = randf_range(-100, 100)
-	elif weather_type == "heavy_rain":
-		for i in 150:
-			var d = _raindrops[i]
-			d.y += d.speed * delta
-			d.x -= d.speed * 0.25 * delta # 15 degree angle approx
-			if d.y > 10.0:
-				if randf() < 0.2 and _splashes.size() < 40:
-					_splashes.append({"x": d.x, "y": randf_range(-2, 8), "rad": 1.0, "alpha": 0.6})
-				d.y = -600; d.x = randf_range(-1500, 1500)
-		_lightning_timer -= delta
-		if _lightning_timer <= 0.0:
-			_lightning_flash = 1.0
-			_lightning_timer = randf_range(12.0, 25.0)
-			if has_node("/root/AudioDirector"):
-				AudioDirector.trigger_thunder()
-		if _lightning_flash > 0.0:
-			_lightning_flash -= delta * 5.0
-	elif weather_type == "thick_fog":
-		for f in _fog_layers:
-			f.x += f.speed * delta
-			if f.x > 2000: f.x = -2000
-	elif weather_type == "sandstorm":
-		for i in 200:
-			var s = _sand_particles[i]
-			s.x += s.speed * delta
-			s.y += (s.speed * 0.1) * delta
-			if s.x > 1500.0:
-				s.x = randf_range(-1500, -500)
-				s.y = randf_range(-600, 50)
-	elif weather_type == "snowstorm":
-		for i in 150:
-			var s = _snowflakes[i]
-			s.y += s.speed * delta
-			s.x += (s.drift + sin(_time * 2.0 + s.phase) * 50.0) * delta
-			if s.y > 50.0: s.y = -600; s.x = randf_range(-1500, 1500)
-	elif weather_type == "meteor_shower":
-		if randf() < 0.01 and _meteors.size() < 5:
-			_meteors.append({"x": randf_range(-500, 1500), "y": -600, "speed": randf_range(800, 1200)})
-		for i in range(_meteors.size() - 1, -1, -1):
-			var m = _meteors[i]
-			m.x -= m.speed * delta
-			m.y += m.speed * delta
-			if m.y > 200: _meteors.remove_at(i)
-			
-	# Update splashes
-	for i in range(_splashes.size() - 1, -1, -1):
-		var sp = _splashes[i]
-		sp.rad += delta * 15.0
-		sp.alpha -= delta * 3.0
-		if sp.alpha <= 0.0: _splashes.remove_at(i)
+	# Update Shader Cabin Screen Pos
+	var cam = get_viewport().get_camera_2d()
+	if cam and pp_mat:
+		var vp_size = get_viewport().get_visible_rect().size
+		var screen_pos = get_viewport().get_canvas_transform() * cabin_world_pos
+		var uv = screen_pos / vp_size
+		pp_mat.set_shader_parameter("cabin_screen_pos", uv)
+		if particle_group and particle_group.material:
+			particle_group.material.set_shader_parameter("cabin_screen_pos", uv)
+		
+	var eco = false
+	if has_node("/root/GameState"): eco = get_node("/root/GameState").get("eco_mode")
+	
+	# Zoom Density Binding
+	var zf = _get_zoom_factor()
+	var eco_div = 2 if eco else 1
+	
+	if weather_type == "heavy_rain" or weather_type == "drizzle":
+		var base = 100 if weather_type == "heavy_rain" else 30
+		p_rain_near.amount = max(1, int(base * lerp(0.4, 1.0, zf)) / eco_div)
+		p_rain_mid.amount = max(1, int(base * 0.8 * lerp(0.4, 1.0, zf)) / eco_div)
+		p_rain_far.amount = max(1, int(base * 0.7 * lerp(0.4, 1.0, zf)) / eco_div)
+		
+		if weather_type == "heavy_rain":
+			_lightning_timer -= delta
+			if _lightning_timer <= 0.0:
+				_lightning_flash = 1.0
+				_lightning_timer = randf_range(12.0, 25.0)
+				if has_node("/root/AudioDirector"):
+					AudioDirector.trigger_thunder()
+			if _lightning_flash > 0.0:
+				_lightning_flash -= delta * 5.0
+				flash_rect.color.a = _lightning_flash * 0.3
+			else:
+				flash_rect.color.a = 0.0
+				
+	elif weather_type == "sandstorm" or weather_type == "nightmare_sandstorm":
+		var base = 100
+		p_sand_near.amount = max(1, int(base * lerp(0.3, 1.0, zf)) / eco_div)
+		p_sand_mid.amount = max(1, int(base * 0.8 * lerp(0.3, 1.0, zf)) / eco_div)
+		p_sand_far.amount = max(1, int(base * 0.7 * lerp(0.3, 1.0, zf)) / eco_div)
 
-func _draw() -> void:
-	if weather_type == "sunny":
-		# Sunbeams
-		draw_line(Vector2(500, -600), Vector2(-100, 0), Color(1.0, 0.9, 0.5, 0.1), 100.0)
-		draw_line(Vector2(700, -600), Vector2(100, 0), Color(1.0, 0.9, 0.5, 0.08), 80.0)
-		for d in _dust:
-			draw_circle(Vector2(d.x, d.y), 1.5, Color(1.0, 0.9, 0.5, 0.6))
-	elif weather_type == "drizzle":
-		for i in 50:
-			var d = _raindrops[i]
-			draw_line(Vector2(d.x, d.y), Vector2(d.x, d.y + d.length), Color(0.7, 0.8, 0.9, d.alpha), 1.0)
-		# Window drops
-		for w in _window_drops:
-			draw_line(Vector2(w.x, w.y), Vector2(w.x, w.y + 4.0), Color(0.8, 0.9, 1.0, 0.5), 1.5)
-	elif weather_type == "heavy_rain":
-		for i in 150:
-			var d = _raindrops[i]
-			draw_line(Vector2(d.x, d.y), Vector2(d.x - d.length*0.25, d.y + d.length), Color(0.6, 0.7, 0.9, d.alpha), 1.5)
-		for sp in _splashes:
-			draw_arc(Vector2(sp.x, sp.y), sp.rad, 0.0, TAU, 8, Color(0.8, 0.9, 1.0, sp.alpha), 1.0)
-		if _lightning_flash > 0:
-			draw_rect(Rect2(-10, -200, 250, 140), Color(0.4, 0.2, 0.8, _lightning_flash * 0.85)) # Masked window flash (Purple/Cyan)
-	elif weather_type == "thick_fog":
-		for f in _fog_layers:
-			# draw huge soft circles for fog
-			for i in 5:
-				draw_circle(Vector2(f.x + i*400 - 1000, -100 + sin(_time+i)*50), 300, Color(0.8,0.8,0.8, f.alpha))
-	elif weather_type == "sandstorm":
-		draw_rect(Rect2(-2000, -1000, 4000, 2000), Color(0.8, 0.5, 0.3, 0.35))
-		for i in 200:
-			var s = _sand_particles[i]
-			draw_line(Vector2(s.x, s.y), Vector2(s.x + 20.0, s.y + 2.0), Color(0.9, 0.7, 0.5, 0.6), 2.0)
-	elif weather_type == "solar_eclipse":
-		draw_circle(Vector2(-750, -320), 22.0, Color(0, 0, 0, 1.0))
-		draw_arc(Vector2(-750, -320), 25.0, 0, TAU, 32, Color(1, 1, 1, 0.8), 2.0)
-		draw_arc(Vector2(-750, -320), 30.0, 0, TAU, 32, Color(1, 1, 1, 0.4), 4.0)
-	elif weather_type == "snowstorm":
-		draw_rect(Rect2(-2000, 0, 4000, 50), Color(1.0, 1.0, 1.0, 0.3)) # Snow on ground
-		for i in 150:
-			var s = _snowflakes[i]
-			draw_circle(Vector2(s.x, s.y), 2.0, Color(0.9, 0.95, 1.0, 0.8))
-	elif weather_type == "meteor_shower":
-		for m in _meteors:
-			draw_line(Vector2(m.x, m.y), Vector2(m.x + 40, m.y - 40), Color(1.0, 0.9, 0.6, 0.8), 2.0)
-			draw_circle(Vector2(m.x, m.y), 3.0, Color(1.0, 1.0, 0.8))
-
-func _on_phase_changed(is_night: bool) -> void:
-	pass
-
-func _on_mood_changed(mood: String) -> void:
-	if not pp_mat: return
-	if mood == "insomnia":
-		pp_mat.set_shader_parameter("tint_amount", 0.5)
-		pp_mat.set_shader_parameter("vignette_intensity", 0.6)
-		pp_mat.set_shader_parameter("grain_amount", 0.4)
-	elif mood == "nightmare":
-		pp_mat.set_shader_parameter("tint_color", Color(0.8, 0.2, 0.2))
-		pp_mat.set_shader_parameter("tint_amount", 0.4)
-		pp_mat.set_shader_parameter("vignette_intensity", 0.5)
-		pp_mat.set_shader_parameter("aberration_amount", 1.2)
+	# Beacon Effect
+	var is_bad = (weather_type != "sunny" and weather_type != "clear")
+	var fireplace = get_tree().get_first_node_in_group("fireplace_light")
+	if fireplace:
+		var target_e = 1.0
+		if is_bad:
+			if weather_type == "heavy_rain": target_e = 1.3
+			elif weather_type == "sandstorm": target_e = 1.4
+			elif weather_type == "nightmare_sandstorm": target_e = 1.5
+			target_e += sin(_time * 15.0) * 0.05
+		fireplace.set("energy", lerp(float(fireplace.get("energy")), target_e, 0.1))
