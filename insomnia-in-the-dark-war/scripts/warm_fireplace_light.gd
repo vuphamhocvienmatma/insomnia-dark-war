@@ -41,7 +41,7 @@ func _process(delta: float) -> void:
 		energy = base_energy
 		return
 
-	_current_color = _current_color.lerp(_target_color, delta * 1.5)
+	_current_color = _current_color.lerp(_target_color, 1.0 - exp(-1.5 * delta))
 	color = _current_color
 
 	_update_timer += delta
@@ -49,4 +49,5 @@ func _process(delta: float) -> void:
 		_update_timer = 0.0
 		noise_time += delta * flicker_speed * 1.5
 		_target_energy = base_energy + (noise.get_noise_1d(noise_time) * 0.25)
-	energy = lerpf(energy, _target_energy, 8.0 * delta)
+	# Time-based exponential lerp (frame-rate independent)
+	energy = lerpf(energy, _target_energy, 1.0 - exp(-8.0 * delta))

@@ -299,6 +299,11 @@ func _process(delta: float) -> void:
 	var eco = false
 	if has_node("/root/GameState"): eco = get_node("/root/GameState").get("eco_mode")
 	
+	# Eco mode: disable all weather particles
+	if eco:
+		_turn_off_all()
+		return
+	
 	# Zoom Density Binding
 	var zf = _get_zoom_factor()
 	var eco_div = 2 if eco else 1

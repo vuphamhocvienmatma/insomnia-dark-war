@@ -48,7 +48,12 @@ func interact() -> void:
 
 func start_cooking_visual() -> void:
 	is_cooking = true
-	$SteamParticles.emitting = true
+	if has_node("SteamParticles"):
+		var steam = get_node("SteamParticles")
+		if GameState != null and GameState.eco_mode:
+			steam.emitting = false
+		else:
+			steam.emitting = true
 	$CookingTimer.start()
 
 

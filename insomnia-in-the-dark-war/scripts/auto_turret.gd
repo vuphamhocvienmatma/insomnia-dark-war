@@ -59,10 +59,11 @@ func _on_fire_rate_timer_timeout() -> void:
 			
 		current_target.call("take_damage", final_damage)
 		
-		# Zero-allocation hitscan tracer
-		var to_local_pos = current_target.global_position - global_position
-		_tracers.append({"end_pos": to_local_pos, "ttl": 0.05})
-		queue_redraw()
+		# Zero-allocation hitscan tracer (skip in eco mode)
+		if GameState == null or not GameState.eco_mode:
+			var to_local_pos = current_target.global_position - global_position
+			_tracers.append({"end_pos": to_local_pos, "ttl": 0.05})
+			queue_redraw()
 		
 		var art_node: Node = get_node_or_null("Art")
 		if art_node != null and art_node.has_method("trigger_muzzle_flash"):

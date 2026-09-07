@@ -51,9 +51,11 @@ func _process(delta: float) -> void:
 	zoom = zoom.lerp(target_zoom, 5.0 * delta)
 
 	if shake_intensity > 0.0:
+		# Scale shake by inverse zoom to prevent viewport clipping when zoomed in
+		var zoom_scale: float = 1.0 / max(zoom.x, 0.01)
 		var t: float = randf()
 		var angle: float = t * TAU
-		var strength: float = shake_intensity * 0.5
+		var strength: float = shake_intensity * 0.5 * min(zoom_scale, 2.0)
 		offset = Vector2(cos(angle), sin(angle)) * strength
 		shake_intensity *= pow(0.05, delta * shake_decay)
 		if shake_intensity < 0.2:
@@ -73,6 +75,9 @@ func _unhandled_input(event: InputEvent) -> void:
 			# Don't zoom if any mouse button is held (dragging items, etc.)
 			if Input.is_mouse_button_pressed(MOUSE_BUTTON_LEFT) or Input.is_mouse_button_pressed(MOUSE_BUTTON_RIGHT):
 				return
+			# Don't zoom if any modal UI is open (mailbox, cooking, guitar, coffee)
+			if _is_modal_ui_open():
+				return
 			# Don't zoom if hovering over a UI control (scrollable panels, buttons, etc.)
 			var hovered = get_viewport().gui_get_hovered_control()
 			if hovered != null and (hovered is ScrollContainer or hovered is Button or hovered is Panel):
@@ -81,6 +86,23 @@ func _unhandled_input(event: InputEvent) -> void:
 				zoom_in()
 			elif mb.button_index == MOUSE_BUTTON_WHEEL_DOWN:
 				zoom_out()
+
+
+func _is_modal_ui_open() -> bool:
+	# Check mailbox
+	var mb = get_tree().get_first_node_in_group("hud")
+	if mb != null:
+		for child in mb.get_children():
+			if child is Panel and child.visible and child.has_method("close_mailbox"):
+				return true
+	# Check cooking UI
+	var stove = get_tree().get_first_node_in_group("stove")
+	if stove != null and stove.get("is_cooking"):
+		return true
+	# Check guitar/coffee (these pause the game)
+	if get_tree().paused:
+		return true
+	return false
 
 
 func zoom_in() -> void:

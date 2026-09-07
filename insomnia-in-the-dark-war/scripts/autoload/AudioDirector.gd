@@ -31,12 +31,37 @@ var _current_bgm_name: String = ""
 var _current_weather_id: String = ""
 var _bgm_base_vol: float = 0.0
 var _duck_tween: Tween = null
+var _duck_active: bool = false
+
+var _audio_resumed: bool = false
 
 func _ready() -> void:
 	process_mode = Node.PROCESS_MODE_ALWAYS
 	_setup_buses()
 	_init_pools()
 	_connect_signals()
+	# Resume Web AudioContext after first user gesture (required for HTML5/WebGL)
+	if OS.has_feature("web"):
+		get_viewport().gui_focus_changed.connect(_on_web_focus_changed)
+
+func _on_web_focus_changed(_ctrl: Control) -> void:
+	_resume_web_audio()
+
+func _unhandled_input(event: InputEvent) -> void:
+	if not _audio_resumed and OS.has_feature("web"):
+		if event is InputEventMouseButton or event is InputEventKey:
+			_resume_web_audio()
+
+func _resume_web_audio() -> void:
+	if _audio_resumed:
+		return
+	_audio_resumed = true
+	# Godot 4 Web: AudioServer.resume_autoplay() doesn't exist, but playing a silent
+	# stream or just setting bus volumes forces the AudioContext to resume
+	var bgm_bus = AudioServer.get_bus_index(BUS_BGM)
+	if bgm_bus >= 0:
+		AudioServer.set_bus_mute(bgm_bus, false)
+	print("🔊 Web AudioContext resumed after user gesture")
 
 func _setup_buses() -> void:
 	# Ensure buses exist
@@ -107,7 +132,7 @@ func crossfade_bgm(target_track: String, duration: float = 3.0) -> void:
 	
 	var stream = load(BGM_DIR + target_track + ".ogg")
 	if not stream:
-		push_warning("BGM not found: " + target_track)
+		push_warning("BGM not found: " + BGM_DIR + target_track + ".ogg")
 		return
 		
 	p_in.stream = stream
@@ -159,9 +184,13 @@ func set_weather(weather_id: String) -> void:
 			create_tween().tween_property(p, "volume_db", 0.0, 2.0)
 
 func duck_bgm(amount_db: float = -6.0, duration: float = 0.1, hold: float = 0.8) -> void:
+	# Guard: don't restart duck if already ducking (prevents pumping from rapid triggers)
+	if _duck_active:
+		return
 	var bgm_bus_idx = AudioServer.get_bus_index(BUS_BGM)
 	if bgm_bus_idx < 0:
 		return
+	_duck_active = true
 	if _duck_tween != null and _duck_tween.is_valid():
 		_duck_tween.kill()
 	var current_vol = AudioServer.get_bus_volume_db(bgm_bus_idx)
@@ -170,6 +199,7 @@ func duck_bgm(amount_db: float = -6.0, duration: float = 0.1, hold: float = 0.8)
 	_duck_tween.tween_method(func(val: float): AudioServer.set_bus_volume_db(bgm_bus_idx, val), current_vol, target_vol, duration)
 	_duck_tween.tween_interval(hold)
 	_duck_tween.tween_method(func(val: float): AudioServer.set_bus_volume_db(bgm_bus_idx, val), target_vol, _bgm_base_vol, duration * 2.0)
+	_duck_tween.tween_callback(func(): _duck_active = false)
 
 func trigger_thunder() -> void:
 	var v = randi() % 3 + 1
@@ -177,6 +207,15 @@ func trigger_thunder() -> void:
 	duck_bgm(-6.0, 0.1, 1.0)
 
 func play_sfx(id: String, pitch_variance: float = 0.05, custom_bus: String = BUS_SFX) -> void:
+	# Eco mode: limit SFX to reduce CPU load on WebGL
+	if GameState != null and GameState.eco_mode:
+		var any_playing = false
+		for p in _sfx_players:
+			if p.playing:
+				any_playing = true
+				break
+		if any_playing:
+			return
 	var stream = null
 	if ResourceLoader.exists(SFX_DIR + id + ".ogg"):
 		stream = load(SFX_DIR + id + ".ogg")
