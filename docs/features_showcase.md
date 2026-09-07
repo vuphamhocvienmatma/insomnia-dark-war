@@ -1,6 +1,6 @@
 # Showcase Gallery: Insomnia in the Dark War (Bản Cập Nhật Mới Nhất)
 
-Bộ tài liệu tổng hợp hình ảnh thực tế được trích xuất trực tiếp từ Viewport của game **Insomnia in the Dark War**, thể hiện đầy đủ chu kỳ thời gian (ngày/hoàng hôn/đêm), các trạng thái thời tiết đặc trưng và các tính năng giao diện (UI) cốt lõi mới nhất — bao gồm hệ thống **Diegetic UI (Cầu dao điện Eco Breaker, Ống nhòm quân sự, Lò sưởi gang cải tiến)** vừa được cập nhật.
+Bộ tài liệu tổng hợp hình ảnh thực tế được trích xuất trực tiếp từ Viewport của game **Insomnia in the Dark War**, thể hiện đầy đủ chu kỳ thời gian (ngày/hoàng hôn/đêm), các trạng thái thời tiết đặc trưng và các tính năng giao diện (UI) cốt lõi mới nhất — bao gồm hệ thống **Cinematic Contrast (Vùng bảo vệ tâm bão Radial Clarity Mask, Beacon Lighting lò sưởi, Multi-layer Parallax Weather, Chế độ Eco tối ưu)** vừa được nâng cấp.
 
 ---
 
@@ -9,7 +9,7 @@ Bộ tài liệu tổng hợp hình ảnh thực tế được trích xuất tr�
 ![Ngày Nắng Đẹp Bình Thường (Clear Day)](./screenshots/clear_day.png)
 
 * **Vị trí ảnh trong repo:** [`docs/screenshots/clear_day.png`](./screenshots/clear_day.png)
-* **Mood & Gameplay:** Ánh ban ngày ấm áp rọi qua ô cửa sổ áp mái tạo nên các vệt sáng God-rays đặc trưng kết hợp với bụi nắng lơ lửng và dải đèn đom đóm rực rỡ trong cabin. Góc trên bên phải hiển thị cầu dao điện rỉ sét (Diegetic Eco Breaker), góc dưới bên phải là ống nhòm dã chiến (Diegetic Binoculars) điều khiển zoom, mang lại trải nghiệm nhập vai đậm chất lofi sinh tồn.
+* **Mood & Gameplay:** Ánh ban ngày ấm áp rọi qua ô cửa sổ áp mái tạo nên các vệt sáng God-rays đặc trưng kết hợp với bụi nắng lơ lửng và dải đèn đom đóm rực rỡ trong cabin. Góc trên bên phải hiển thị cụm điều khiển Zoom camera và nút bật/tắt chế độ Tiết kiệm điện (Eco Mode). Bé mèo đồng hành nằm thảnh thơi sưởi nắng, mang lại trải nghiệm sinh tồn lofi ấm cúng, thư thái.
 
 ---
 
@@ -36,7 +36,7 @@ Bộ tài liệu tổng hợp hình ảnh thực tế được trích xuất tr�
 ![Thời Tiết Trời Mưa (Rain)](./screenshots/rain.png)
 
 * **Vị trí ảnh trong repo:** [`docs/screenshots/rain.png`](./screenshots/rain.png)
-* **Mood & Gameplay:** Những hạt mưa rơi chéo trên nền trời xám lạnh cùng hiệu ứng hậu kỳ quang sai (chromatic aberration) và chớp tím qua cửa sổ tái hiện không gian tĩnh lặng, đượm chút u buồn. Mưa giúp cấp ẩm tự nhiên cho đất canh tác nhưng đồng thời làm giảm đáng kể tầm nhìn, đòi hỏi người chơi phải cảnh giác cao độ khi di chuyển.
+* **Mood & Gameplay:** Hệ thống thời tiết đa tầng (Parallax Weather 3 lớp: near, mid, far) với góc rơi chéo chân thực, kết hợp hiệu ứng chớp tím và sấm sét rền vang. Công nghệ **Radial Clarity Mask** tự động khoét vùng sáng trong suốt quanh cabin, giữ cho nơi trú ẩn luôn an toàn và sáng rõ giữa cơn mưa rào hậu tận thế.
 
 ---
 
@@ -45,7 +45,7 @@ Bộ tài liệu tổng hợp hình ảnh thực tế được trích xuất tr�
 ![Thời Tiết Bão Cát (Sandstorm)](./screenshots/sandstorm.png)
 
 * **Vị trí ảnh trong repo:** [`docs/screenshots/sandstorm.png`](./screenshots/sandstorm.png)
-* **Mood & Gameplay:** Gió lốc cuốn theo bụi cát vàng nâu mịt mù cùng hiệu ứng nhiễu hạt (grain) và viền tối (vignette) dày đặc, lột tả sự tàn khốc của vùng hoang mạc hậu tận thế. Bão cát làm triệt tiêu hiệu suất hấp thụ của pin mặt trời và che phủ hoàn toàn bóng đổ, buộc căn cứ phải dựa vào nguồn năng lượng lưu trữ dự phòng.
+* **Mood & Gameplay:** Cơn bão cát sa mạc gầm rú với hàng trăm vệt cát cuộn xoáy với tốc độ cao, phủ một lớp Haze bụi vàng đặc trưng lên không gian bên ngoài. Hiệu ứng **Beacon Lighting** tự động đẩy độ sáng của lò sưởi gang lên 1.4x và nhấp nháy theo nhịp thở sinh tồn, tạo sự tương phản điện ảnh tuyệt đối giữa hiểm họa bên ngoài và sự che chở bên trong cabin.
 
 ---
 

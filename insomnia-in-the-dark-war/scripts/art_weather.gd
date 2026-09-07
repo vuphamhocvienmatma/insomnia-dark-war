@@ -152,9 +152,16 @@ func _create_particles() -> void:
 	_turn_off_all()
 
 func _create_line_texture(start: Vector2, end: Vector2) -> Texture2D:
-	# Create a simple line texture dynamically or just use a small rect
-	var img = Image.create(int(max(abs(end.x), 1.0)), int(max(abs(end.y), 1.0)), false, Image.FORMAT_RGBA8)
-	img.fill(Color.WHITE)
+	var w = int(max(abs(end.x), 1.0))
+	var h = int(max(abs(end.y), 1.0))
+	var img = Image.create(w, h, false, Image.FORMAT_RGBA8)
+	img.fill(Color(1, 1, 1, 0))
+	var is_vertical = h >= w
+	for y in h:
+		for x in w:
+			var t = float(y) / float(max(h - 1, 1)) if is_vertical else float(x) / float(max(w - 1, 1))
+			var a = sin(t * PI)
+			img.set_pixel(x, y, Color(1, 1, 1, a))
 	return ImageTexture.create_from_image(img)
 
 func _turn_off_all() -> void:
@@ -194,38 +201,38 @@ func _apply_post_process() -> void:
 	var g_a = 0.0
 	var a_a = 0.0
 	var desat = 0.0
-	var cr_uv = 0.2
+	var cr_uv = 0.28
 	
 	if weather_type == "sunny":
 		t_c = Color(1.0, 0.9, 0.7)
 		t_a = 0.0
-		cr_uv = 0.1
+		cr_uv = 0.25
 	elif weather_type == "drizzle":
 		t_c = Color(0.8, 0.9, 1.0)
-		t_a = 0.1
+		t_a = 0.08
 		desat = 0.1
-		cr_uv = 0.2
+		cr_uv = 0.28
 	elif weather_type == "heavy_rain":
-		t_c = Color(0.6, 0.7, 0.9)
-		t_a = 0.15
-		desat = 0.15
-		v_i = 0.35
-		a_a = 1.5
-		cr_uv = 0.15
+		t_c = Color(0.65, 0.75, 0.9)
+		t_a = 0.12
+		desat = 0.12
+		v_i = 0.25
+		a_a = 0.8
+		cr_uv = 0.32
 	elif weather_type == "sandstorm":
-		t_c = Color(0.85, 0.7, 0.5)
-		t_a = 0.35
-		desat = 0.25
-		v_i = 0.5
-		g_a = 0.3
-		cr_uv = 0.12
+		t_c = Color(0.88, 0.68, 0.45)
+		t_a = 0.28
+		desat = 0.20
+		v_i = 0.35
+		g_a = 0.2
+		cr_uv = 0.30
 	elif weather_type == "nightmare_sandstorm":
 		t_c = Color(0.6, 0.2, 0.3)
-		t_a = 0.4
-		desat = 0.3
-		v_i = 0.6
-		a_a = 2.0
-		cr_uv = 0.1
+		t_a = 0.35
+		desat = 0.25
+		v_i = 0.45
+		a_a = 1.2
+		cr_uv = 0.28
 		
 	pp_mat.set_shader_parameter("tint_color", t_c)
 	pp_mat.set_shader_parameter("tint_amount", t_a)

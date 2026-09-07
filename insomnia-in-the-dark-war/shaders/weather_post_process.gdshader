@@ -41,7 +41,7 @@ void fragment() {
     // Vignette
     vec2 center = uv - 0.5;
     float dist = length(center);
-    float vignette = smoothstep(0.8, 0.2, dist * (1.0 + vignette_intensity));
+    float vignette = clamp(1.0 - smoothstep(0.35, 0.75, dist) * vignette_intensity, 0.0, 1.0);
     color *= vignette;
     
     // Grain

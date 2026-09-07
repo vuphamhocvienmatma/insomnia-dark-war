@@ -129,23 +129,31 @@ func set_weather(weather_id: String) -> void:
 	_current_weather_id = weather_id
 	
 	# Stop all weather beds
-	var tween = create_tween().set_parallel(true)
+	var has_playing = false
 	for p in _weather_players:
 		if p.playing:
-			tween.tween_property(p, "volume_db", -80.0, 2.0)
-			tween.chain().tween_callback(p.stop)
+			has_playing = true
+			break
+	if has_playing:
+		var tween = create_tween()
+		for p in _weather_players:
+			if p.playing:
+				tween.tween_property(p, "volume_db", -80.0, 2.0)
+				tween.chain().tween_callback(p.stop)
 			
 	if weather_id == "":
 		return
 		
 	# Play new weather bed
-	var stream = load(BGM_DIR + "bed_" + weather_id + ".ogg")
-	if stream:
-		var p = _weather_players[0]
-		p.stream = stream
-		p.volume_db = -80.0
-		p.play()
-		create_tween().tween_property(p, "volume_db", 0.0, 2.0)
+	var bed_path = BGM_DIR + "bed_" + weather_id + ".ogg"
+	if ResourceLoader.exists(bed_path):
+		var stream = load(bed_path)
+		if stream:
+			var p = _weather_players[0]
+			p.stream = stream
+			p.volume_db = -80.0
+			p.play()
+			create_tween().tween_property(p, "volume_db", 0.0, 2.0)
 
 func trigger_thunder() -> void:
 	var v = randi() % 3 + 1
@@ -153,18 +161,20 @@ func trigger_thunder() -> void:
 	
 	# Duck BGM
 	var bgm_bus_idx = AudioServer.get_bus_index(BUS_BGM)
-	var current_vol = AudioServer.get_bus_volume_db(bgm_bus_idx)
-	var tween = create_tween()
-	tween.tween_property(AudioServer, "bus_volume_db:" + str(bgm_bus_idx), current_vol - 3.0, 0.1)
-	tween.tween_interval(1.0)
-	tween.tween_property(AudioServer, "bus_volume_db:" + str(bgm_bus_idx), current_vol, 1.0)
+	if bgm_bus_idx >= 0:
+		var current_vol = AudioServer.get_bus_volume_db(bgm_bus_idx)
+		var tween = create_tween()
+		tween.tween_method(func(val: float): AudioServer.set_bus_volume_db(bgm_bus_idx, val), current_vol, current_vol - 3.0, 0.1)
+		tween.tween_interval(1.0)
+		tween.tween_method(func(val: float): AudioServer.set_bus_volume_db(bgm_bus_idx, val), current_vol - 3.0, current_vol, 1.0)
 
 func play_sfx(id: String, pitch_variance: float = 0.05, custom_bus: String = BUS_SFX) -> void:
-	var stream = load(SFX_DIR + id + ".ogg")
+	var stream = null
+	if ResourceLoader.exists(SFX_DIR + id + ".ogg"):
+		stream = load(SFX_DIR + id + ".ogg")
+	elif ResourceLoader.exists(BGM_DIR + id + ".ogg"):
+		stream = load(BGM_DIR + id + ".ogg")
 	if not stream:
-		stream = load(BGM_DIR + id + ".ogg") # Fallback for some weather beds
-	if not stream:
-		push_warning("SFX not found: " + id)
 		return
 		
 	for p in _sfx_players:

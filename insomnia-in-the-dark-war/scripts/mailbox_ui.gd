@@ -269,8 +269,11 @@ func _typewriter_step(val: int) -> void:
 	content_lbl.visible_characters = val
 	if val > prev:
 		# Play sound
-		if _am == null: 
-		if _am and _am.has_method("play_sfx"): _AudioDirector.play_sfx("typewriter_tick")
+		var ad = get_node_or_null("/root/AudioDirector")
+		if ad and ad.has_method("play_sfx"):
+			ad.play_sfx("typewriter_tick")
+		elif _am and _am.has_method("play_sfx"):
+			_am.call("play_sfx", "typewriter_tick")
 
 func _on_claim_gift_pressed() -> void:
 	var mm: Node = get_tree().get_first_node_in_group("mailbox_manager")

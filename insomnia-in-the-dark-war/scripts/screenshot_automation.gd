@@ -96,6 +96,14 @@ func _save_screenshot(shot_name: String) -> void:
 	var shots_dir_path = ProjectSettings.globalize_path("res://assets/screenshots/" + shot_name + ".png")
 	img.save_png(shots_dir_path)
 
+	# 5. Save copy to repo docs/screenshots/
+	var docs_shots_path = ProjectSettings.globalize_path("res://../docs/screenshots/" + shot_name + ".png")
+	img.save_png(docs_shots_path)
+
+	# 6. Save copy to repo root assets/screenshots/
+	var root_assets_shots_path = ProjectSettings.globalize_path("res://../assets/screenshots/" + shot_name + ".png")
+	img.save_png(root_assets_shots_path)
+
 	print("[SAVED] Successfully captured: ", shot_name, " -> ", global_proj_path)
 
 func _setup_camera_and_actors() -> void:
