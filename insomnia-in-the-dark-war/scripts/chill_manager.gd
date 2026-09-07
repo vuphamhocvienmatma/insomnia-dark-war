@@ -186,7 +186,7 @@ func _stop_guitar_minigame() -> void:
 	get_tree().paused = false
 	_set_shader_wobble(0.0)
 	
-	var tw = create_tween()
+	var tw = create_tween().set_pause_mode(Tween.TWEEN_PAUSE_PROCESS)
 	tw.tween_property(guitar_ui, "modulate:a", 0.0, 1.0)
 	tw.tween_callback(func(): guitar_ui.hide())
 
@@ -215,7 +215,7 @@ func _update_guitar_minigame(delta: float) -> void:
 	if guitar_timer >= 22.0:
 		guitar_active = false
 		get_tree().paused = false
-		var tw = create_tween()
+		var tw = create_tween().set_pause_mode(Tween.TWEEN_PAUSE_PROCESS)
 		tw.tween_property(guitar_ui, "modulate:a", 0.0, 1.5).set_ease(Tween.EASE_IN)
 		tw.tween_callback(guitar_ui.hide)
 		var hud = get_tree().get_first_node_in_group("hud")

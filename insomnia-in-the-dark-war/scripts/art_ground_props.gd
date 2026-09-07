@@ -7,6 +7,7 @@ var _flora_node: Node2D
 var current_state: String = "dry"
 var _time: float = 0.0
 var _redraw_timer: float = 0.0
+var _last_camera_x: float = 0.0
 
 var _decals: Array[Dictionary] = []
 var _sub_rocks: Array[Dictionary] = []
@@ -140,9 +141,17 @@ func _process(delta: float) -> void:
 			needs_redraw = true
 
 	_redraw_timer += delta
-	if _redraw_timer >= 0.1: # 10 FPS throttle for ground updates (decals fading)
+	# Redraw when camera moves significantly OR timer expires (whichever first)
+	var camera_moved = false
+	if _camera != null:
+		var cam_pos_diff = abs(_camera.global_position.x - _last_camera_x)
+		if cam_pos_diff > 8.0:
+			camera_moved = true
+			_last_camera_x = _camera.global_position.x
+	
+	if _redraw_timer >= 0.05 or camera_moved: # 20 FPS throttle or position change
 		_redraw_timer = 0.0
-		if _decals.size() > 0 or needs_redraw:
+		if _decals.size() > 0 or needs_redraw or camera_moved:
 			queue_redraw()
 
 func _get_pal() -> Dictionary:

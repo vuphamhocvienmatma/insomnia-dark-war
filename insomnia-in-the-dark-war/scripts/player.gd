@@ -52,8 +52,11 @@ func _physics_process(_delta: float) -> void:
 			if ground and ground.has_method("add_decal"):
 				ground.call("add_decal", "footprint", global_position)
 
-	# Ladder interaction only triggered by pressing E when near the ladder (x = 150)
-	var near_ladder: bool = absf(position.x - 150.0) < 22.0
+	# Ladder interaction only triggered by pressing E when near the ladder
+	var ladder_x: float = 150.0
+	if cabin != null:
+		ladder_x = cabin.global_position.x + 150.0
+	var near_ladder: bool = absf(position.x - ladder_x) < 22.0
 	if ladder_prompt != null:
 		if near_ladder and not _climbing:
 			ladder_prompt.visible = true
@@ -165,7 +168,8 @@ func _on_floor_changed(_floor_name: String) -> void:
 		return
 	_climbing = true
 	# Center on ladder while climbing
-	position.x = 150.0
+	var ladder_x: float = cabin.global_position.x + 150.0
+	position.x = ladder_x
 	velocity = Vector2.ZERO
 	if art != null and art.has_method("set_climbing"):
 		art.call("set_climbing", true)

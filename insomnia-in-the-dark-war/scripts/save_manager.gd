@@ -3,6 +3,7 @@ extends Node
 const SAVE_PATH: String = "user://insomnia_save.json"
 
 var _unlocked_ids: Array[String] = []
+var _save_pending: bool = false
 
 
 func unlock(id: String) -> void:
@@ -12,6 +13,16 @@ func unlock(id: String) -> void:
 
 func has_unlocked(id: String) -> bool:
 	return _unlocked_ids.has(id)
+
+func save_game_deferred() -> void:
+	if _save_pending:
+		return
+	_save_pending = true
+	call_deferred("_do_save_game")
+
+func _do_save_game() -> void:
+	_save_pending = false
+	save_game()
 
 func save_game() -> void:
 	var save_data: Dictionary = {}
@@ -46,6 +57,9 @@ func save_game() -> void:
 	var ls: Node = get_tree().root.find_child("LevelSetup", true, false)
 	if ls != null and ls.has_method("get_save_data"):
 		save_data["level_data"] = ls.call("get_save_data")
+		# Save merchant dog visit day for persistence across reloads
+		if "day_count" in ls:
+			save_data["merchant_last_visit_day"] = ls.get("merchant_last_visit_day")
 
 	var built_walls: Array = []
 	for wall in get_tree().get_nodes_in_group("defensive_wall"):
@@ -199,6 +213,9 @@ func load_game() -> bool:
 		var ls: Node = get_tree().root.find_child("LevelSetup", true, false)
 		if ls != null and ls.has_method("load_save_data"):
 			ls.call("load_save_data", save_data["level_data"])
+		# Restore merchant dog visit day
+		if ls != null and save_data.has("merchant_last_visit_day"):
+			ls.set("merchant_last_visit_day", int(save_data["merchant_last_visit_day"]))
 
 	# Restore merchant data
 	if save_data.has("merchant_data"):

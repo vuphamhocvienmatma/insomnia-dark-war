@@ -93,6 +93,9 @@ func start_new_day() -> void:
 		print("Đêm qua mất ngủ... hôm nay đi chậm hơn một chút.")
 	elif saved_breach and saved_meal:
 		print("Bữa ăn ấm bụng đã giúp bạn ngủ ngon dù hàng rào bị hở!")
+	# Save immediately after day transition to persist tired state
+	if has_node("/root/SaveManager"):
+		SaveManager.save_game_deferred()
 
 	# Permanent Relic: Golden Fishing Rod bonus each morning
 	if relics_found.has("golden_fishing_rod"):

@@ -122,6 +122,7 @@ func _grant_rewards(gifts: Dictionary) -> void:
 
 
 func _check_milestone_surprise(sender: String, aff: int) -> void:
+	# Check 60 milestone first (higher priority)
 	if aff >= 60 and not bool(SaveManager.has_unlocked("surprise_60_" + sender) if SaveManager else false):
 		if SaveManager:
 			SaveManager.unlock("surprise_60_" + sender)
@@ -168,7 +169,9 @@ func _check_milestone_surprise(sender: String, aff: int) -> void:
 		}
 		receive_letter(s_pkg)
 		surprise_gift_unlocked.emit(sender, title, "Kích hoạt bảo vật vĩnh viễn: " + relic_name)
-	elif aff >= 30 and not bool(SaveManager.has_unlocked("surprise_30_" + sender) if SaveManager else false):
+	
+	# Always check 30 milestone (even if 60 already claimed this call)
+	if aff >= 30 and not bool(SaveManager.has_unlocked("surprise_30_" + sender) if SaveManager else false):
 		if SaveManager:
 			SaveManager.unlock("surprise_30_" + sender)
 		var s_pkg: Dictionary = {

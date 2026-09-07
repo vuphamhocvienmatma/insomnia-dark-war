@@ -29,6 +29,8 @@ var _sfx_2d_pool: Array[AudioStreamPlayer2D] = []
 var _active_bgm_idx: int = 0
 var _current_bgm_name: String = ""
 var _current_weather_id: String = ""
+var _bgm_base_vol: float = 0.0
+var _duck_tween: Tween = null
 
 func _ready() -> void:
 	process_mode = Node.PROCESS_MODE_ALWAYS
@@ -42,21 +44,6 @@ func _setup_buses() -> void:
 	_ensure_bus(BUS_WEATHER)
 	_ensure_bus(BUS_SFX)
 	_ensure_bus(BUS_UI)
-	
-	# Add compressor to Master to duck BGM when SFX is loud
-	var master_idx = AudioServer.get_bus_index(BUS_MASTER)
-	var has_comp = false
-	for i in AudioServer.get_bus_effect_count(master_idx):
-		if AudioServer.get_bus_effect(master_idx, i) is AudioEffectCompressor:
-			has_comp = true
-			break
-	
-	if not has_comp:
-		var comp = AudioEffectCompressor.new()
-		comp.threshold = -15.0
-		comp.ratio = 4.0
-		comp.release_ms = 250.0
-		AudioServer.add_bus_effect(master_idx, comp)
 
 func _ensure_bus(bus_name: String) -> void:
 	var idx = AudioServer.get_bus_index(bus_name)
@@ -128,11 +115,15 @@ func crossfade_bgm(target_track: String, duration: float = 3.0) -> void:
 	p_in.play()
 	
 	var tween = create_tween().set_parallel(true)
-	tween.tween_property(p_in, "volume_db", 0.0, duration).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN_OUT)
+	tween.tween_property(p_in, "volume_db", _bgm_base_vol, duration).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN_OUT)
 	tween.tween_property(p_out, "volume_db", -80.0, duration).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN_OUT)
 	tween.chain().tween_callback(p_out.stop)
 	
 	_active_bgm_idx = next_idx
+	# Restore bus volume in case a duck was in progress
+	var bgm_bus_idx = AudioServer.get_bus_index(BUS_BGM)
+	if bgm_bus_idx >= 0:
+		AudioServer.set_bus_volume_db(bgm_bus_idx, _bgm_base_vol)
 
 func set_weather(weather_id: String) -> void:
 	if _current_weather_id == weather_id:
@@ -167,18 +158,23 @@ func set_weather(weather_id: String) -> void:
 			p.play()
 			create_tween().tween_property(p, "volume_db", 0.0, 2.0)
 
+func duck_bgm(amount_db: float = -6.0, duration: float = 0.1, hold: float = 0.8) -> void:
+	var bgm_bus_idx = AudioServer.get_bus_index(BUS_BGM)
+	if bgm_bus_idx < 0:
+		return
+	if _duck_tween != null and _duck_tween.is_valid():
+		_duck_tween.kill()
+	var current_vol = AudioServer.get_bus_volume_db(bgm_bus_idx)
+	var target_vol = _bgm_base_vol + amount_db
+	_duck_tween = create_tween()
+	_duck_tween.tween_method(func(val: float): AudioServer.set_bus_volume_db(bgm_bus_idx, val), current_vol, target_vol, duration)
+	_duck_tween.tween_interval(hold)
+	_duck_tween.tween_method(func(val: float): AudioServer.set_bus_volume_db(bgm_bus_idx, val), target_vol, _bgm_base_vol, duration * 2.0)
+
 func trigger_thunder() -> void:
 	var v = randi() % 3 + 1
 	play_sfx("bed_thunder_0" + str(v), 0.0, BUS_WEATHER)
-	
-	# Duck BGM
-	var bgm_bus_idx = AudioServer.get_bus_index(BUS_BGM)
-	if bgm_bus_idx >= 0:
-		var current_vol = AudioServer.get_bus_volume_db(bgm_bus_idx)
-		var tween = create_tween()
-		tween.tween_method(func(val: float): AudioServer.set_bus_volume_db(bgm_bus_idx, val), current_vol, current_vol - 3.0, 0.1)
-		tween.tween_interval(1.0)
-		tween.tween_method(func(val: float): AudioServer.set_bus_volume_db(bgm_bus_idx, val), current_vol - 3.0, current_vol, 1.0)
+	duck_bgm(-6.0, 0.1, 1.0)
 
 func play_sfx(id: String, pitch_variance: float = 0.05, custom_bus: String = BUS_SFX) -> void:
 	var stream = null
@@ -205,13 +201,12 @@ func play_sfx(id: String, pitch_variance: float = 0.05, custom_bus: String = BUS
 	override_p.play()
 
 func on_guitar_hit(lane: int, perfect: bool) -> void:
-	# If missing beat, duck BGM slightly to simulate missing voice
-	if not perfect:
-		var p_in = _bgm_players[_active_bgm_idx]
-		var old_vol = p_in.volume_db
-		var tween = create_tween()
-		tween.tween_property(p_in, "volume_db", old_vol - 10.0, 0.1)
-		tween.tween_property(p_in, "volume_db", old_vol, 0.4)
+	if perfect:
+		# Play a pluck sound with lane-based pitch variation
+		var pitch_offset = float(lane) * 0.08
+		play_sfx("typewriter_tick", 0.02, BUS_SFX)
+	else:
+		duck_bgm(-10.0, 0.1, 0.3)
 
 func _on_eco_mode_changed(is_eco: bool) -> void:
 	# Turn off vinyl crackle and wow/flutter in Lofi Shader or Audio Bus

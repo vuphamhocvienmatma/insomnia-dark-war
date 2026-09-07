@@ -30,6 +30,7 @@ var current_weather: String = "sunny"
 var _hud: Node = null
 var _tm: Node = null
 var _dog: Node2D = null
+var merchant_last_visit_day: int = -1
 
 
 func _ready() -> void:
@@ -307,7 +308,13 @@ func _spawn_merchant_dog() -> void:
 func update_merchant_dog_visibility() -> void:
 	var dog: Node2D = get_tree().get_first_node_in_group("merchant_dog") as Node2D
 	if dog != null:
-		var is_visiting: bool = (day_count == 1 or day_count % 3 == 0)
+		var is_visiting: bool = false
+		if day_count == 1:
+			is_visiting = true
+		elif day_count % 3 == 0 and merchant_last_visit_day != day_count:
+			is_visiting = true
+		if is_visiting:
+			merchant_last_visit_day = day_count
 		dog.visible = is_visiting
 		dog.set_process(is_visiting)
 		dog.set_physics_process(is_visiting)

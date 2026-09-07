@@ -68,14 +68,14 @@ func _on_fire_rate_timer_timeout() -> void:
 		if art_node != null and art_node.has_method("trigger_muzzle_flash"):
 			art_node.call("trigger_muzzle_flash")
 			
-		var am := get_tree().get_first_node_in_group("audio_manager")
-		if true:
-			AudioDirector.play_sfx_positional("turret_shoot", global_position)
+		AudioDirector.play_sfx_positional("turret_shoot", global_position)
 			
 		var ground = get_tree().get_first_node_in_group("ground_props")
 		if ground and ground.has_method("add_decal"):
-			# Bullet casings or impact mark near target
 			ground.call("add_decal", "bullet", current_target.global_position + Vector2(randf_range(-15, 15), 0))
+	else:
+		# Solar depleted - duck BGM briefly to simulate turret powering down
+		AudioDirector.duck_bgm(-3.0, 0.2, 0.5)
 
 
 
