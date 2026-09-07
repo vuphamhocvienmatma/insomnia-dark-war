@@ -190,6 +190,12 @@ func set_weather(w_type: String) -> void:
 		
 	if has_node("/root/AudioDirector"):
 		AudioDirector.set_weather(w_type)
+
+	var stove_light = get_tree().get_first_node_in_group("fireplace_light")
+	if stove_light == null:
+		stove_light = get_tree().root.find_child("StoveLight", true, false)
+	if stove_light != null and stove_light.has_method("on_weather_changed"):
+		stove_light.on_weather_changed(weather_type)
 		
 	_apply_post_process()
 
@@ -244,6 +250,18 @@ func _apply_post_process() -> void:
 	
 	if particle_group and particle_group.material:
 		particle_group.material.set_shader_parameter("clarity_radius_uv", cr_uv)
+
+	# Cozy Thermal Contrast: boost warmth from decoration score
+	var cdm: Node = null
+	var cdm_list = get_tree().get_nodes_in_group("cabin_decoration_manager")
+	if cdm_list.size() > 0:
+		cdm = cdm_list[0]
+	if cdm == null:
+		cdm = get_tree().root.find_child("CabinDecorationManager", true, false)
+	if cdm != null and "cozy_score" in cdm:
+		var c_score: float = float(cdm.get("cozy_score")) / 120.0
+		if pp_mat != null:
+			pp_mat.set_shader_parameter("cozy_warmth", c_score * 0.12)
 
 func _get_zoom_factor() -> float:
 	var cam = get_viewport().get_camera_2d()

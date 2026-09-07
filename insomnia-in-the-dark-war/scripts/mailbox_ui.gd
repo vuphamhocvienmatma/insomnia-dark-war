@@ -8,7 +8,7 @@ var header_lbl: Label
 var sender_lbl: Label
 var affinity_lbl: Label
 var title_lbl: Label
-var content_lbl: Label
+var content_lbl: RichTextLabel
 var gift_box: Panel
 var gift_lbl: Label
 var gift_btn: Button
@@ -22,7 +22,22 @@ const TEXT_COL: Color = Color(0.94, 0.90, 0.82, 1.0)
 const HEART_COL: Color = Color(1.0, 0.45, 0.45, 1.0)
 
 
+
+var _journal_font = preload("res://assets/fonts/SpecialElite.ttf")
+
+func _apply_fonts(node: Node) -> void:
+	for child in node.get_children():
+		if child is Label or child is RichTextLabel or child is Button:
+			child.add_theme_font_override("font", _journal_font)
+			child.add_theme_font_override("normal_font", _journal_font)
+			# Enable bbcode if RichTextLabel
+			if child is RichTextLabel:
+				child.bbcode_enabled = true
+		_apply_fonts(child)
+
 func _ready() -> void:
+	_apply_fonts(self)
+
 	anchor_left = 0.5
 	anchor_top = 0.5
 	anchor_right = 0.5
@@ -120,12 +135,20 @@ func _build_ui() -> void:
 	scroll.size_flags_vertical = Control.SIZE_EXPAND_FILL
 	vbox.add_child(scroll)
 
-	content_lbl = Label.new()
-	content_lbl.text = "Nội dung thư..."
-	content_lbl.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	content_lbl.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	content_lbl.add_theme_font_size_override("font_size", 11)
-	content_lbl.add_theme_color_override("font_color", TEXT_COL)
+	# Use RichTextLabel for BBCode shake/kinetic typewriter effect
+	var rtl := RichTextLabel.new()
+	rtl.bbcode_enabled = true
+	rtl.text = "Nội dung thư..."
+	rtl.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	rtl.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	rtl.fit_content = true
+	rtl.add_theme_font_size_override("normal_font_size", 11)
+	rtl.add_theme_color_override("default_color", TEXT_COL)
+	if ResourceLoader.exists("res://assets/fonts/SpecialElite.ttf"):
+		var ef := load("res://assets/fonts/SpecialElite.ttf")
+		rtl.add_theme_font_override("normal_font", ef)
+		rtl.add_theme_font_override("bold_font", ef)
+	content_lbl = rtl
 	scroll.add_child(content_lbl)
 
 	# 5. Gift Card
@@ -213,14 +236,17 @@ func display_letter(letter: Dictionary) -> void:
 	var sender: String = str(letter.get("sender", "Ẩn danh"))
 	sender_lbl.text = "Người gửi: " + sender
 	title_lbl.text = str(letter.get("title", ""))
-	content_lbl.text = str(letter.get("content", ""))
+	# Wrap letter body in [shake] BBCode for kinetic typewriter misaligned feel
+	var raw_text: String = str(letter.get("content", ""))
+	content_lbl.text = "[shake rate=8.0 level=2 connected=1]" + raw_text + "[/shake]"
 	content_lbl.visible_characters = 0
 
 	# Typewriter Effect
 	if _typewriter_tween != null and _typewriter_tween.is_valid():
 		_typewriter_tween.kill()
 	_typewriter_tween = create_tween()
-	_typewriter_tween.tween_method(func(val): _typewriter_step(val), 0, content_lbl.text.length(), content_lbl.text.length() * 0.05)
+	var char_count: int = content_lbl.get_total_character_count()
+	_typewriter_tween.tween_method(func(val): _typewriter_step(val), 0, char_count, float(char_count) * 0.05)
 
 	var mm: Node = get_tree().get_first_node_in_group("mailbox_manager")
 	var aff_val: int = 0

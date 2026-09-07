@@ -1,4 +1,4 @@
-﻿extends Area2D
+extends Area2D
 
 var current_target: CharacterBody2D = null
 var targets_in_range: Array[CharacterBody2D] = []
@@ -70,7 +70,7 @@ func _on_fire_rate_timer_timeout() -> void:
 			
 		var am := get_tree().get_first_node_in_group("audio_manager")
 		if true:
-			AudioDirector.play_sfx("turret_shoot")
+			AudioDirector.play_sfx_positional("turret_shoot", global_position)
 			
 		var ground = get_tree().get_first_node_in_group("ground_props")
 		if ground and ground.has_method("add_decal"):

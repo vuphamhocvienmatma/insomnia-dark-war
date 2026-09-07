@@ -46,7 +46,26 @@ const HEADER_COLOR: Color = Color("#F4EFE6")
 const GUIDE_COLOR: Color = Color("#FFD166")
 
 
+
+var _hud_font = preload("res://assets/fonts/ShareTechMono.ttf")
+var _journal_font = preload("res://assets/fonts/SpecialElite.ttf")
+
+func _apply_fonts(node: Node) -> void:
+	for child in node.get_children():
+		if child is Label or child is RichTextLabel:
+			# Use SpecialElite for tasks (Journal), ShareTechMono for HUD
+			var fname = child.name.to_lower()
+			if "task" in fname or "journal" in fname:
+				child.add_theme_font_override("font", _journal_font)
+				child.add_theme_font_override("normal_font", _journal_font)
+			else:
+				child.add_theme_font_override("font", _hud_font)
+				child.add_theme_font_override("normal_font", _hud_font)
+		_apply_fonts(child)
+
 func _ready() -> void:
+	_apply_fonts(self)
+
 	add_to_group("hud")
 	fps_label = Label.new()
 	fps_label.add_theme_font_size_override("font_size", 11)

@@ -10,6 +10,11 @@ var _sway_time: float = 0.0
 
 var _player: Node2D = null
 
+var _breath_time: float = 0.0
+const BREATH_AMPLITUDE: float = 1.8
+const BREATH_FREQ_NORMAL: float = 0.30
+const BREATH_FREQ_TIRED: float = 0.18
+
 
 func _ready() -> void:
 	add_to_group("main_camera")
@@ -34,7 +39,10 @@ func _process(delta: float) -> void:
 		is_in_cabin = absf(_player.global_position.x) < CABIN_HALF_WIDTH
 		
 	# Solid steady camera height
-	global_position.y = CAM_Y
+	var is_tired: bool = GameState != null and GameState.get("is_tired") == true
+	var breath_freq: float = BREATH_FREQ_TIRED if is_tired else BREATH_FREQ_NORMAL
+	_breath_time += delta * breath_freq * TAU
+	global_position.y = CAM_Y + sin(_breath_time) * BREATH_AMPLITUDE
 	
 	# Contextual base zoom + User manual zoom offset
 	var base_zoom_val: float = 1.05 if is_in_cabin else 0.95

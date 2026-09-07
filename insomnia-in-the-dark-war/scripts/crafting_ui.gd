@@ -12,7 +12,19 @@ var cat_toy_done: bool = false
 var craft_sound: AudioStreamPlayer
 
 
+
+var _hud_font = preload("res://assets/fonts/ShareTechMono.ttf")
+
+func _apply_fonts(node: Node) -> void:
+	for child in node.get_children():
+		if child is Label or child is RichTextLabel or child is Button:
+			child.add_theme_font_override("font", _hud_font)
+			child.add_theme_font_override("normal_font", _hud_font)
+		_apply_fonts(child)
+
 func _ready() -> void:
+	_apply_fonts(self)
+
 	panel = $Panel
 	panel.visible = false
 	var vbox: VBoxContainer = $Panel/VBoxContainer

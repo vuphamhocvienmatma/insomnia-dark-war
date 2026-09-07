@@ -82,7 +82,35 @@ func _ready() -> void:
 	attack_timer.timeout.connect(_on_attack_timer_timeout)
 
 
+func _process(delta: float) -> void:
+	if is_dead: return
+
+	# Groan / ambient zombie sound
+	_groan_timer -= delta
+	if _groan_timer <= 0.0:
+		_groan_timer = randf_range(3.0, 7.0)
+		if has_node("/root/AudioDirector"):
+			match zombie_type:
+				"runner":
+					AudioDirector.play_sfx_positional("zombie_runner", global_position)
+				"brute":
+					AudioDirector.play_sfx_positional("zombie_brute", global_position)
+				"thief":
+					AudioDirector.play_sfx_positional("zombie_thief", global_position)
+				_:
+					AudioDirector.play_sfx_positional("zombie_groan_normal", global_position)
+
+	# Footstep sounds while moving
+	if velocity.length() > 1.0:
+		_footprint_timer -= delta
+		if _footprint_timer <= 0.0:
+			var step_interval = 0.35 / max(speed / 30.0, 0.5)
+			_footprint_timer = step_interval
+			if has_node("/root/AudioDirector"):
+				AudioDirector.play_sfx_positional("footstep", global_position)
+
 func _physics_process(_delta: float) -> void:
+
 	queue_redraw()
 	if is_dead: return
 	
