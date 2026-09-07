@@ -75,7 +75,7 @@ func _physics_process(_delta: float) -> void:
 				cabin.climb_down()
 
 	# Climb logic here
-	var effective_speed: float = speed * (0.85 if (GameState and GameState.is_tired) else 1.0)
+	var effective_speed: float = speed * (0.90 if (GameState and GameState.is_tired) else 1.0)
 	velocity = Vector2(direction.x * effective_speed, 0.0)
 
 	if art and direction.x != 0.0:

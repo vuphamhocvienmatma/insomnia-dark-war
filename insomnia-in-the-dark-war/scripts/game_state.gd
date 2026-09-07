@@ -32,6 +32,9 @@ var is_tired: bool = false
 var relics_found: Array[String] = []
 var eco_mode: bool = false
 
+const SEED_CAP: int = 50
+const WATER_CAP: int = 30
+
 func _ready() -> void:
 	# Default eco_mode to true on Web export for maximum smoothness on low-end browsers
 	if OS.has_feature("web"):
@@ -60,8 +63,10 @@ func spend_scrap(amount: int) -> bool:
 	return true
 
 func add_seeds(amount: int = 1) -> void:
-	seeds_count += amount
-	seeds_changed.emit(seeds_count)
+	var old = seeds_count
+	seeds_count = mini(seeds_count + amount, SEED_CAP)
+	if seeds_count != old:
+		seeds_changed.emit(seeds_count)
 
 func spend_seeds(amount: int) -> bool:
 	if seeds_count < amount:
@@ -71,8 +76,10 @@ func spend_seeds(amount: int) -> bool:
 	return true
 
 func add_water(amount: int = 1) -> void:
-	water_count += amount
-	water_changed.emit(water_count)
+	var old = water_count
+	water_count = mini(water_count + amount, WATER_CAP)
+	if water_count != old:
+		water_changed.emit(water_count)
 
 func spend_water(amount: int) -> bool:
 	if water_count < amount:
@@ -85,12 +92,16 @@ func start_new_day() -> void:
 	stats["days_survived"] += 1
 	var saved_meal: bool = meal_buff
 	var saved_breach: bool = breach_last_night
-	is_tired = saved_breach and not saved_meal
+	# Death spiral fix: tired goes away after 1 day regardless, capped at mild penalty
+	if is_tired:
+		is_tired = false  # Recover after surviving one more day
+	elif saved_breach and not saved_meal:
+		is_tired = true
 	breach_last_night = false
 	meal_buff = false
 	tired_changed.emit(is_tired)
 	if is_tired:
-		print("Đêm qua mất ngủ... hôm nay đi chậm hơn một chút.")
+		print("Đêm qua mất ngủ... hôm nay bước chân nặng hơn một chút.")
 	elif saved_breach and saved_meal:
 		print("Bữa ăn ấm bụng đã giúp bạn ngủ ngon dù hàng rào bị hở!")
 	# Save immediately after day transition to persist tired state

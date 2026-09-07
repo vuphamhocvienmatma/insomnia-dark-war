@@ -31,6 +31,8 @@ var _hud: Node = null
 var _tm: Node = null
 var _dog: Node2D = null
 var merchant_last_visit_day: int = -1
+var _grace_timer: float = 0.0
+var _zombie_spawn_deferred: bool = false
 
 
 func _ready() -> void:
@@ -190,13 +192,23 @@ func _on_phase_changed(is_night: bool) -> void:
 				tm.set("current_solar_energy", float(tm.get("current_solar_energy")) * 0.5)
 				if tm.has_signal("solar_changed"):
 					tm.emit_signal("solar_changed", tm.get("current_solar_energy"))
-		_respawn_zombie_wave()
+		# Grace period: delay zombie spawn 8 seconds so player can finish minigame / close UI
+		_grace_timer = 8.0
+		_zombie_spawn_deferred = true
 	else:
+		_zombie_spawn_deferred = false
 		current_night_mutation = ""
 		for zombie in _spawned_zombies:
 			if is_instance_valid(zombie):
 				zombie.queue_free()
 		_spawned_zombies.clear()
+
+func _process(delta: float) -> void:
+	if _zombie_spawn_deferred:
+		_grace_timer -= delta
+		if _grace_timer <= 0.0:
+			_zombie_spawn_deferred = false
+			_respawn_zombie_wave()
 
 
 func _roll_daily_weather() -> void:

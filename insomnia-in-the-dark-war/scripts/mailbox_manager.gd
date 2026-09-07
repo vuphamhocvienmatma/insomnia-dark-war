@@ -192,7 +192,12 @@ func generate_random_letter() -> void:
 	var candidates: Array[Dictionary] = []
 	for t in _all_templates:
 		if not _used_letter_ids.has(t.get("id", "")):
-			candidates.append(t)
+			# Affinity filter: low affinity letters only appear at high negative affinity
+			var sender: String = str(t.get("sender", ""))
+			var aff: int = int(sender_affinity.get(sender, 0))
+			var min_aff: int = int(t.get("min_affinity", -100))
+			if aff >= min_aff:
+				candidates.append(t)
 
 	if candidates.is_empty():
 		_used_letter_ids.clear()

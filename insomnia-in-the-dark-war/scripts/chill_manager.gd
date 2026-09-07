@@ -116,8 +116,9 @@ func _process(delta: float) -> void:
 		else:
 			fireflies_list.remove_at(i)
 			
-	# Radio Schedule Update
-	_update_radio_schedule(is_night, time_elapsed)
+	# Radio Schedule Update (skip during minigames to preserve zen)
+	if not guitar_active and coffee_step == 0:
+		_update_radio_schedule(is_night, time_elapsed)
 	
 	# Wild Animals Spawn
 	_update_wild_animals(is_night, delta)
@@ -141,10 +142,23 @@ func _update_radio_schedule(is_night: bool, time_elapsed: float) -> void:
 	else: h = 18.0 + ratio * 12.0
 	if h >= 24.0: h -= 24.0
 	
+	# Get actual weather for radio forecast
+	var w = "sunny"
+	if get_node_or_null("/root/LevelSetup"): w = get_node("/root/LevelSetup").get("current_weather")
+	var weather_desc = ""
+	match w:
+		"sunny": weather_desc = "Nắng vàng ấm áp"
+		"drizzle": weather_desc = "Mưa phùn lất phất"
+		"heavy_rain": weather_desc = "Mưa rào xối xả, sấm chớp!"
+		"thick_fog": weather_desc = "Sương mù dày đặc, tầm nhìn thấp"
+		"snowstorm": weather_desc = "Bão tuyết lạnh giá"
+		"meteor_shower": weather_desc = "Mưa sao băng rực rỡ"
+		"sandstorm": weather_desc = "Bão cát dữ dội"
+	
 	var r_text = ""
-	if h >= 6.0 and h < 8.0: r_text = "📻 6:00 - Chào Bình Minh: Thời tiết hnay..."
+	if h >= 6.0 and h < 8.0: r_text = "📻 6:00 - Chào Bình Minh: Hôm nay " + weather_desc.to_lower() + "."
 	elif h >= 12.0 and h < 14.0: r_text = "📻 12:00 - Giờ Ăn Trưa: *Lofi beats & ads*"
-	elif h >= 18.0 and h < 20.0: r_text = "📻 18:00 - Chiều Tà: Nhạc jazz thư giãn..."
+	elif h >= 18.0 and h < 20.0: r_text = "📻 18:00 - Chiều Tà: " + weather_desc + ". Nhạc jazz thư giãn..."
 	elif h >= 22.0 or h < 0.0: r_text = "📻 22:00 - Đêm Khuya: Truyện ma đêm muộn..."
 	elif h >= 2.0 and h < 4.0: r_text = "📻 2:00 - Tần Số Ma: *Tín hiệu méo mó...*"
 	

@@ -36,19 +36,27 @@ func _refresh_shop() -> void:
 		child.queue_free()
 
 	var stock: Array[Dictionary] = [
-		{"id": "seeds_pack", "name": "🌾 Túi Hạt Giống (+3 Hạt)", "desc": "Hạt giống thảo dược chịu hạn tốt", "price": 4, "type": "consumable"},
-		{"id": "water_pack", "name": "💧 Bình Nước Sạch (+2 Nước)", "desc": "Nước ngầm lọc than hoạt tính", "price": 3, "type": "consumable"},
-		{"id": "cozy_rug", "name": "🧶 Thảm Len Dệt (+20 Cozy)", "desc": "Thảm len êm ái trải giữa phòng khách", "price": 12, "type": "unique"},
-		{"id": "disco_ball", "name": "🪩 Quả Cầu Disco Lofi (+25 Cozy)", "desc": "Treo xà trần, xoay lấp lánh đốm nắng", "price": 18, "type": "unique"},
-		{"id": "retro_poster", "name": "🖼️ Tranh Poster Hoài Niệm (+15 Cozy)", "desc": "Treo tường tầng 1, ngắm là thấy chill", "price": 8, "type": "unique"},
-		{"id": "pastel_lights", "name": "💡 Bộ Đèn Fairy Light Hồng (+20 Cozy)", "desc": "Đổi màu dây đèn lofi sang tông hồng pastel", "price": 10, "type": "unique"},
-		{"id": "bp_radio", "name": "📻 Blueprint: Radio Dã Chiến", "desc": "Mở khóa chế tạo Radio dự báo bão & đột biến", "price": 15, "type": "unique"},
-		{"id": "bp_stove", "name": "♨️ Blueprint: Lò Sưởi Tăng Cường", "desc": "Mở khóa lò sưởi chặn mệt mỏi 2 ngày", "price": 20, "type": "unique"},
-		{"id": "bp_greenhouse", "name": "🌿 Blueprint: Nhà Kính Hiên Nhà", "desc": "Mở khóa thêm 2 chậu cây trồng rau", "price": 25, "type": "unique"},
-		{"id": "tape_rainy", "name": "📼 Băng Nhạc: Rainy Shelter", "desc": "Băng cassette lofi tiếng mưa và acoustic guitar", "price": 10, "type": "unique"}
+		{"id": "seeds_pack", "name": "🌾 Túi Hạt Giống (+3 Hạt)", "desc": "Hạt giống thảo dược chịu hạn tốt", "base_price": 4, "type": "consumable"},
+		{"id": "water_pack", "name": "💧 Bình Nước Sạch (+2 Nước)", "desc": "Nước ngầm lọc than hoạt tính", "base_price": 3, "type": "consumable"},
+		{"id": "cozy_rug", "name": "🧶 Thảm Len Dệt (+20 Cozy)", "desc": "Thảm len êm ái trải giữa phòng khách", "base_price": 12, "type": "unique"},
+		{"id": "disco_ball", "name": "🪩 Quả Cầu Disco Lofi (+25 Cozy)", "desc": "Treo xà trần, xoay lấp lánh đốm nắng", "base_price": 18, "type": "unique"},
+		{"id": "retro_poster", "name": "🖼️ Tranh Poster Hoài Niệm (+15 Cozy)", "desc": "Treo tường tầng 1, ngắm là thấy chill", "base_price": 8, "type": "unique"},
+		{"id": "pastel_lights", "name": "💡 Bộ Đèn Fairy Light Hồng (+20 Cozy)", "desc": "Đổi màu dây đèn lofi sang tông hồng pastel", "base_price": 10, "type": "unique"},
+		{"id": "bp_radio", "name": "📻 Blueprint: Radio Dã Chiến", "desc": "Mở khóa chế tạo Radio dự báo bão & đột biến", "base_price": 15, "type": "unique"},
+		{"id": "bp_stove", "name": "♨️ Blueprint: Lò Sưởi Tăng Cường", "desc": "Mở khóa lò sưởi chặn mệt mỏi 2 ngày", "base_price": 20, "type": "unique"},
+		{"id": "bp_greenhouse", "name": "🌿 Blueprint: Nhà Kính Hiên Nhà", "desc": "Mở khóa thêm 2 chậu cây trồng rau", "base_price": 25, "type": "unique"},
+		{"id": "tape_rainy", "name": "📼 Băng Nhạc: Rainy Shelter", "desc": "Băng cassette lofi tiếng mưa và acoustic guitar", "base_price": 10, "type": "unique"}
 	]
 
+	# Price scaling: +5% per day after day 3
+	var ls = get_tree().get_first_node_in_group("level_setup") if get_tree().get_first_node_in_group("level_setup") else get_tree().root.find_child("LevelSetup", true, false)
+	var day_count_val: int = 1
+	if ls != null and "day_count" in ls:
+		day_count_val = int(ls.get("day_count"))
+	var price_mult: float = 1.0 + max(0, day_count_val - 3) * 0.05
+
 	for itm in stock:
+		var scaled_price: int = int(itm["base_price"] * price_mult)
 		var row := HBoxContainer.new()
 		row.custom_minimum_size = Vector2(0, 38)
 
@@ -56,7 +64,7 @@ func _refresh_shop() -> void:
 		info_box.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 
 		var name_lbl := Label.new()
-		name_lbl.text = itm["name"] + " — " + str(itm["price"]) + " Phế liệu"
+		name_lbl.text = itm["name"] + " — " + str(scaled_price) + " Phế liệu"
 		name_lbl.add_theme_font_size_override("font_size", 12)
 		name_lbl.add_theme_color_override("font_color", Color(0.96, 0.88, 0.65, 1.0))
 
@@ -77,9 +85,10 @@ func _refresh_shop() -> void:
 			buy_btn.disabled = true
 		else:
 			buy_btn.text = "Mua"
-			var can_afford: bool = GameState.scrap_count >= itm["price"]
+			var can_afford: bool = GameState.scrap_count >= scaled_price
 			buy_btn.disabled = not can_afford
-			var item_ref: Dictionary = itm
+			var item_ref: Dictionary = itm.duplicate()
+			item_ref["price"] = scaled_price
 			buy_btn.pressed.connect(func() -> void: _buy_item(item_ref))
 
 		row.add_child(info_box)
