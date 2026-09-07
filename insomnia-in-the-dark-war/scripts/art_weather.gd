@@ -190,6 +190,14 @@ func set_weather(w_type: String) -> void:
 		
 	if has_node("/root/AudioDirector"):
 		AudioDirector.set_weather(w_type)
+		match w_type:
+			"heavy_rain":
+				AudioDirector.crossfade_bgm("bgm_rain", 4.0)
+			"sandstorm", "nightmare_sandstorm":
+				AudioDirector.crossfade_bgm("bgm_sandstorm", 4.0)
+			"sunny", "drizzle", "thick_fog", "meteor_shower":
+				# BGM returns to day/night phase — AudioDirector handles via TimeManager
+				pass
 
 	var stove_light = get_tree().get_first_node_in_group("fireplace_light")
 	if stove_light == null:

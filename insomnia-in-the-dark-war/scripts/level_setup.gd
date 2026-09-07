@@ -79,6 +79,9 @@ func _ready() -> void:
 
 	if _tm != null:
 		_tm.phase_changed.connect(_on_phase_changed)
+		if has_node("/root/AudioDirector"):
+			AudioDirector.connect_time_manager(_tm)
+			AudioDirector.crossfade_bgm("bgm_day_clear", 1.0)
 
 	if OS.get_cmdline_args().has("--take-screenshots"):
 		var auto = preload("res://scripts/screenshot_automator.gd").new()

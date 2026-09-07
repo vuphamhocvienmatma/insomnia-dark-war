@@ -10,6 +10,16 @@ const BUS_WEATHER = "Weather_Bus"
 const BUS_SFX = "SFX_Bus"
 const BUS_UI = "UI_Bus"
 
+const WEATHER_BED_MAP = {
+	"drizzle": "rain",
+	"heavy_rain": "rain",
+	"thick_fog": "wind",
+	"snowstorm": "wind",
+	"meteor_shower": "wind",
+	"sandstorm": "sandstorm",
+	"nightmare_sandstorm": "sandstorm",
+}
+
 # Pooling
 var _sfx_players: Array[AudioStreamPlayer] = []
 var _bgm_players: Array[AudioStreamPlayer] = []
@@ -90,13 +100,14 @@ func _connect_signals() -> void:
 		var gs = get_node("/root/GameState")
 		if gs.has_signal("eco_mode_changed"):
 			gs.eco_mode_changed.connect(_on_eco_mode_changed)
-			
-	if has_node("/root/TimeManager"):
-		var tm = get_node("/root/TimeManager")
-		if tm.has_signal("phase_changed"):
-			tm.phase_changed.connect(_on_time_phase_changed)
-		if tm.has_signal("sunset_warning"):
-			tm.sunset_warning.connect(func(): crossfade_bgm("bgm_sunset", 3.0))
+
+func connect_time_manager(tm: Node) -> void:
+	if tm == null:
+		return
+	if tm.has_signal("phase_changed") and not tm.phase_changed.is_connected(_on_time_phase_changed):
+		tm.phase_changed.connect(_on_time_phase_changed)
+	if tm.has_signal("sunset_warning") and not tm.sunset_warning.is_connected(func(): crossfade_bgm("bgm_sunset", 3.0)):
+		tm.sunset_warning.connect(func(): crossfade_bgm("bgm_sunset", 3.0))
 
 func crossfade_bgm(target_track: String, duration: float = 3.0) -> void:
 	if _current_bgm_name == target_track:
@@ -145,7 +156,8 @@ func set_weather(weather_id: String) -> void:
 		return
 		
 	# Play new weather bed
-	var bed_path = BGM_DIR + "bed_" + weather_id + ".ogg"
+	var bed_key = WEATHER_BED_MAP.get(weather_id, weather_id)
+	var bed_path = BGM_DIR + "bed_" + bed_key + ".ogg"
 	if ResourceLoader.exists(bed_path):
 		var stream = load(bed_path)
 		if stream:
@@ -213,6 +225,8 @@ func _on_time_phase_changed(is_night: bool) -> void:
 		crossfade_bgm("bgm_day_clear", 4.0)
 
 func play_sfx_positional(id: String, world_pos: Vector2, pitch_variance: float = 0.05) -> void:
+	if not ResourceLoader.exists(SFX_DIR + id + ".ogg"):
+		return
 	var stream = load(SFX_DIR + id + ".ogg")
 	if not stream: return
 	

@@ -224,6 +224,8 @@ func open_mailbox() -> void:
 
 
 func close_mailbox() -> void:
+	if _typewriter_tween != null and _typewriter_tween.is_valid():
+		_typewriter_tween.kill()
 	var tw: Tween = create_tween()
 	tw.tween_property(self, "modulate:a", 0.0, 0.12)
 	tw.tween_callback(func() -> void: visible = false)
@@ -245,7 +247,7 @@ func display_letter(letter: Dictionary) -> void:
 	if _typewriter_tween != null and _typewriter_tween.is_valid():
 		_typewriter_tween.kill()
 	_typewriter_tween = create_tween()
-	var char_count: int = content_lbl.get_total_character_count()
+	var char_count: int = len(raw_text)
 	_typewriter_tween.tween_method(func(val): _typewriter_step(val), 0, char_count, float(char_count) * 0.05)
 
 	var mm: Node = get_tree().get_first_node_in_group("mailbox_manager")
@@ -291,9 +293,11 @@ func display_letter(letter: Dictionary) -> void:
 
 
 func _typewriter_step(val: int) -> void:
+	if not visible:
+		return
 	var prev = content_lbl.visible_characters
 	content_lbl.visible_characters = val
-	if val > prev:
+	if val > prev and val % 2 == 0:
 		# Play sound
 		var ad = get_node_or_null("/root/AudioDirector")
 		if ad and ad.has_method("play_sfx"):
