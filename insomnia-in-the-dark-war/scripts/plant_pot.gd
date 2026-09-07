@@ -61,7 +61,7 @@ func plant_seed() -> bool:
 	art_node.set_state("planted")
 	var am := get_tree().get_first_node_in_group("audio_manager")
 	if am != null:
-		am.call("play_sfx", "plant")
+		AudioDirector.play_sfx("plant")
 	_spawn_burst(5, Color(0.3, 0.8, 0.3, 1.0))
 	print("Đã trồng hạt giống, chờ nở...")
 	return true
@@ -75,7 +75,7 @@ func harvest() -> bool:
 	art_node.set_state("empty")
 	var am := get_tree().get_first_node_in_group("audio_manager")
 	if am != null:
-		am.call("play_sfx", "harvest")
+		AudioDirector.play_sfx("harvest")
 	_spawn_burst(10, Color(1.0, 0.85, 0.2, 1.0))
 
 	# Bezier Curve Juice with pre-allocated Label

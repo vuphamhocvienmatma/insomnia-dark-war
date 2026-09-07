@@ -1,0 +1,56 @@
+[gd_scene load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/test_audio.gd" id="1_test"]
+
+[node name="TestAudio" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_test")
+
+[node name="VBox" type="VBoxContainer" parent="."]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -200.0
+offset_top = -250.0
+offset_right = 200.0
+offset_bottom = 250.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Label" type="Label" parent="VBox"]
+layout_mode = 2
+text = "AUDIO TEST SUITE"
+horizontal_alignment = 1
+
+[node name="BtnDay" type="Button" parent="VBox"]
+layout_mode = 2
+text = "BGM: Day Clear"
+
+[node name="BtnNight" type="Button" parent="VBox"]
+layout_mode = 2
+text = "BGM: Night Watch"
+
+[node name="BtnRain" type="Button" parent="VBox"]
+layout_mode = 2
+text = "Weather: Rain"
+
+[node name="BtnThunder" type="Button" parent="VBox"]
+layout_mode = 2
+text = "Weather: Thunder"
+
+[node name="BtnSfx" type="Button" parent="VBox"]
+layout_mode = 2
+text = "SFX: Click Wood"
+
+[node name="BtnGuitar" type="Button" parent="VBox"]
+layout_mode = 2
+text = "Minigame: Guitar Hit"
+

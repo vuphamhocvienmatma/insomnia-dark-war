@@ -19,6 +19,8 @@ config/icon="res://icon.svg"
 
 [autoload]
 
+AudioDirector="*res://scripts/autoload/AudioDirector.gd"
+
 EmojiInjector="*res://scripts/emoji_injector.gd"
 GameState="*res://scripts/game_state.gd"
 JournalManager="*res://scripts/journal_manager.gd"

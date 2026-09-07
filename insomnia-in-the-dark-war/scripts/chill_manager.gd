@@ -224,13 +224,19 @@ func _update_guitar_minigame(delta: float) -> void:
 		if p: p.set("speed", float(p.get("speed")) * 1.05)
 
 func _catch_note() -> void:
+	var hit = false
+	var lane_hit = 0
 	for i in range(guitar_notes.size()):
 		var n = guitar_notes[i]
 		if n.y > 140.0 and n.y < 180.0:
+			lane_hit = int(n.get("lane", 0))
 			guitar_notes.remove_at(i)
 			var hud = get_tree().get_first_node_in_group("hud")
 			if hud and hud.has_method("show_toast"): hud.call("show_toast", "🎵 Note Perfect!", 0.5, false)
-			return
+			hit = true
+			break
+	if has_node("/root/AudioDirector"):
+		AudioDirector.on_guitar_hit(lane_hit, hit)
 
 func _draw_guitar_notes() -> void:
 	# Diegetic: Guitar strings vibrating and lighting

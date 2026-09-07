@@ -57,9 +57,9 @@ func toggle_door() -> void:
 			art.queue_redraw()
 		, _swing_angle, 1.0 if is_open else 0.0, 0.4).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN_OUT)
 
-	var am: Node = get_tree().get_first_node_in_group("audio_manager")
+	var _am_placeholder = null
 	if am != null and am.has_method("play_sfx"):
-		am.call("play_sfx", "wood_creak")
+		AudioDirector.play_sfx("wood_creak")
 
 	var hud: Node = get_tree().get_first_node_in_group("hud")
 	if hud != null and hud.has_method("show_toast"):
@@ -138,9 +138,9 @@ func take_damage(amount: float) -> void:
 				art.queue_redraw()
 			, _swing_angle, 1.0, 0.2).set_trans(Tween.TRANS_BOUNCE).set_ease(Tween.EASE_OUT)
 			
-		var am: Node = get_tree().get_first_node_in_group("audio_manager")
+		var _am_placeholder = null
 		if am != null and am.has_method("play_sfx"):
-			am.call("play_sfx", "wall_break")
+			AudioDirector.play_sfx("wall_break")
 
 		var hud: Node = get_tree().get_first_node_in_group("hud")
 		if hud != null and hud.has_method("show_toast"):

@@ -39,7 +39,7 @@ func _spawn_break_fx() -> void:
 	particles.emitting = true
 	var am := get_tree().get_first_node_in_group("audio_manager")
 	if am != null:
-		am.call("play_sfx", "wall_break")
+		AudioDirector.play_sfx("wall_break")
 	var cam := get_tree().get_first_node_in_group("main_camera")
 	if cam != null and cam.has_method("trigger_shake"):
 		cam.call("trigger_shake", 12.0)

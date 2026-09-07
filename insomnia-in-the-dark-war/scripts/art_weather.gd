@@ -69,6 +69,9 @@ func set_weather(w_type: String) -> void:
 	weather_type = w_type
 	_reset_particles()
 	_apply_post_process()
+	if has_node("/root/AudioDirector"):
+		AudioDirector.set_weather(w_type)
+
 
 func _reset_particles() -> void:
 	if weather_type == "sunny":
@@ -212,6 +215,8 @@ func _process(delta: float) -> void:
 		if _lightning_timer <= 0.0:
 			_lightning_flash = 1.0
 			_lightning_timer = randf_range(12.0, 25.0)
+			if has_node("/root/AudioDirector"):
+				AudioDirector.trigger_thunder()
 		if _lightning_flash > 0.0:
 			_lightning_flash -= delta * 5.0
 	elif weather_type == "thick_fog":

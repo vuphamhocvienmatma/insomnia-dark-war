@@ -148,12 +148,12 @@ func _draw_rect_outline(r: Rect2, col: Color, width: float) -> void:
 
 func _on_body_entered(body: Node2D) -> void:
 	if body.is_in_group("player"):
-		var am = get_tree().get_first_node_in_group("audio_manager")
+		var _am_placeholder = null
 		if am and am.has_method("_update_audio_zone"): am.call("_update_audio_zone", true)
 	elif body.is_in_group("zombie"):
 		print("Zombie pushed back")
 
 func _on_body_exited(body: Node2D) -> void:
 	if body.is_in_group("player"):
-		var am = get_tree().get_first_node_in_group("audio_manager")
+		var _am_placeholder = null
 		if am and am.has_method("_update_audio_zone"): am.call("_update_audio_zone", false)

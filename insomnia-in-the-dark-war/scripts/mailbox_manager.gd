@@ -50,9 +50,9 @@ func get_current_unread() -> Dictionary:
 func receive_letter(letter: Dictionary) -> void:
 	unread_letters.append(letter)
 	mail_received.emit(letter)
-	var am: Node = get_tree().get_first_node_in_group("audio_manager")
+	var _am_placeholder = null
 	if am != null and am.has_method("play_sfx"):
-		am.call("play_sfx", "item_pickup")
+		AudioDirector.play_sfx("item_pickup")
 
 
 func claim_gift(letter_id: String) -> Dictionary:
