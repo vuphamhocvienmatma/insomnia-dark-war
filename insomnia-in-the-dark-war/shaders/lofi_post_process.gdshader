@@ -39,8 +39,7 @@ vec3 aces_tonemap(vec3 x) {
 void fragment() {
 	if (eco_mode) {
 		COLOR = texture(screen_texture, SCREEN_UV);
-		return;
-	}
+	} else {
 
 	vec2 uv = SCREEN_UV;
 	vec2 diff = uv - vec2(0.5);
@@ -90,4 +89,5 @@ void fragment() {
 	col = mix(col, col * (1.0 - vignette_opacity), vig * vignette_intensity * 2.0);
 
 	COLOR = vec4(col, 1.0);
+	}
 }
