@@ -70,6 +70,9 @@ func _unhandled_input(event: InputEvent) -> void:
 	if event is InputEventMouseButton:
 		var mb: InputEventMouseButton = event as InputEventMouseButton
 		if mb.is_pressed():
+			# Don't zoom if any mouse button is held (dragging items, etc.)
+			if Input.is_mouse_button_pressed(MOUSE_BUTTON_LEFT) or Input.is_mouse_button_pressed(MOUSE_BUTTON_RIGHT):
+				return
 			# Don't zoom if hovering over a UI control (scrollable panels, buttons, etc.)
 			var hovered = get_viewport().gui_get_hovered_control()
 			if hovered != null and (hovered is ScrollContainer or hovered is Button or hovered is Panel):

@@ -84,7 +84,10 @@ func _ready() -> void:
 	var level = get_node_or_null("/root/LevelSetup")
 	if level: level.add_child(guitar_area)
 
+var _fish_cooldown: float = 0.0
+
 func _process(delta: float) -> void:
+	_fish_cooldown = max(_fish_cooldown - delta, 0.0)
 	if not is_instance_valid(tm): return
 	var is_night: bool = false
 	if "is_night" in tm: is_night = tm.is_night
@@ -626,7 +629,9 @@ func _create_aquarium_ui() -> void:
 	add_child(aquarium_ui)
 
 func _on_fish() -> void:
+	if _fish_cooldown > 0.0: return
 	if GameState.relics_found.has("golden_fishing_rod"):
+		_fish_cooldown = 1.5
 		fish_count += 1
 		aquarium_ui.get_node("FishLbl").text = "Bể Cá Sa Mạc: " + str(fish_count)
 

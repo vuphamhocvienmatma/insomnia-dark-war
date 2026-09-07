@@ -13,6 +13,7 @@ var noise_time: float = 0.0
 var _update_timer: float = 0.0
 var _target_color: Color = COLOR_WARM_GOLD
 var _current_color: Color = COLOR_WARM_GOLD
+var _target_energy: float = 0.55
 
 func _ready() -> void:
 	shadow_enabled = false
@@ -44,7 +45,8 @@ func _process(delta: float) -> void:
 	color = _current_color
 
 	_update_timer += delta
-	if _update_timer >= 0.08:
+	if _update_timer >= 0.04:
 		_update_timer = 0.0
 		noise_time += delta * flicker_speed * 1.5
-		energy = base_energy + (noise.get_noise_1d(noise_time) * 0.25)
+		_target_energy = base_energy + (noise.get_noise_1d(noise_time) * 0.25)
+	energy = lerpf(energy, _target_energy, 8.0 * delta)

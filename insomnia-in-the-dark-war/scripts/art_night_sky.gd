@@ -48,7 +48,7 @@ func _process(delta: float) -> void:
 		i -= 1
 
 	_redraw_timer += delta
-	if _redraw_timer >= 0.05:
+	if _shooting_stars.size() > 0 or _redraw_timer >= 0.05:
 		_redraw_timer = 0.0
 		queue_redraw()
 

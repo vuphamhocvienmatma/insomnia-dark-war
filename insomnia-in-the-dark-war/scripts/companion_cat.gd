@@ -157,7 +157,7 @@ func _deliver_item() -> void:
 
 func _unhandled_input(event: InputEvent) -> void:
 	if target_player != null and is_instance_valid(target_player):
-		if event.is_action_pressed("interact") and global_position.distance_to(target_player.global_position) < 40.0:
+		if event.is_action_pressed("interact") and not is_being_pet and global_position.distance_to(target_player.global_position) < 40.0:
 			is_being_pet = true
 			pet_happiness = min(pet_happiness + 10.0, 100.0)
 			print("Vuốt ve mèo... purrr... Mood: ", pet_happiness)

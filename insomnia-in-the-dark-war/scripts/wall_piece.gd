@@ -16,6 +16,9 @@ func take_damage(amount: float) -> void:
 		art.call("set_health_ratio", current_health / max_health)
 	if current_health <= 0.0:
 		_spawn_break_fx()
+		for child in get_children():
+			if child is CollisionShape2D:
+				child.set_deferred("disabled", true)
 		queue_free()
 
 

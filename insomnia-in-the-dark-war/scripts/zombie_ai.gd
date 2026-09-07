@@ -245,6 +245,8 @@ func take_damage(amount: float) -> void:
 
 
 func _spawn_death_fx() -> void:
+	if GameState != null and GameState.eco_mode:
+		return
 	var particles := CPUParticles2D.new()
 	var parent := get_parent()
 	if parent != null:
